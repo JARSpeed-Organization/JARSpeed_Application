@@ -23,4 +23,4 @@ Ce projet est conduit avec en suivant une méthode Agile SCRUM. L'équipe de dé
 
 Voici l'ensemble des liens qui peuvent être utiles :
 - [Google Drive](https://drive.google.com/drive/folders/1IpAnSOIMVffRGjbrBUw9aLNlk-8IU0fO?usp=sharing)
-- [Board Github Project](https://github.com/users/SimonLAUNAY/projects/3/views/1)
+- [Board Github Project](https://github.com/users/SimonLAUNAY/projects/3)

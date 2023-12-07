@@ -1,0 +1,22 @@
+<resources>
+    <!-- Strings for Login Screen -->
+    <string name="app_name">JARSpeed</string>
+    <string name="email_hint">E-mail</string>
+    <string name="password_hint">Mot de passe</string>
+    <string name="login">Se connecter</string>
+    <string name="no_account">Pas de compte ?</string>
+    <string name="register">S\'inscrire</string>
+
+    <!-- Error messages and other strings -->
+    <string name="error_field_required">Ce champ est requis</string>
+    <string name="error_invalid_email">Cette adresse e-mail semble invalide</string>
+    <string name="error_invalid_password">Ce mot de passe est trop court</string>
+    <string name="error_incorrect_password">Ce mot de passe est incorrect</string>
+    <string name="error_network">Erreur de réseau</string>
+    <string name="action_sign_in_short">Connexion</string>
+    <string name="permission_rationale">L\'autorisation est nécessaire pour accéder à la fonctionnalité</string>
+
+    <!-- Other common strings -->
+    <string name="ok">OK</string>
+    <string name="cancel">Annuler</string>
+</resources>

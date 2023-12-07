@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Application"
+rootProject.name = "JARSpeed"
 include ':app'

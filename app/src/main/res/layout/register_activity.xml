@@ -9,7 +9,7 @@
     <RelativeLayout
         android:id="@+id/topSection"
         android:layout_width="match_parent"
-        android:layout_height="375dp"
+        android:layout_height="400dp"
         android:background="@drawable/top_background_gradient"
         android:paddingBottom="16dp">
 
@@ -27,28 +27,27 @@
         android:id="@+id/tvConnexion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/action_sign_in_short"
+        android:text="@string/action_sign_up_short"
         android:layout_above="@id/cardView"
         android:layout_centerHorizontal="true"
         android:textSize="40sp"
         android:textColor="@color/white"
-        android:layout_marginBottom="93dp"
+        android:layout_marginBottom="123dp"
         android:fontFamily="@font/righteous" />
 
     <!-- CardView for form elements -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
-        android:layout_width="326dp"
-        android:layout_height="280dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@id/topSection"
+        android:layout_marginTop="-120dp"
         android:layout_marginLeft="45dp"
-        android:layout_marginTop="-90dp"
         android:layout_marginRight="45dp"
         android:layout_marginBottom="30dp"
-        app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="35dp"
         app:cardElevation="10dp"
-        android:layout_centerHorizontal="true">
+        app:cardBackgroundColor="@color/white">
 
         <!-- LinearLayout for EditText elements -->
         <LinearLayout
@@ -57,70 +56,111 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <EditText
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:hint="@string/name_hint"
+                android:inputType="text"
+                android:drawableStart="@drawable/ic_user"
+                android:drawablePadding="10dp"
+                android:background="@drawable/edittext_background"
+                android:paddingLeft="14dp"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/righteous" />
+
+            <EditText
+                android:id="@+id/firstname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:hint="@string/firstname_hint"
+                android:inputType="text"
+                android:drawableStart="@drawable/ic_user"
+                android:drawablePadding="10dp"
+                android:background="@drawable/edittext_background"
+                android:paddingLeft="14dp"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/righteous" />
             <!-- Email EditText -->
             <EditText
                 android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/edittext_background"
-                android:drawableStart="@drawable/ic_email"
-                android:drawablePadding="10dp"
-                android:fontFamily="@font/righteous"
+                android:minHeight="48dp"
                 android:hint="@string/email_hint"
                 android:inputType="textEmailAddress"
-                android:minHeight="48dp"
-                android:paddingLeft="14dp" />
+                android:drawableStart="@drawable/ic_email"
+                android:drawablePadding="10dp"
+                android:background="@drawable/edittext_background"
+                android:paddingLeft="14dp"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/righteous" />
 
             <!-- Password EditText -->
             <EditText
                 android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:background="@drawable/edittext_background"
-                android:drawableStart="@drawable/ic_password"
-                android:drawablePadding="10dp"
-                android:fontFamily="@font/righteous"
+                android:minHeight="48dp"
                 android:hint="@string/password_hint"
                 android:inputType="textPassword"
+                android:drawableStart="@drawable/ic_password"
+                android:drawablePadding="10dp"
+                android:background="@drawable/edittext_background"
+                android:paddingLeft="14dp"
+                android:layout_marginBottom="24dp"
+                android:fontFamily="@font/righteous" />
+
+            <EditText
+                android:id="@+id/password_confirmation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:minHeight="48dp"
-                android:paddingLeft="14dp" />
+                android:hint="@string/password_confirmation_hint"
+                android:inputType="textPassword"
+                android:drawableStart="@drawable/ic_password"
+                android:drawablePadding="10dp"
+                android:background="@drawable/edittext_background"
+                android:paddingLeft="14dp"
+                android:layout_marginBottom="24dp"
+                android:fontFamily="@font/righteous" />
         </LinearLayout>
 
         <!-- RelativeLayout for Button and TextView -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="bottom"
-            android:paddingLeft="16dp"
+            android:paddingBottom="16dp"
             android:paddingTop="16dp"
+            android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:paddingBottom="16dp">
+            android:gravity="bottom">
 
             <!-- Login Button -->
             <Button
                 android:id="@+id/loginButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
                 android:background="@drawable/button_gradient"
-                android:fontFamily="@font/righteous"
-                android:minWidth="10dp"
-                android:minHeight="10dp"
+                android:text="@string/register"
+                android:textColor="@color/white"
                 android:paddingLeft="45dp"
-                android:paddingTop="10dp"
                 android:paddingRight="45dp"
+                android:paddingTop="10dp"
                 android:paddingBottom="10dp"
-                android:text="@string/login"
-                android:textColor="@color/white" />
+                android:minHeight="10dp"
+                android:minWidth="10dp"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="@font/righteous" />
 
             <!-- Container for the registration prompts -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/loginButton"
                 android:layout_centerHorizontal="true"
+                android:layout_below="@id/loginButton"
                 android:layout_marginTop="8dp"
                 android:orientation="horizontal">
 
@@ -129,19 +169,19 @@
                     android:id="@+id/tvNoAccount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/righteous"
-                    android:text="@string/no_account"
-                    android:textColor="@color/black" />
+                    android:text="@string/already_account"
+                    android:textColor="@color/black"
+                    android:fontFamily="@font/righteous" />
 
                 <!-- Register Action TextView -->
                 <TextView
                     android:id="@+id/registerPrompt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
+                    android:text="@string/loginRegister"
+                    android:textColor="@color/blue"
                     android:fontFamily="@font/righteous"
-                    android:text="@string/register"
-                    android:textColor="@color/blue" />
+                    android:layout_marginStart="4dp"/>
             </LinearLayout>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <!-- Colors for the login screen gradient -->
+    <color name="gradient_start">#FF4801</color> <!-- Or whatever your start color is -->
+    <color name="gradient_end">#C9000D</color>   <!-- Or whatever your end color is -->
+    <color name="gradient_button_start">#C9000D</color> <!-- Start color for button gradient -->
+    <color name="gradient_button_end">#FF4801</color>   <!-- End color for button gradient -->
+
+    <!-- Text colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#727272</color>
+    <color name="text_input_hint">#BEBEBE</color>
+    <color name="text_on_primary">#FFFFFF</color>
+
+    <!-- Other component colors -->
+    <color name="input_field">#FFFFFF</color>
+    <color name="input_field_shadow_start">#EFEFEF</color> <!-- For top edge inner shadow effect -->
+    <color name="input_field_shadow_end">#CCCCCC</color>   <!-- For top edge inner shadow effect -->
+
+    <!-- Button colors -->
+    <color name="button_text">#FFFFFF</color>
+    <color name="button_shadow">#BDBDBD</color>
+
+    <!-- Other UI colors -->
+    <color name="background">#F5F5F5</color>
+    <color name="divider">#BDBDBD</color>
+    <color name="gray">#D3D3D3</color>
+    <color name="blue">#1400FF</color>
+
+</resources>

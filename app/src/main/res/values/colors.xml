@@ -30,5 +30,6 @@
     <color name="divider">#BDBDBD</color>
     <color name="gray">#D3D3D3</color>
     <color name="blue">#1400FF</color>
+    <color name="error_red">#FF1100</color>
 
 </resources>

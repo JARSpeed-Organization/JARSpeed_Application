@@ -110,7 +110,7 @@
                 android:drawablePadding="10dp"
                 android:background="@drawable/edittext_background"
                 android:paddingLeft="14dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="16dp"
                 android:fontFamily="@font/righteous" />
 
             <EditText
@@ -140,7 +140,7 @@
 
             <!-- Login Button -->
             <Button
-                android:id="@+id/loginButton"
+                android:id="@+id/registerButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/button_gradient"
@@ -153,14 +153,15 @@
                 android:minHeight="10dp"
                 android:minWidth="10dp"
                 android:layout_centerHorizontal="true"
-                android:fontFamily="@font/righteous" />
+                android:fontFamily="@font/righteous"
+                android:onClick="onRegisterClick" />
 
             <!-- Container for the registration prompts -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_below="@id/loginButton"
+                android:layout_below="@id/registerButton"
                 android:layout_marginTop="8dp"
                 android:orientation="horizontal">
 
@@ -181,7 +182,8 @@
                     android:text="@string/loginRegister"
                     android:textColor="@color/blue"
                     android:fontFamily="@font/righteous"
-                    android:layout_marginStart="4dp"/>
+                    android:layout_marginStart="4dp"
+                    android:onClick="onRegisterClick"/>
             </LinearLayout>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

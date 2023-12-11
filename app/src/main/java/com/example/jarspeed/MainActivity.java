@@ -22,8 +22,8 @@ public class MainActivity extends AppCompatActivity {
         EditText emailEditText = findViewById(R.id.email);
         EditText passwordEditText = findViewById(R.id.password);
 
-        emailEditText.setHintTextColor(getResources().getColor(R.color.gray)); // Use ContextCompat.getColor if you support devices below API level 23
-        passwordEditText.setHintTextColor(getResources().getColor(R.color.gray)); // Use ContextCompat.getColor if you support devices below API level 23
+        emailEditText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));
+        passwordEditText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));
 
         TextView registerTextView = findViewById(R.id.registerPrompt);
         registerTextView.setOnClickListener(new View.OnClickListener() {

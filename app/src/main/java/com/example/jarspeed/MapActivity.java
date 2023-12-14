@@ -4,6 +4,9 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -43,7 +46,7 @@ public class MapActivity extends AppCompatActivity {
         mapView.setBuiltInZoomControls(true);
         mapView.setMultiTouchControls(true);
         mapController = mapView.getController();
-        mapController.setZoom(18.0);
+        mapController.setZoom(20.0);
 
         // Gestion de la localisation
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -76,6 +79,11 @@ public class MapActivity extends AppCompatActivity {
         Marker startMarker = new Marker(mapView);
         startMarker.setPosition(location);
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        // Redimensionner et définir l'icône personnalisée
+        Drawable icon = getResources().getDrawable(R.drawable.ic_direct_location, getApplicationContext().getTheme());
+        Bitmap bitmap = ((BitmapDrawable) icon).getBitmap();
+        Drawable resizedIcon = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 50, 50, true)); // Redimensionner à 50x50 pixels
+        startMarker.setIcon(resizedIcon);
         mapView.getOverlays().add(startMarker);
     }
 

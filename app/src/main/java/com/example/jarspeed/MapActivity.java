@@ -1,10 +1,13 @@
 package com.example.jarspeed;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -39,6 +42,16 @@ public class MapActivity extends AppCompatActivity {
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
+
+        ImageView profileButton = findViewById(R.id.imageViewProfile);
+        profileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Intent pour ouvrir la vue profil
+                Intent intent = new Intent(MapActivity.this, ProfilActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void initializeMapLocation() {

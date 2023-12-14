@@ -102,7 +102,7 @@
         <!-- Top border View -->
 
         <ImageView
-            android:id="@+id/homeButton"
+            android:id="@+id/returnProfil"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_chevron_left"

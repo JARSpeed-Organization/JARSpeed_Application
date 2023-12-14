@@ -28,7 +28,7 @@
 
         <!-- Profile Item -->
 
-        <TextView
+        <EditText
             android:id="@+id/profileItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,13 +38,16 @@
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
             android:padding="12dp"
-            android:text="@string/name_hint" />
+            android:text="@string/name_hint"
+            android:maxLines="1"
+            />
 
-        <TextView
+        <EditText
             android:id="@+id/routesItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/firstname_hint"
+            android:maxLines="1"
             android:drawableStart="@drawable/ic_profile_gradient"
             android:drawableEnd="@drawable/ic_pencil"
             android:drawablePadding="8dp"
@@ -52,11 +55,12 @@
             android:padding="12dp"
             android:background="@drawable/selectable_item_with_bottom_border"/>
 
-        <TextView
+        <EditText
             android:id="@+id/logoutItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/email_hint"
+            android:maxLines="1"
             android:drawableStart="@drawable/ic_email_gradient"
             android:drawableEnd="@drawable/ic_pencil"
             android:drawablePadding="17dp"
@@ -67,23 +71,24 @@
             android:paddingLeft="20dp"
             android:background="@drawable/selectable_item_with_bottom_border"/>
 
-        <TextView
+        <EditText
             android:id="@+id/deleteAccountItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/password_hint"
+            android:maxLines="1"
             android:drawableStart="@drawable/ic_locker_gradient"
             android:drawableEnd="@drawable/ic_pencil"
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
             android:padding="12dp"
             android:background="@drawable/selectable_item_with_bottom_border"/>
-        <!-- Delete Account Item -->
-        <TextView
+        <EditText
             android:id="@+id/dataBody"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/dataHealth"
+            android:maxLines="1"
             android:drawableStart="@drawable/ic_health_gradient"
             android:drawableEnd="@drawable/ic_pencil"
             android:drawablePadding="8dp"

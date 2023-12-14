@@ -10,7 +10,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        jcenter()  // En fonction de ce qui est déjà là
+        jcenter()
         maven { url 'https://jitpack.io' }
     }
 }

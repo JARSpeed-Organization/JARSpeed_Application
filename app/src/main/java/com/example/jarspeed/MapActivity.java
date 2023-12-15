@@ -27,7 +27,14 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
-public class MapActivity extends AppCompatActivity {
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+
+public class MapActivity extends AppCompatActivity implements SensorEventListener {
+    private SensorManager sensorManager;
+    private Sensor compass;
     private static final int REQUEST_LOCATION_PERMISSION = 1;
 
     private MapView mapView;
@@ -43,7 +50,11 @@ public class MapActivity extends AppCompatActivity {
         // Initialisation de la configuration d'OSMdroid
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
-
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        compass = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+        if (compass != null) {
+            sensorManager.registerListener(this, compass, SensorManager.SENSOR_DELAY_GAME);
+        }
         mapView = findViewById(R.id.map);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         mapView.setBuiltInZoomControls(true);
@@ -69,7 +80,7 @@ public class MapActivity extends AppCompatActivity {
 
     private void setupLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener, Looper.getMainLooper());
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 800, 1, locationListener, Looper.getMainLooper());
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (location != null) {
                 updateMarker(location);
@@ -120,5 +131,35 @@ public class MapActivity extends AppCompatActivity {
                 setupLocation();
             }
         }
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
+            // Obtenez l'angle de la boussole
+            float azimuth = event.values[0];
+
+            // Faites pivoter la carte en fonction de l'angle de la boussole
+            mapView.setMapOrientation(-azimuth);
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // Vous pouvez implémenter la gestion des changements de précision ici
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (compass != null) {
+            sensorManager.registerListener(this, compass, SensorManager.SENSOR_DELAY_GAME);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(this);
     }
 }

@@ -8,8 +8,10 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,6 +33,7 @@ public class MapActivity extends AppCompatActivity {
     private MapView mapView;
     private IMapController mapController;
     private LocationManager locationManager;
+    private Marker currentLocationMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,25 +69,47 @@ public class MapActivity extends AppCompatActivity {
 
     private void setupLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener, Looper.getMainLooper());
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (location != null) {
-                GeoPoint myLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
-                mapController.setCenter(myLocation);
-                addMarker(myLocation);
+                updateMarker(location);
             }
         }
     }
 
-    private void addMarker(GeoPoint location) {
-        Marker startMarker = new Marker(mapView);
-        startMarker.setPosition(location);
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        // Redimensionner et définir l'icône personnalisée
+    private final LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            updateMarker(location);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+        @Override
+        public void onProviderEnabled(String provider) {}
+
+        @Override
+        public void onProviderDisabled(String provider) {}
+    };
+
+    private void updateMarker(Location location) {
+        GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
+        if (currentLocationMarker == null) {
+            currentLocationMarker = new Marker(mapView);
+            currentLocationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            mapView.getOverlays().add(currentLocationMarker);
+        }
+        currentLocationMarker.setPosition(newLocation);
+        mapController.animateTo(newLocation);
+
+        // Configuration de l'icône du marqueur
         Drawable icon = getResources().getDrawable(R.drawable.ic_direct_location, getApplicationContext().getTheme());
         Bitmap bitmap = ((BitmapDrawable) icon).getBitmap();
         Drawable resizedIcon = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 50, 50, true)); // Redimensionner à 50x50 pixels
-        startMarker.setIcon(resizedIcon);
-        mapView.getOverlays().add(startMarker);
+        currentLocationMarker.setIcon(resizedIcon);
+
+        mapView.invalidate(); // Rafraîchir la carte
     }
 
     @Override

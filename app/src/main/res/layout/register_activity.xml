@@ -107,7 +107,7 @@
                 android:hint="@string/password_hint"
                 android:inputType="textPassword"
                 android:drawableStart="@drawable/ic_password"
-                android:drawablePadding="10dp"
+                android:drawablePadding="7dp"
                 android:background="@drawable/edittext_background"
                 android:paddingLeft="14dp"
                 android:layout_marginBottom="16dp"
@@ -121,7 +121,7 @@
                 android:hint="@string/password_confirmation_hint"
                 android:inputType="textPassword"
                 android:drawableStart="@drawable/ic_password"
-                android:drawablePadding="10dp"
+                android:drawablePadding="7dp"
                 android:background="@drawable/edittext_background"
                 android:paddingLeft="14dp"
                 android:layout_marginBottom="24dp"
@@ -183,7 +183,7 @@
                     android:textColor="@color/blue"
                     android:fontFamily="@font/righteous"
                     android:layout_marginStart="4dp"
-                    android:onClick="onRegisterClick"/>
+                    android:onClick="onLoginClick"/>
             </LinearLayout>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

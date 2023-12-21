@@ -31,17 +31,13 @@ public class RegisterActivity extends AppCompatActivity {
         passwordConfirmationEditText = findViewById(R.id.password_confirmation);
 
         setHintColors(nameEditText, firstnameEditText, emailEditText, passwordEditText, passwordConfirmationEditText);
-
-        TextView loginTextView = findViewById(R.id.registerPrompt);
-        loginTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent loginIntent = new Intent(RegisterActivity.this, MainActivity.class);
-                startActivity(loginIntent);
-            }
-        });
     }
 
+    public void onLoginClick(View view) {
+        // Démarrez login page ici
+        Intent loginIntent = new Intent(this, MainActivity.class);
+        startActivity(loginIntent);
+    }
     // This method is called when the register button is clicked
     public void onRegisterClick(View view) {
         resetFieldBorders();

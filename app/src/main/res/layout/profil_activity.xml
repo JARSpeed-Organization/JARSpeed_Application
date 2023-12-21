@@ -37,7 +37,8 @@
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
             android:padding="16dp"
-            android:background="@drawable/selectable_item_with_bottom_border"/>
+            android:background="@drawable/selectable_item_with_bottom_border"
+            android:onClick="onEditProfileClick"/>
 
         <!-- Routes Item -->
         <TextView
@@ -93,7 +94,8 @@
             android:src="@drawable/ic_home"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginStart="16dp"/>
+            android:layout_marginStart="16dp"
+            android:onClick="onHomeButtonClick"/>
 
         <ImageView
             android:id="@+id/profileButton"
@@ -102,7 +104,7 @@
             android:layout_marginEnd="16dp"
             android:src="@drawable/ic_profil"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </RelativeLayout>

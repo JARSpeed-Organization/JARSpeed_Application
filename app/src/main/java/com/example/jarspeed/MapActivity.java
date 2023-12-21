@@ -69,13 +69,12 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         } else {
             setupLocation();
         }
+    }
 
-        ImageView profileButton = findViewById(R.id.imageViewProfile);
-        profileButton.setOnClickListener(v -> {
-            // Intent pour ouvrir la vue profil
-            Intent intent = new Intent(MapActivity.this, ProfilActivity.class);
-            startActivity(intent);
-        });
+    // Méthode pour gérer le clic sur le bouton de profil
+    public void onProfileButtonClick(View view) {
+        Intent intent = new Intent(this, ProfilActivity.class);
+        startActivity(intent);
     }
 
     private void setupLocation() {

@@ -16,25 +16,14 @@ public class ProfilActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profil_activity);
+    }
 
-        // Ajoutez un OnClickListener pour le bouton home
-        ImageView homeButton = findViewById(R.id.homeButton);
-        TextView editProfil = findViewById(R.id.profileItem);
-        homeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Intent pour ouvrir la vue profil
-                Intent intent = new Intent(ProfilActivity.this, MapActivity.class);
-                startActivity(intent);
-            }
-        });
-        editProfil.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Intent pour ouvrir la vue edition profil
-                Intent intent = new Intent(ProfilActivity.this, EditProfilActivity.class);
-                startActivity(intent);
-            }
-        });
+    public void onHomeButtonClick(View view) {
+        Intent intent = new Intent(this, MapActivity.class);
+        startActivity(intent);
+    }
+    public void onEditProfileClick(View view) {
+        Intent intent = new Intent(this, EditProfilActivity.class);
+        startActivity(intent);
     }
 }

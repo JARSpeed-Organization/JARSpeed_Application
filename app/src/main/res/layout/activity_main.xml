@@ -80,7 +80,7 @@
                 android:layout_marginBottom="24dp"
                 android:background="@drawable/edittext_background"
                 android:drawableStart="@drawable/ic_password"
-                android:drawablePadding="10dp"
+                android:drawablePadding="7dp"
                 android:fontFamily="@font/righteous"
                 android:hint="@string/password_hint"
                 android:inputType="textPassword"
@@ -113,7 +113,8 @@
                 android:paddingRight="45dp"
                 android:paddingBottom="10dp"
                 android:text="@string/login"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:onClick="onLoginClick"/>
 
             <!-- Container for the registration prompts -->
             <LinearLayout
@@ -141,7 +142,8 @@
                     android:layout_marginStart="4dp"
                     android:fontFamily="@font/righteous"
                     android:text="@string/register"
-                    android:textColor="@color/blue" />
+                    android:textColor="@color/blue"
+                    android:onClick="onRegisterClick"/>
             </LinearLayout>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

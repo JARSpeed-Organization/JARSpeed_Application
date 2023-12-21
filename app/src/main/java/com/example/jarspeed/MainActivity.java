@@ -6,12 +6,7 @@ import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.UnderlineSpan;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -28,24 +23,18 @@ public class MainActivity extends AppCompatActivity {
 
         emailEditText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));
         passwordEditText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));
+    }
 
-        TextView registerTextView = findViewById(R.id.registerPrompt);
-        registerTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent registerIntent = new Intent(MainActivity.this, RegisterActivity.class);
-                startActivity(registerIntent);
-            }
-        });
+    // Méthode pour la gestion du clic sur le bouton d'inscription
+    public void onRegisterClick(View view) {
+        Intent registerIntent = new Intent(this, RegisterActivity.class);
+        startActivity(registerIntent);
+    }
 
-        Button loginButton = findViewById(R.id.loginButton);
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Démarrez MapActivity ici
-                Intent mapIntent = new Intent(MainActivity.this, MapActivity.class);
-                startActivity(mapIntent);
-            }
-        });
+    // Méthode pour la gestion du clic sur le bouton de connexion
+    public void onLoginClick(View view) {
+        // Démarrez MapActivity ici
+        Intent mapIntent = new Intent(this, MapActivity.class);
+        startActivity(mapIntent);
     }
 }

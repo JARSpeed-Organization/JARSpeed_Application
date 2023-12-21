@@ -27,6 +27,7 @@
     <!-- Other common strings -->
     <string name="ok">OK</string>
     <string name="cancel">Annuler</string>
+    <string name="confirm">Confirmer</string>
 
     <!-- Strings for Profil Screen -->
     <string name="myProfil">Mon profil</string>

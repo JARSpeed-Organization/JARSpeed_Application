@@ -39,4 +39,7 @@
     <!-- Strings for Edit Profil Screen -->
     <string name="dataHealth">Données corporelles</string>
     <string name="editTextOldPassword">Ancien mot de passe</string>
+    <string name="newNameHint">Nouveau nom</string>
+    <string name="newFirstNameHint">Nouveau prénom</string>
+    <string name="newEmailHint">Nouveau mail</string>
 </resources>

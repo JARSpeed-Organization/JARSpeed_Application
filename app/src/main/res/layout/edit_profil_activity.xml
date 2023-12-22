@@ -29,7 +29,7 @@
         <!-- Profile Item -->
 
         <EditText
-            android:id="@+id/profileItem"
+            android:id="@+id/nameItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/selectable_item_with_bottom_border"
@@ -40,10 +40,13 @@
             android:padding="12dp"
             android:text="@string/name_hint"
             android:maxLines="1"
-            />
+            android:focusable="false"
+            android:clickable="true"
+            android:cursorVisible="false"
+            android:onClick="onGenericEditClick" />
 
         <EditText
-            android:id="@+id/routesItem"
+            android:id="@+id/firstNameItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/firstname_hint"
@@ -53,10 +56,14 @@
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
             android:padding="12dp"
-            android:background="@drawable/selectable_item_with_bottom_border"/>
+            android:background="@drawable/selectable_item_with_bottom_border"
+            android:focusable="false"
+            android:clickable="true"
+            android:cursorVisible="false"
+            android:onClick="onGenericEditClick"/>
 
         <EditText
-            android:id="@+id/logoutItem"
+            android:id="@+id/emailItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/email_hint"
@@ -69,7 +76,11 @@
             android:paddingBottom="19dp"
             android:paddingRight="12dp"
             android:paddingLeft="20dp"
-            android:background="@drawable/selectable_item_with_bottom_border"/>
+            android:background="@drawable/selectable_item_with_bottom_border"
+            android:focusable="false"
+            android:clickable="true"
+            android:cursorVisible="false"
+            android:onClick="onGenericEditClick"/>
 
         <EditText
             android:id="@+id/oldPassword"

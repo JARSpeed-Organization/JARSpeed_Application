@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+import com.example.jarspeed.R;
+
 
 public class EditProfilActivity extends AppCompatActivity {
 
@@ -94,4 +96,72 @@ public class EditProfilActivity extends AppCompatActivity {
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
     }
+
+    public void onGenericEditClick(View view) {
+        // Assombrir l'arrière-plan
+        final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+        final Drawable originalBackground = rootView.getBackground();
+        final WindowManager.LayoutParams params = getWindow().getAttributes();
+        final EditText targetEditText = (EditText) view; // Conserver une référence au EditText cliqué
+
+        params.alpha = 0.2f;
+        getWindow().setAttributes(params);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.generic_edit_dialog, null);
+        builder.setView(dialogView);
+
+        EditText editTextGeneric = dialogView.findViewById(R.id.editTextGeneric);
+        Button buttonCancel = dialogView.findViewById(R.id.buttonCancelGeneric);
+        Button buttonConfirm = dialogView.findViewById(R.id.buttonConfirmGeneric);
+        boolean isEmailField = view.getId() == R.id.emailItem;
+
+        String typeModification = "";
+        // Configurez le hint de l'EditText en fonction du type de modification
+        if (view.getId() == R.id.nameItem) {
+            editTextGeneric.setHint("Nouveau nom");
+            typeModification = "name";
+        } else if (view.getId() == R.id.firstNameItem) {
+            editTextGeneric.setHint("Nouveau prénom");
+            typeModification = "firstname";
+        } else {
+            editTextGeneric.setHint("Nouvel email");
+            typeModification = "email";
+        }
+        AlertDialog dialog = builder.create();
+
+        buttonCancel.setOnClickListener(v -> {
+            dialog.dismiss();
+            params.alpha = 1.0f;
+            getWindow().setAttributes(params);
+        });
+
+        buttonConfirm.setOnClickListener(v -> {
+            String newValue = editTextGeneric.getText().toString().trim();
+            if (!newValue.isEmpty()) {
+                if (isEmailField && !ValidationUtils.isValidEmail(newValue)) {
+                    Toast.makeText(this, "Format de l'email invalide.", Toast.LENGTH_LONG).show();
+                    editTextGeneric.setError("Format de l'email invalide");
+                    return;
+                }
+                // Mettre à jour la valeur du EditText concerné
+                targetEditText.setText(newValue);
+                // TODO: Mettre à jour la valeur dans l'API pour l'utilisateur
+                dialog.dismiss();
+            } else {
+                Toast.makeText(this, "Veuillez entrer une valeur valide.", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        dialog.setOnDismissListener(d -> {
+            rootView.setBackground(originalBackground);
+            params.alpha = 1.0f;
+            getWindow().setAttributes(params);
+        });
+
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
+    }
+
+
 }

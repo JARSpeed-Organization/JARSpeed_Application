@@ -72,7 +72,7 @@ public class EditProfilActivity extends AppCompatActivity {
                 return;
             }
 
-            if (isValidPassword(password) && password.equals(confirmPassword)) {
+            if (ValidationUtils.isValidPassword(password) && password.equals(confirmPassword)) {
                 // TODO: Insérez ici la logique pour changer le mot de passe
                 // ...
                 dialog.dismiss();
@@ -93,11 +93,5 @@ public class EditProfilActivity extends AppCompatActivity {
 
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
-    }
-
-    // Réutilisez la méthode isValidPassword de votre RegisterActivity ici.
-    private boolean isValidPassword(String password) {
-        String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>])[A-Za-z\\d!@#$%^&*(),.?\":{}|<>]{8,}$";
-        return password.matches(passwordRegex);
     }
 }

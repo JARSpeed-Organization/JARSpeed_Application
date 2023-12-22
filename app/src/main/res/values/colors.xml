@@ -32,5 +32,6 @@
     <color name="blue">#1400FF</color>
     <color name="error_red">#FF1100</color>
     <color name="polyline_color">#FF1100</color>
+    <color name="transparent">#00FFFFFF</color>
 
 </resources>

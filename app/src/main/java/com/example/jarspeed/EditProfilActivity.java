@@ -43,6 +43,8 @@ public class EditProfilActivity extends AppCompatActivity {
         View dialogView = getLayoutInflater().inflate(R.layout.password_dialog, null);
         builder.setView(dialogView);
 
+        // Edits texts de la popup
+        EditText editTextOldPassword = dialogView.findViewById(R.id.editTextOldPassword);
         EditText editTextPassword = dialogView.findViewById(R.id.editTextPassword);
         EditText editTextConfirmPassword = dialogView.findViewById(R.id.editTextConfirmPassword);
         Button buttonCancel = dialogView.findViewById(R.id.buttonCancel);
@@ -57,10 +59,21 @@ public class EditProfilActivity extends AppCompatActivity {
             getWindow().setAttributes(params);
         });
         buttonConfirm.setOnClickListener(v -> {
+            String oldPassword = editTextOldPassword.getText().toString();
             String password = editTextPassword.getText().toString();
             String confirmPassword = editTextConfirmPassword.getText().toString();
+
+            // TODO: Récupérez l'ancien mot de passe de l'utilisateur depuis la base de données ou le système de gestion des utilisateurs.
+            String userCurrentPassword = "admin"; // bouchon : à remplacer par la valeur récupérée dans l'API ou autre
+
+            if (!oldPassword.equals(userCurrentPassword)) {
+                Toast.makeText(this, "L'ancien mot de passe est incorrect.", Toast.LENGTH_LONG).show();
+                editTextOldPassword.setError("Ancien mot de passe incorrect");
+                return;
+            }
+
             if (isValidPassword(password) && password.equals(confirmPassword)) {
-                // Insérez ici la logique pour changer le mot de passe
+                // TODO: Insérez ici la logique pour changer le mot de passe
                 // ...
                 dialog.dismiss();
             } else {

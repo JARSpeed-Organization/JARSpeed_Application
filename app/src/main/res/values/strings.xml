@@ -4,7 +4,7 @@
     <string name="name_hint">Nom</string>
     <string name="firstname_hint">Prénom</string>
     <string name="email_hint">E-mail</string>
-    <string name="password_hint">Mot de passe</string>
+    <string name="password_hint">Nouveau mot de passe</string>
     <string name="password_confirmation_hint">Confirmer mot de passe</string>
     <string name="login">Se connecter</string>
     <string name="no_account">Pas de compte ?</string>
@@ -38,4 +38,5 @@
 
     <!-- Strings for Edit Profil Screen -->
     <string name="dataHealth">Données corporelles</string>
+    <string name="editTextOldPassword">Ancien mot de passe</string>
 </resources>

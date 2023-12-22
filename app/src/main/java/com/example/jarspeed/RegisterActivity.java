@@ -1,5 +1,11 @@
 package com.example.jarspeed;
 
+import static com.example.jarspeed.ValidationUtils.isEmpty;
+import static com.example.jarspeed.ValidationUtils.isValidEmail;
+import static com.example.jarspeed.ValidationUtils.isValidPassword;
+import static com.example.jarspeed.ValidationUtils.resetFieldBorders;
+import static com.example.jarspeed.ValidationUtils.setErrorBorder;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -40,7 +46,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
     // This method is called when the register button is clicked
     public void onRegisterClick(View view) {
-        resetFieldBorders();
+        resetFieldBorders(this);
         if (validateFields()) {
             // All fields are valid, proceed to the home activity
             Intent homeIntent = new Intent(RegisterActivity.this, MainActivity.class);
@@ -53,32 +59,32 @@ public class RegisterActivity extends AppCompatActivity {
         boolean isValid = true;
 
         // Reset all edits text fields borders.
-        resetFieldBorders(nameEditText, firstnameEditText, emailEditText, passwordEditText, passwordConfirmationEditText);
+        resetFieldBorders(this, nameEditText, firstnameEditText, emailEditText, passwordEditText, passwordConfirmationEditText);
 
         // Check not empty field
         if (isEmpty(nameEditText)) {
-            setErrorBorder(nameEditText);
+            setErrorBorder(this, nameEditText);
             isValid = false;
         }
 
         if (isEmpty(firstnameEditText)) {
-            setErrorBorder(firstnameEditText);
+            setErrorBorder(this, firstnameEditText);
             isValid = false;
         }
 
         boolean emailInvalid = isEmpty(emailEditText) || !isValidEmail(emailEditText.getText().toString());
         if (emailInvalid) {
-            setErrorBorder(emailEditText);
+            setErrorBorder(this, emailEditText);
             isValid = false;
         }
 
         if (isEmpty(passwordEditText)) {
-            setErrorBorder(passwordEditText);
+            setErrorBorder(this, passwordEditText);
             isValid = false;
         }
 
         if (isEmpty(passwordConfirmationEditText)) {
-            setErrorBorder(passwordConfirmationEditText);
+            setErrorBorder(this, passwordConfirmationEditText);
             isValid = false;
         }
 
@@ -95,14 +101,14 @@ public class RegisterActivity extends AppCompatActivity {
         }
         // Check Strength password
         if (!isValidPassword(passwordEditText.getText().toString())) {
-            setErrorBorder(passwordEditText);
+            setErrorBorder(this, passwordEditText);
             Toast.makeText(this, "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule et un caractère spécial", Toast.LENGTH_LONG).show();
             isValid = false;
         }
         // check passwords
         if (!passwordEditText.getText().toString().equals(passwordConfirmationEditText.getText().toString())) {
-            setErrorBorder(passwordEditText);
-            setErrorBorder(passwordConfirmationEditText);
+            setErrorBorder(this, passwordEditText);
+            setErrorBorder(this, passwordConfirmationEditText);
             Toast.makeText(this, "Veuillez saisir deux mots de passe identiques", Toast.LENGTH_LONG).show();
             return false;
         }
@@ -110,59 +116,9 @@ public class RegisterActivity extends AppCompatActivity {
         return isValid;
     }
 
-    // Method to check email format
-    private boolean isValidEmail(String email) {
-        String emailRegex = "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
-        return email.matches(emailRegex);
-    }
-
-    // Check password strength
-    private boolean isValidPassword(String password) {
-        String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>])[A-Za-z\\d!@#$%^&*(),.?\":{}|<>]{8,}$";
-        return password.matches(passwordRegex);
-    }
-
-
-    // Checks if an EditText is empty
-    private boolean isEmpty(EditText editText) {
-        return editText.getText().toString().trim().isEmpty();
-    }
-
     private void setHintColors(EditText... editsText) {
         for (EditText editText : editsText) {
             editText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));
         }
     }
-
-    // Sets an error border for invalid EditText fields
-    private void setErrorBorder(EditText editText) {
-        int paddingLeft = editText.getPaddingLeft();
-        int paddingTop = editText.getPaddingTop();
-        int paddingRight = editText.getPaddingRight();
-        int paddingBottom = editText.getPaddingBottom();
-        // New background error
-        editText.setBackground(ContextCompat.getDrawable(this, R.drawable.edittext_error_border));
-        editText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));
-
-
-        // Re apply paddings
-        editText.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
-    }
-
-
-    // Resets the borders and hint text color of EditText fields
-    private void resetFieldBorders(EditText... editTexts) {
-        for (EditText editText : editTexts) {
-            int paddingLeft = editText.getPaddingLeft();
-            int paddingTop = editText.getPaddingTop();
-            int paddingRight = editText.getPaddingRight();
-            int paddingBottom = editText.getPaddingBottom();
-            editText.setBackground(ContextCompat.getDrawable(this, R.drawable.edittext_background));
-            editText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));
-            editText.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
-
-        }
-    }
-
-
 }

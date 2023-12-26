@@ -1,4 +1,4 @@
-package com.example.jarspeed;
+package fr.iutrodez.jarspeed;
 
 import android.Manifest;
 import android.content.Context;
@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.view.View;
-import android.widget.ImageView;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -31,6 +30,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+
+import com.example.jarspeed.R;
 
 public class MapActivity extends AppCompatActivity implements SensorEventListener {
     private SensorManager sensorManager;

@@ -1,4 +1,4 @@
-package com.example.jarspeed;
+package fr.iutrodez.jarspeed;
 
 import android.content.Context;
 

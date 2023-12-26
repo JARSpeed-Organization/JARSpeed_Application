@@ -1,14 +1,12 @@
-package com.example.jarspeed;
+package fr.iutrodez.jarspeed;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.w3c.dom.Text;
+import com.example.jarspeed.R;
 
 public class ProfilActivity extends AppCompatActivity {
 

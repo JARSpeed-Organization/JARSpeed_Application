@@ -1,8 +1,10 @@
-package com.example.jarspeed;
+package fr.iutrodez.jarspeed;
 
 import android.content.Context;
 import android.widget.EditText;
 import androidx.core.content.ContextCompat;
+
+import com.example.jarspeed.R;
 
 public class ValidationUtils {
 

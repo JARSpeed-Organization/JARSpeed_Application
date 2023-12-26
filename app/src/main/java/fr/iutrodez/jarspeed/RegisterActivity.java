@@ -1,10 +1,4 @@
-package com.example.jarspeed;
-
-import static com.example.jarspeed.ValidationUtils.isEmpty;
-import static com.example.jarspeed.ValidationUtils.isValidEmail;
-import static com.example.jarspeed.ValidationUtils.isValidPassword;
-import static com.example.jarspeed.ValidationUtils.resetFieldBorders;
-import static com.example.jarspeed.ValidationUtils.setErrorBorder;
+package fr.iutrodez.jarspeed;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -13,8 +7,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.jarspeed.R;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -46,7 +41,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
     // This method is called when the register button is clicked
     public void onRegisterClick(View view) {
-        resetFieldBorders(this);
+        ValidationUtils.resetFieldBorders(this);
         if (validateFields()) {
             // All fields are valid, proceed to the home activity
             Intent homeIntent = new Intent(RegisterActivity.this, MainActivity.class);
@@ -59,37 +54,37 @@ public class RegisterActivity extends AppCompatActivity {
         boolean isValid = true;
 
         // Reset all edits text fields borders.
-        resetFieldBorders(this, nameEditText, firstnameEditText, emailEditText, passwordEditText, passwordConfirmationEditText);
+        ValidationUtils.resetFieldBorders(this, nameEditText, firstnameEditText, emailEditText, passwordEditText, passwordConfirmationEditText);
 
         // Check not empty field
-        if (isEmpty(nameEditText)) {
-            setErrorBorder(this, nameEditText);
+        if (ValidationUtils.isEmpty(nameEditText)) {
+            ValidationUtils.setErrorBorder(this, nameEditText);
             isValid = false;
         }
 
-        if (isEmpty(firstnameEditText)) {
-            setErrorBorder(this, firstnameEditText);
+        if (ValidationUtils.isEmpty(firstnameEditText)) {
+            ValidationUtils.setErrorBorder(this, firstnameEditText);
             isValid = false;
         }
 
-        boolean emailInvalid = isEmpty(emailEditText) || !isValidEmail(emailEditText.getText().toString());
+        boolean emailInvalid = ValidationUtils.isEmpty(emailEditText) || !ValidationUtils.isValidEmail(emailEditText.getText().toString());
         if (emailInvalid) {
-            setErrorBorder(this, emailEditText);
+            ValidationUtils.setErrorBorder(this, emailEditText);
             isValid = false;
         }
 
-        if (isEmpty(passwordEditText)) {
-            setErrorBorder(this, passwordEditText);
+        if (ValidationUtils.isEmpty(passwordEditText)) {
+            ValidationUtils.setErrorBorder(this, passwordEditText);
             isValid = false;
         }
 
-        if (isEmpty(passwordConfirmationEditText)) {
-            setErrorBorder(this, passwordConfirmationEditText);
+        if (ValidationUtils.isEmpty(passwordConfirmationEditText)) {
+            ValidationUtils.setErrorBorder(this, passwordConfirmationEditText);
             isValid = false;
         }
 
         // If email is the only invalid field
-        if (emailInvalid && !isEmpty(nameEditText) && !isEmpty(firstnameEditText) && !isEmpty(passwordEditText) && !isEmpty(passwordConfirmationEditText)) {
+        if (emailInvalid && !ValidationUtils.isEmpty(nameEditText) && !ValidationUtils.isEmpty(firstnameEditText) && !ValidationUtils.isEmpty(passwordEditText) && !ValidationUtils.isEmpty(passwordConfirmationEditText)) {
             Toast.makeText(this, "Format email non respecté", Toast.LENGTH_LONG).show();
             return false;
         }
@@ -100,15 +95,15 @@ public class RegisterActivity extends AppCompatActivity {
             return false;
         }
         // Check Strength password
-        if (!isValidPassword(passwordEditText.getText().toString())) {
-            setErrorBorder(this, passwordEditText);
+        if (!ValidationUtils.isValidPassword(passwordEditText.getText().toString())) {
+            ValidationUtils.setErrorBorder(this, passwordEditText);
             Toast.makeText(this, "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule et un caractère spécial", Toast.LENGTH_LONG).show();
             isValid = false;
         }
         // check passwords
         if (!passwordEditText.getText().toString().equals(passwordConfirmationEditText.getText().toString())) {
-            setErrorBorder(this, passwordEditText);
-            setErrorBorder(this, passwordConfirmationEditText);
+            ValidationUtils.setErrorBorder(this, passwordEditText);
+            ValidationUtils.setErrorBorder(this, passwordConfirmationEditText);
             Toast.makeText(this, "Veuillez saisir deux mots de passe identiques", Toast.LENGTH_LONG).show();
             return false;
         }

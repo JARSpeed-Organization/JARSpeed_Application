@@ -1,4 +1,4 @@
-package com.example.jarspeed;
+package fr.iutrodez.jarspeed;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -8,7 +8,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
+
+import com.example.jarspeed.R;
 
 public class MainActivity extends AppCompatActivity {
 

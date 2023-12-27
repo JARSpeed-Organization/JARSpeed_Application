@@ -38,8 +38,8 @@
     <!-- CardView for form elements -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="326dp"
+        android:layout_height="500dp"
         android:layout_below="@id/topSection"
         android:layout_marginTop="-120dp"
         android:layout_marginLeft="45dp"
@@ -47,7 +47,8 @@
         android:layout_marginBottom="30dp"
         app:cardCornerRadius="35dp"
         app:cardElevation="10dp"
-        app:cardBackgroundColor="@color/white">
+        app:cardBackgroundColor="@color/white"
+        android:layout_centerHorizontal="true">
 
         <!-- LinearLayout for EditText elements -->
         <LinearLayout

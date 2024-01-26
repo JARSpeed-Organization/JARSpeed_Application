@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.jarspeed.R;
@@ -151,6 +152,46 @@ public class EditProfilActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Veuillez entrer une valeur valide.", Toast.LENGTH_LONG).show();
             }
+        });
+
+        dialog.setOnDismissListener(d -> {
+            rootView.setBackground(originalBackground);
+            params.alpha = 1.0f;
+            getWindow().setAttributes(params);
+        });
+
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
+    }
+
+    public void onChangeHealthData(View view) {
+        final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+        final Drawable originalBackground = rootView.getBackground();
+        final WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.alpha = 0.2f;
+        getWindow().setAttributes(params);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.health_data_dialog, null);
+        builder.setView(dialogView);
+
+        EditText editTextAge = dialogView.findViewById(R.id.editTextAge);
+        Spinner spinnerGender = dialogView.findViewById(R.id.spinnerGender);
+        EditText editTextWeight = dialogView.findViewById(R.id.editTextWeight);
+        Button buttonCancel = dialogView.findViewById(R.id.buttonCancelHealthData);
+        Button buttonConfirm = dialogView.findViewById(R.id.buttonConfirmHealthData);
+
+        AlertDialog dialog = builder.create();
+
+        buttonCancel.setOnClickListener(v -> {
+            dialog.dismiss();
+            params.alpha = 1.0f;
+            getWindow().setAttributes(params);
+        });
+        buttonConfirm.setOnClickListener(v -> {
+            // Récupérer et valider les données saisies par l'utilisateur
+            // TODO: Mettre à jour les données de l'utilisateur dans l'API ou la base de données
+            dialog.dismiss();
         });
 
         dialog.setOnDismissListener(d -> {

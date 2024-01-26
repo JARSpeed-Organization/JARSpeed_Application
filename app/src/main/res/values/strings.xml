@@ -42,4 +42,9 @@
     <string name="newNameHint">Nouveau nom</string>
     <string name="newFirstNameHint">Nouveau prénom</string>
     <string name="newEmailHint">Nouveau mail</string>
+    <string name="newAgeHint">Age</string>
+    <string name="newWeightHint">Nouveau poids</string>
+
+    <string name="preference_file_key">my_preference_file_key</string>
+    <string name="saved_token">saved_token</string>
 </resources>

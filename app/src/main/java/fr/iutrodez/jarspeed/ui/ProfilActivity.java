@@ -1,4 +1,4 @@
-package fr.iutrodez.jarspeed;
+package fr.iutrodez.jarspeed.ui;
 
 import android.content.Intent;
 import android.os.Bundle;

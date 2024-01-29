@@ -1,4 +1,4 @@
-package fr.iutrodez.jarspeed;
+package fr.iutrodez.jarspeed.utils;
 
 import android.content.Context;
 import android.widget.EditText;

@@ -1,4 +1,4 @@
-package fr.iutrodez.jarspeed;
+package fr.iutrodez.jarspeed.ui;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +16,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.jarspeed.R;
+
+import fr.iutrodez.jarspeed.utils.ValidationUtils;
 
 
 public class EditProfilActivity extends AppCompatActivity {

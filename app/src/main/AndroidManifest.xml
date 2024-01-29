@@ -21,10 +21,10 @@
         android:usesCleartextTraffic="true"
         >
         <activity
-            android:name="fr.iutrodez.jarspeed.EditProfilActivity"
+            android:name="fr.iutrodez.jarspeed.ui.EditProfilActivity"
             android:exported="false" />
         <activity
-            android:name="fr.iutrodez.jarspeed.MainActivity"
+            android:name="fr.iutrodez.jarspeed.ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,9 +32,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="fr.iutrodez.jarspeed.RegisterActivity" />
-        <activity android:name="fr.iutrodez.jarspeed.MapActivity" />
-        <activity android:name="fr.iutrodez.jarspeed.ProfilActivity" />
+        <activity android:name="fr.iutrodez.jarspeed.ui.RegisterActivity" />
+        <activity android:name="fr.iutrodez.jarspeed.ui.MapActivity" />
+        <activity android:name="fr.iutrodez.jarspeed.ui.ProfilActivity" />
     </application>
 
 </manifest>

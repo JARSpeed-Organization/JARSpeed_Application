@@ -1,15 +1,24 @@
-package fr.iutrodez.jarspeed;
+package fr.iutrodez.jarspeed.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.example.jarspeed.R;
+
+import java.nio.charset.StandardCharsets;
+
+import fr.iutrodez.jarspeed.model.UserRegistrationRequest;
+import fr.iutrodez.jarspeed.network.ApiUtils;
+import fr.iutrodez.jarspeed.utils.ValidationUtils;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -41,13 +50,39 @@ public class RegisterActivity extends AppCompatActivity {
     }
     // This method is called when the register button is clicked
     public void onRegisterClick(View view) {
-        ValidationUtils.resetFieldBorders(this);
         if (validateFields()) {
-            // All fields are valid, proceed to the home activity
-            Intent homeIntent = new Intent(RegisterActivity.this, MainActivity.class);
-            startActivity(homeIntent);
-            finish();
+            String name = nameEditText.getText().toString();
+            String firstname = firstnameEditText.getText().toString();
+            String email = emailEditText.getText().toString();
+            String password = passwordEditText.getText().toString();
+
+            UserRegistrationRequest registrationRequest = new UserRegistrationRequest(name, firstname, email, password);
+
+            ApiUtils.registerUser(this, registrationRequest, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Toast.makeText(RegisterActivity.this, "Inscription réussie", Toast.LENGTH_SHORT).show();
+                    goToLoginActivity();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String errorMsg = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        Toast.makeText(RegisterActivity.this, "Erreur d'inscription : " + errorMsg, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(RegisterActivity.this, "Erreur de connexion", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
+    }
+
+    private void goToLoginActivity() {
+        Intent loginIntent = new Intent(this, MainActivity.class);
+        loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(loginIntent);
+        finish();
     }
 
     private boolean validateFields() {

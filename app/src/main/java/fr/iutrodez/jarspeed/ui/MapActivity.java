@@ -32,6 +32,11 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import com.example.jarspeed.R;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 
 public class MapActivity extends AppCompatActivity implements SensorEventListener {
     private SensorManager sensorManager;
@@ -40,8 +45,28 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
 
     private MapView mapView;
     private IMapController mapController;
-    private LocationManager locationManager;
+    private FusedLocationProviderClient fusedLocationClient;
     private Marker currentLocationMarker;
+
+    private LocationRequest createLocationRequest() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000); // Mise à jour de la position toutes les 10 secondes
+        locationRequest.setFastestInterval(5000); // Mise à jour la plus rapide acceptée
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        return locationRequest;
+    }
+
+    private LocationCallback locationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            if (locationResult == null) {
+                return;
+            }
+            for (Location location : locationResult.getLocations()) {
+                updateMarker(location);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,12 +89,21 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         mapController.setZoom(20.0);
 
         // Gestion de la localisation
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
         } else {
             setupLocation();
+            startLocationUpdates();
         }
+    }
+
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Vérifiez si l'autorisation a été accordée
+            return;
+        }
+        fusedLocationClient.requestLocationUpdates(createLocationRequest(), locationCallback, Looper.getMainLooper());
     }
 
     // Méthode pour gérer le clic sur le bouton de profil
@@ -80,29 +114,17 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
 
     private void setupLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 800, 1, locationListener, Looper.getMainLooper());
-            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (location != null) {
-                updateMarker(location);
-            }
+            fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener(this, location -> {
+                    if (location != null) {
+                        updateMarker(location);
+                    }
+                })
+                .addOnFailureListener(this, e -> {
+                    // Gérez l'échec ici
+                });
         }
     }
-
-    private final LocationListener locationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-            updateMarker(location);
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {}
-
-        @Override
-        public void onProviderEnabled(String provider) {}
-
-        @Override
-        public void onProviderDisabled(String provider) {}
-    };
 
     private void updateMarker(Location location) {
         GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
@@ -162,4 +184,6 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         super.onPause();
         sensorManager.unregisterListener(this);
     }
+
+    // TODO Arret recuperer position quand arret application
 }

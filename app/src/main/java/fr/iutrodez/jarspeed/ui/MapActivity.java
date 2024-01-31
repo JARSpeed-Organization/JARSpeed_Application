@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
@@ -15,6 +17,7 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.view.View;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,8 +36,12 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.jarspeed.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -46,6 +53,8 @@ import com.google.android.gms.maps.model.Polygon;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import fr.iutrodez.jarspeed.utils.ValidationUtils;
 
 /**
  * The type Map activity.
@@ -180,6 +189,40 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         if (isOngoing) {
             if (isStarted) {
                 // TODO afficher 2 boutons reprendre ou stopper
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                View dialogView = getLayoutInflater().inflate(R.layout.popup_pause, null);
+                builder.setView(dialogView);
+
+                TextView textViewTextGeneric = dialogView.findViewById(R.id.pauseTextView);
+                textViewTextGeneric.setText("Voulez-vous arréter votre activité ?");
+                textViewTextGeneric.setTextSize(16);
+                textViewTextGeneric.setTextColor(Color.BLACK);
+                Button buttonCancel = dialogView.findViewById(R.id.buttonStop);
+                Button buttonConfirm = dialogView.findViewById(R.id.buttonKeepGoing);
+                AlertDialog dialog = builder.create();
+
+                final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+                final Drawable originalBackground = rootView.getBackground();
+                final WindowManager.LayoutParams params = getWindow().getAttributes();
+                params.alpha = 0.2f;
+                getWindow().setAttributes(params);
+                buttonCancel.setOnClickListener(v -> {
+                    dialog.dismiss();
+                    params.alpha = 1.0f;
+                    getWindow().setAttributes(params);
+                });
+                buttonConfirm.setOnClickListener(v -> {
+
+                });
+                dialog.setOnDismissListener(d -> {
+                    rootView.setBackground(originalBackground);
+                    params.alpha = 1.0f;
+                    getWindow().setAttributes(params);
+                });
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+
                 btnRun.setImageResource(R.drawable.ic_add);
                 isStarted = false;
             }

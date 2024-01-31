@@ -20,16 +20,21 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.example.jarspeed.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -37,11 +42,18 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.Polygon;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The type Map activity.
  */
 public class MapActivity extends AppCompatActivity implements SensorEventListener {
+
+    private static final String MY_USER_AGENT = "USER_AGENT";
+    private boolean isOngoing;
     /**
      * The Sensor manager.
      */
@@ -71,6 +83,12 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      * The Current location marker.
      */
     private Marker currentLocationMarker;
+
+    private Polyline line;
+
+    private RoadManager roadManager = new OSRMRoadManager(this, MY_USER_AGENT);
+    private boolean isStarted;
+    private ImageButton btnRun;
 
     /**
      * Create location request location request.
@@ -119,8 +137,11 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         mapView.setMultiTouchControls(true);
         mapController = mapView.getController();
         mapController.setZoom(20.0);
+        btnRun = findViewById(R.id.fabAdd);
 
         // Gestion de la localisation
+        isOngoing = false;
+        isStarted = false;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
@@ -146,15 +167,37 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      *
      * @param view the view
      */
-// Méthode pour gérer le clic sur le bouton de profil
     public void onProfileButtonClick(View view) {
         Intent intent = new Intent(this, ProfilActivity.class);
         startActivity(intent);
     }
 
     /**
-     * Sets location.
+     * Start recording.
+     * @param view View
      */
+    public void onRunButtonClick(View view) {
+        if (isOngoing) {
+            if (isStarted) {
+                // TODO afficher 2 boutons reprendre ou stopper
+                btnRun.setImageResource(R.drawable.ic_add);
+                isStarted = false;
+            }
+            isOngoing = false;
+        } else {
+            // Lancement de l'enregistrement
+            btnRun.setImageResource(R.drawable.ic_pause);
+            isStarted = true;
+            isOngoing = true;
+            List<GeoPoint> geoPoints = new ArrayList<>(); // Points de la route
+            setupLocation();
+            line = new Polyline(); // Créez une nouvelle polyline
+            line.setPoints(geoPoints); // Ajoutez les points à la polyline
+            mapView.getOverlays().add(line); // Ajoutez la polyline à la carte
+            mapView.invalidate(); // Rafraîchissez la carte
+        }
+    }
+
     private void setupLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, null)
@@ -176,6 +219,13 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      */
     private void updateMarker(Location location) {
         GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
+
+        // Manamgment line overlay
+        if (line != null && isStarted) {
+            line.addPoint(newLocation);
+            mapView.invalidate(); // Rafraîchissez la carte
+        }
+
         if (currentLocationMarker == null) {
             currentLocationMarker = new Marker(mapView);
             currentLocationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);

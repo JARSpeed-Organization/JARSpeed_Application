@@ -20,12 +20,30 @@ import fr.iutrodez.jarspeed.model.UserRegistrationRequest;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.ValidationUtils;
 
+/**
+ * The type Register activity.
+ */
 public class RegisterActivity extends AppCompatActivity {
 
+    /**
+     * The Name edit text.
+     */
     private EditText nameEditText;
+    /**
+     * The Firstname edit text.
+     */
     private EditText firstnameEditText;
+    /**
+     * The Email edit text.
+     */
     private EditText emailEditText;
+    /**
+     * The Password edit text.
+     */
     private EditText passwordEditText;
+    /**
+     * The Password confirmation edit text.
+     */
     private EditText passwordConfirmationEditText;
 
     @Override
@@ -43,12 +61,23 @@ public class RegisterActivity extends AppCompatActivity {
         setHintColors(nameEditText, firstnameEditText, emailEditText, passwordEditText, passwordConfirmationEditText);
     }
 
+    /**
+     * On login click.
+     *
+     * @param view the view
+     */
     public void onLoginClick(View view) {
         // Démarrez login page ici
         Intent loginIntent = new Intent(this, MainActivity.class);
         startActivity(loginIntent);
     }
-    // This method is called when the register button is clicked
+
+    /**
+     * On register click.
+     *
+     * @param view the view
+     */
+// This method is called when the register button is clicked
     public void onRegisterClick(View view) {
         if (validateFields()) {
             String name = nameEditText.getText().toString();
@@ -78,6 +107,9 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Go to login activity.
+     */
     private void goToLoginActivity() {
         Intent loginIntent = new Intent(this, MainActivity.class);
         loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -85,6 +117,11 @@ public class RegisterActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Validate fields boolean.
+     *
+     * @return the boolean
+     */
     private boolean validateFields() {
         boolean isValid = true;
 
@@ -146,6 +183,11 @@ public class RegisterActivity extends AppCompatActivity {
         return isValid;
     }
 
+    /**
+     * Sets hint colors.
+     *
+     * @param editsText the edits text
+     */
     private void setHintColors(EditText... editsText) {
         for (EditText editText : editsText) {
             editText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));

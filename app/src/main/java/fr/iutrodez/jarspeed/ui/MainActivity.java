@@ -28,6 +28,9 @@ import java.util.Map;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
 
+/**
+ * The type Main activity.
+ */
 public class MainActivity extends AppCompatActivity {
 
 
@@ -44,13 +47,23 @@ public class MainActivity extends AppCompatActivity {
         passwordEditText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));
     }
 
-    // Méthode pour la gestion du clic sur le bouton d'inscription
+    /**
+     * On register click.
+     *
+     * @param view the view
+     */
+// Méthode pour la gestion du clic sur le bouton d'inscription
     public void onRegisterClick(View view) {
         Intent registerIntent = new Intent(this, RegisterActivity.class);
         startActivity(registerIntent);
     }
 
-    // Méthode pour la gestion du clic sur le bouton de connexion
+    /**
+     * On login click.
+     *
+     * @param view the view
+     */
+// Méthode pour la gestion du clic sur le bouton de connexion
     public void onLoginClick(View view) {
         EditText emailEditText = findViewById(R.id.email);
         EditText passwordEditText = findViewById(R.id.password);
@@ -62,7 +75,8 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Méthode pour envoyer une requête de connexion à l'API.
-     * @param email L'email de l'utilisateur.
+     *
+     * @param email    L'email de l'utilisateur.
      * @param password Le mot de passe de l'utilisateur.
      */
     private void loginUser(String email, String password) {

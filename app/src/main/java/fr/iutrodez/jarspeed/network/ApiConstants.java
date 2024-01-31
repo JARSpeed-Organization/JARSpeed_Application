@@ -1,10 +1,28 @@
 package fr.iutrodez.jarspeed.network;
 
+/**
+ * The type Api constants.
+ */
 public class ApiConstants {
+    /**
+     * The constant BASE_URL.
+     */
     public static final String BASE_URL = "http://10.0.2.2:8080";
+    /**
+     * The constant LOGIN_URL.
+     */
     public static final String LOGIN_URL = BASE_URL + "/users/login";
+    /**
+     * The constant USER_INFO_URL.
+     */
     public static final String USER_INFO_URL = BASE_URL + "/users/findById";
+    /**
+     * The constant UPDATE_USER_URL.
+     */
     public static final String UPDATE_USER_URL = BASE_URL + "/users/merge";
+    /**
+     * The constant REGISTER_URL.
+     */
     public static final String REGISTER_URL = BASE_URL + "/users/register";
 
     // ... autres endpoints

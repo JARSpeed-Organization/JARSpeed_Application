@@ -20,6 +20,9 @@ import com.example.jarspeed.R;
 import fr.iutrodez.jarspeed.utils.ValidationUtils;
 
 
+/**
+ * The type Edit profil activity.
+ */
 public class EditProfilActivity extends AppCompatActivity {
 
     @Override
@@ -29,12 +32,22 @@ public class EditProfilActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Return to profil page.
+     *
+     * @param view the view
+     */
     public void returnToProfilPage(View view) {
         // Intent pour ouvrir la vue profil
         Intent intent = new Intent(this, ProfilActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * On change password click.
+     *
+     * @param view the view
+     */
     public void onChangePasswordClick(View view) {
         // Assombrir l'arrière-plan
         final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
@@ -100,6 +113,11 @@ public class EditProfilActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /**
+     * On generic edit click.
+     *
+     * @param view the view
+     */
     public void onGenericEditClick(View view) {
         // Assombrir l'arrière-plan
         final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
@@ -166,6 +184,11 @@ public class EditProfilActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /**
+     * On change health data.
+     *
+     * @param view the view
+     */
     public void onChangeHealthData(View view) {
         final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
         final Drawable originalBackground = rootView.getBackground();

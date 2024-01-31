@@ -15,9 +15,21 @@ import java.util.Map;
 import fr.iutrodez.jarspeed.model.UserRegistrationRequest;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
 
+/**
+ * The type Api utils.
+ */
 public class ApiUtils {
 
-    // Méthode pour envoyer une requête de connexion à l'API.
+    /**
+     * Login user.
+     *
+     * @param context       the context
+     * @param email         the email
+     * @param password      the password
+     * @param listener      the listener
+     * @param errorListener the error listener
+     */
+// Méthode pour envoyer une requête de connexion à l'API.
     public static void loginUser(Context context, String email, String password, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         StringRequest request = new StringRequest(Request.Method.POST, ApiConstants.LOGIN_URL, listener, errorListener) {
             @Override
@@ -31,7 +43,14 @@ public class ApiUtils {
         Volley.newRequestQueue(context).add(request);
     }
 
-    // Méthode pour charger le profil utilisateur
+    /**
+     * Load user profile.
+     *
+     * @param context       the context
+     * @param listener      the listener
+     * @param errorListener the error listener
+     */
+// Méthode pour charger le profil utilisateur
     public static void loadUserProfile(Context context, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         StringRequest request = new StringRequest(Request.Method.GET, ApiConstants.USER_INFO_URL, listener, errorListener) {
             @Override
@@ -42,7 +61,13 @@ public class ApiUtils {
         Volley.newRequestQueue(context).add(request);
     }
 
-    // Méthode utilitaire pour obtenir les headers d'authentification
+    /**
+     * Gets auth headers.
+     *
+     * @param context the context
+     * @return the auth headers
+     */
+// Méthode utilitaire pour obtenir les headers d'authentification
     private static Map<String, String> getAuthHeaders(Context context) {
         Map<String, String> headers = new HashMap<>();
         String token = SharedPreferencesManager.getAuthToken(context);
@@ -52,7 +77,15 @@ public class ApiUtils {
         return headers;
     }
 
-    // Méthode pour inscrire un nouvel utilisateur
+    /**
+     * Register user.
+     *
+     * @param context             the context
+     * @param registrationRequest the registration request
+     * @param listener            the listener
+     * @param errorListener       the error listener
+     */
+// Méthode pour inscrire un nouvel utilisateur
     public static void registerUser(Context context, UserRegistrationRequest registrationRequest, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         StringRequest request = new StringRequest(Request.Method.POST, ApiConstants.REGISTER_URL, listener, errorListener) {
             @Override

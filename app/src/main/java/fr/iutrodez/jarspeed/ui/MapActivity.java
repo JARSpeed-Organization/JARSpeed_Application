@@ -38,16 +38,45 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
+/**
+ * The type Map activity.
+ */
 public class MapActivity extends AppCompatActivity implements SensorEventListener {
+    /**
+     * The Sensor manager.
+     */
     private SensorManager sensorManager;
+    /**
+     * The Compass.
+     */
     private Sensor compass;
+    /**
+     * The constant REQUEST_LOCATION_PERMISSION.
+     */
     private static final int REQUEST_LOCATION_PERMISSION = 1;
 
+    /**
+     * The Map view.
+     */
     private MapView mapView;
+    /**
+     * The Map controller.
+     */
     private IMapController mapController;
+    /**
+     * The Fused location client.
+     */
     private FusedLocationProviderClient fusedLocationClient;
+    /**
+     * The Current location marker.
+     */
     private Marker currentLocationMarker;
 
+    /**
+     * Create location request location request.
+     *
+     * @return the location request
+     */
     private LocationRequest createLocationRequest() {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setInterval(10000); // Mise à jour de la position toutes les 10 secondes
@@ -56,6 +85,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         return locationRequest;
     }
 
+    /**
+     * The Location callback.
+     */
     private LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
@@ -98,6 +130,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         }
     }
 
+    /**
+     * Start location updates.
+     */
     private void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Vérifiez si l'autorisation a été accordée
@@ -106,12 +141,20 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         fusedLocationClient.requestLocationUpdates(createLocationRequest(), locationCallback, Looper.getMainLooper());
     }
 
-    // Méthode pour gérer le clic sur le bouton de profil
+    /**
+     * On profile button click.
+     *
+     * @param view the view
+     */
+// Méthode pour gérer le clic sur le bouton de profil
     public void onProfileButtonClick(View view) {
         Intent intent = new Intent(this, ProfilActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Sets location.
+     */
     private void setupLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, null)
@@ -126,6 +169,11 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         }
     }
 
+    /**
+     * Update marker.
+     *
+     * @param location the location
+     */
     private void updateMarker(Location location) {
         GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
         if (currentLocationMarker == null) {

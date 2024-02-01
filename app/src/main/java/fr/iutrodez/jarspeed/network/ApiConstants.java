@@ -19,11 +19,14 @@ public class ApiConstants {
     /**
      * The constant UPDATE_USER_URL.
      */
-    public static final String UPDATE_USER_URL = BASE_URL + "/users/merge";
+    public static final String UPDATE_USER_URL = BASE_URL + "/users/update";
     /**
      * The constant REGISTER_URL.
      */
     public static final String REGISTER_URL = BASE_URL + "/users/register";
 
-    // ... autres endpoints
+
+    public static final String GENDERS_URL = BASE_URL + "/genders/";
+
+    public static final String DELETE_URL = BASE_URL + "/users/deleteAccount";
 }

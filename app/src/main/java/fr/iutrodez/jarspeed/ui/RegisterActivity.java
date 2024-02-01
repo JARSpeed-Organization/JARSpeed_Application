@@ -5,7 +5,6 @@ import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -16,7 +15,7 @@ import com.example.jarspeed.R;
 
 import java.nio.charset.StandardCharsets;
 
-import fr.iutrodez.jarspeed.model.UserRegistrationRequest;
+import fr.iutrodez.jarspeed.model.user.UserRegistrationRequest;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.ValidationUtils;
 

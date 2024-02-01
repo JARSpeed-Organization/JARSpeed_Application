@@ -4,15 +4,21 @@ import android.content.Context;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import fr.iutrodez.jarspeed.model.UserRegistrationRequest;
+import fr.iutrodez.jarspeed.model.gender.Gender;
+import fr.iutrodez.jarspeed.model.user.UserRegistrationRequest;
+import fr.iutrodez.jarspeed.model.user.UserUpdateRequest;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
 
 /**
@@ -100,5 +106,53 @@ public class ApiUtils {
         };
         Volley.newRequestQueue(context).add(request);
     }
+
+    // Méthode pour mettre à jour un utilisateur
+    public static void updateUser(Context context, UserUpdateRequest updateRequest, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = ApiConstants.UPDATE_USER_URL;
+        StringRequest request = new StringRequest(StringRequest.Method.PUT, url, listener, errorListener) {
+            @Override
+            public byte[] getBody() {
+                return new Gson().toJson(updateRequest).getBytes();
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                String token = SharedPreferencesManager.getAuthToken(context);
+                headers.put("Authorization", "Bearer " + token);
+                return headers;
+            }
+        };
+        Volley.newRequestQueue(context).add(request);
+    }
+
+    public static void fetchGenders(Context context, Response.Listener<List<Gender>> listener, Response.ErrorListener errorListener) {
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, ApiConstants.GENDERS_URL, null,
+                response -> {
+                    Gson gson = new Gson();
+                    Type listType = new TypeToken<List<Gender>>() {}.getType();
+                    List<Gender> genders = gson.fromJson(response.toString(), listType);
+                    listener.onResponse(genders);
+                }, errorListener);
+        Volley.newRequestQueue(context).add(request);
+    }
+
+    public static void deleteAccount(Context context, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        StringRequest request = new StringRequest(Request.Method.DELETE, ApiConstants.DELETE_URL,
+                listener, errorListener) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return getAuthHeaders(context);
+            }
+        };
+        Volley.newRequestQueue(context).add(request);
+    }
+
 }
 

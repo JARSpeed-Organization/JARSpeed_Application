@@ -1,4 +1,4 @@
-package fr.iutrodez.jarspeed.model;
+package fr.iutrodez.jarspeed.model.user;
 
 /**
  * The type User.

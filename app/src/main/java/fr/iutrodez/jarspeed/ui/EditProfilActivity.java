@@ -3,20 +3,33 @@ package fr.iutrodez.jarspeed.ui;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jarspeed.R;
+import com.google.gson.Gson;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
+import fr.iutrodez.jarspeed.model.gender.Gender;
+import fr.iutrodez.jarspeed.model.user.UserUpdateRequest;
+import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.ValidationUtils;
 
 
@@ -25,12 +38,15 @@ import fr.iutrodez.jarspeed.utils.ValidationUtils;
  */
 public class EditProfilActivity extends AppCompatActivity {
 
+    private EditText editTextBirthdate;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_profil_activity);
-    }
+        View dialogView = getLayoutInflater().inflate(R.layout.health_data_dialog, null);
 
+    }
 
     /**
      * Return to profil page.
@@ -77,30 +93,23 @@ public class EditProfilActivity extends AppCompatActivity {
             getWindow().setAttributes(params);
         });
         buttonConfirm.setOnClickListener(v -> {
-            String oldPassword = editTextOldPassword.getText().toString();
-            String password = editTextPassword.getText().toString();
+            String newPassword = editTextPassword.getText().toString();
             String confirmPassword = editTextConfirmPassword.getText().toString();
 
-            // TODO: Récupérez l'ancien mot de passe de l'utilisateur depuis la base de données ou le système de gestion des utilisateurs.
-            String userCurrentPassword = "admin"; // bouchon : à remplacer par la valeur récupérée dans l'API ou autre
-
-            if (!oldPassword.equals(userCurrentPassword)) {
-                Toast.makeText(this, "L'ancien mot de passe est incorrect.", Toast.LENGTH_LONG).show();
-                editTextOldPassword.setError("Ancien mot de passe incorrect");
+            if (!newPassword.equals(confirmPassword)) {
+                Toast.makeText(this, "Les mots de passe ne correspondent pas.", Toast.LENGTH_LONG).show();
                 return;
             }
 
-            if (ValidationUtils.isValidPassword(password) && password.equals(confirmPassword)) {
-                // TODO: Insérez ici la logique pour changer le mot de passe
-                // ...
-                dialog.dismiss();
-            } else {
-                // Affichez un message d'erreur si les mots de passe ne correspondent pas ou ne sont pas valides
-                Toast.makeText(this, "Les mots de passe ne correspondent pas ou ne sont pas valides.", Toast.LENGTH_LONG).show();
-                editTextPassword.setError("Invalid Password");
-                editTextConfirmPassword.setError("Passwords do not match");
-            }
+            // Création de l'objet de demande de mise à jour pour le mot de passe
+            UserUpdateRequest updateRequest = new UserUpdateRequest();
+            updateRequest.setPassword(newPassword);
+
+            sendUpdateRequest(updateRequest);
+
+            dialog.dismiss();
         });
+
 
         dialog.setOnDismissListener(d -> {
             // Restaurer l'arrière-plan à la fermeture de la boîte de dialogue
@@ -141,7 +150,7 @@ public class EditProfilActivity extends AppCompatActivity {
         // Configurez le hint de l'EditText en fonction du type de modification
         if (view.getId() == R.id.nameItem) {
             editTextGeneric.setHint("Nouveau nom");
-            typeModification = "name";
+            typeModification = "lastname";
         } else if (view.getId() == R.id.firstNameItem) {
             editTextGeneric.setHint("Nouveau prénom");
             typeModification = "firstname";
@@ -157,22 +166,21 @@ public class EditProfilActivity extends AppCompatActivity {
             getWindow().setAttributes(params);
         });
 
+        String finalTypeModification = typeModification;
         buttonConfirm.setOnClickListener(v -> {
             String newValue = editTextGeneric.getText().toString().trim();
-            if (!newValue.isEmpty()) {
-                if (isEmailField && !ValidationUtils.isValidEmail(newValue)) {
-                    Toast.makeText(this, "Format de l'email invalide.", Toast.LENGTH_LONG).show();
-                    editTextGeneric.setError("Format de l'email invalide");
-                    return;
-                }
+            if (!newValue.isEmpty() && (!isEmailField || ValidationUtils.isValidEmail(newValue))) {
                 // Mettre à jour la valeur du EditText concerné
                 targetEditText.setText(newValue);
-                // TODO: Mettre à jour la valeur dans l'API pour l'utilisateur
+                // Appeler la méthode de mise à jour avec le champ spécifique et la nouvelle valeur
+                sendUpdateRequestBasedOnField(view.getId(), newValue);
                 dialog.dismiss();
             } else {
                 Toast.makeText(this, "Veuillez entrer une valeur valide.", Toast.LENGTH_LONG).show();
+                if (isEmailField) editTextGeneric.setError("Format de l'email invalide");
             }
         });
+
 
         dialog.setOnDismissListener(d -> {
             rootView.setBackground(originalBackground);
@@ -183,6 +191,7 @@ public class EditProfilActivity extends AppCompatActivity {
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
     }
+
 
     /**
      * On change health data.
@@ -200,11 +209,24 @@ public class EditProfilActivity extends AppCompatActivity {
         View dialogView = getLayoutInflater().inflate(R.layout.health_data_dialog, null);
         builder.setView(dialogView);
 
-        EditText editTextAge = dialogView.findViewById(R.id.editTextAge);
+        TextView textViewBirthdate = dialogView.findViewById(R.id.textViewBirthdate);
         Spinner spinnerGender = dialogView.findViewById(R.id.spinnerGender);
         EditText editTextWeight = dialogView.findViewById(R.id.editTextWeight);
         Button buttonCancel = dialogView.findViewById(R.id.buttonCancelHealthData);
         Button buttonConfirm = dialogView.findViewById(R.id.buttonConfirmHealthData);
+
+        final Calendar calendar = Calendar.getInstance();
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        textViewBirthdate.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(EditProfilActivity.this, (view12, year, monthOfYear, dayOfMonth) -> {
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, monthOfYear);
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                String selectedDate = dateFormat.format(calendar.getTime());
+                textViewBirthdate.setText(selectedDate);
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+            datePickerDialog.show();
+        });
 
         AlertDialog dialog = builder.create();
 
@@ -213,10 +235,31 @@ public class EditProfilActivity extends AppCompatActivity {
             params.alpha = 1.0f;
             getWindow().setAttributes(params);
         });
+
         buttonConfirm.setOnClickListener(v -> {
-            // Récupérer et valider les données saisies par l'utilisateur
-            // TODO: Mettre à jour les données de l'utilisateur dans l'API ou la base de données
-            dialog.dismiss();
+            try {
+                double weight = Double.parseDouble(editTextWeight.getText().toString());
+                String birthdatetext = textViewBirthdate.getText().toString();
+
+                Date birthdate = dateFormat.parse(textViewBirthdate.getText().toString());
+
+                int genderId = spinnerGender.getSelectedItemPosition() + 1;
+                Gender gender = new Gender(genderId, "Femme"); // Assurez-vous que cela correspond à votre logique
+
+                UserUpdateRequest updateRequest = new UserUpdateRequest();
+                updateRequest.setBirthdate(birthdate);
+                updateRequest.setWeight(weight);
+                updateRequest.setGender(gender);
+
+                Gson gson = new Gson();
+                String json = gson.toJson(updateRequest);
+                Log.d("UpdateRequest", "Sending Update Request: " + json);
+
+                sendUpdateRequest(updateRequest);
+                dialog.dismiss();
+            } catch (NumberFormatException | ParseException e) {
+                Toast.makeText(this, "Veuillez entrer des données valides.", Toast.LENGTH_SHORT).show();
+            }
         });
 
         dialog.setOnDismissListener(d -> {
@@ -227,6 +270,29 @@ public class EditProfilActivity extends AppCompatActivity {
 
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
+    }
+
+
+
+    private void sendUpdateRequest(UserUpdateRequest updateRequest) {
+        ApiUtils.updateUser(this, updateRequest, response -> {
+            Toast.makeText(EditProfilActivity.this, "Mise à jour réussie", Toast.LENGTH_SHORT).show();
+        }, error -> {
+            Toast.makeText(EditProfilActivity.this, "Erreur lors de la mise à jour", Toast.LENGTH_LONG).show();
+        });
+    }
+
+    private void sendUpdateRequestBasedOnField(int fieldId, String newValue) {
+        UserUpdateRequest updateRequest = new UserUpdateRequest();
+        if (fieldId == R.id.nameItem) {
+            updateRequest.setLastname(newValue);
+        } else if (fieldId == R.id.firstNameItem) {
+            updateRequest.setFirstname(newValue);
+        } else if (fieldId == R.id.emailItem) {
+            updateRequest.setEmail(newValue);
+
+        }
+        sendUpdateRequest(updateRequest);
     }
 
 

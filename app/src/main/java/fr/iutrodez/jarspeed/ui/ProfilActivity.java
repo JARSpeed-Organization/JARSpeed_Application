@@ -2,10 +2,12 @@ package fr.iutrodez.jarspeed.ui;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.Response;
@@ -67,22 +69,36 @@ public class ProfilActivity extends AppCompatActivity {
      */
 // Ajoutez cette méthode pour être appelée lorsque l'utilisateur souhaite supprimer son compte
     public void onDeleteAccountClick(View view) {
-        ApiUtils.deleteAccount(this, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                // Gestion de la réponse, par exemple en affichant un message et en redirigeant vers l'écran de connexion
+        // Inflate le layout de la popup de confirmation
+        View dialogView = getLayoutInflater().inflate(R.layout.confirmation_popup_deleteaccount, null);
+
+        // Construit la boîte de dialogue
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+
+        // Crée et affiche la boîte de dialogue
+        final AlertDialog dialog = builder.create();
+
+        // Gère le clic sur le bouton Annuler
+        dialogView.findViewById(R.id.buttonCancelGeneric).setOnClickListener(v -> dialog.dismiss());
+
+        // Gère le clic sur le bouton Confirmer
+        dialogView.findViewById(R.id.buttonConfirmGeneric).setOnClickListener(v -> {
+            ApiUtils.deleteAccount(this, response -> {
                 Toast.makeText(ProfilActivity.this, "Compte supprimé avec succès.", Toast.LENGTH_SHORT).show();
                 clearUserSession();
                 redirectToLoginScreen();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // Gérer l'erreur, par exemple en affichant un message d'erreur
+                dialog.dismiss();
+            }, error -> {
                 Toast.makeText(ProfilActivity.this, "Erreur lors de la suppression du compte.", Toast.LENGTH_SHORT).show();
-            }
+                dialog.dismiss();
+            });
         });
+
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.show();
     }
+
 
     /**
      * Clear user session.

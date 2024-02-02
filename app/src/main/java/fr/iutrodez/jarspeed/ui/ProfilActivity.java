@@ -19,6 +19,11 @@ import fr.iutrodez.jarspeed.network.ApiUtils;
  */
 public class ProfilActivity extends AppCompatActivity {
 
+    /**
+     * On create.
+     *
+     * @param savedInstanceState the saved instance state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +59,13 @@ public class ProfilActivity extends AppCompatActivity {
         clearUserSession();
         redirectToLoginScreen();
     }
-    // Ajoutez cette méthode pour être appelée lorsque l'utilisateur souhaite supprimer son compte
+
+    /**
+     * On delete account click.
+     *
+     * @param view the view
+     */
+// Ajoutez cette méthode pour être appelée lorsque l'utilisateur souhaite supprimer son compte
     public void onDeleteAccountClick(View view) {
         ApiUtils.deleteAccount(this, new Response.Listener<String>() {
             @Override

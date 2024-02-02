@@ -107,7 +107,15 @@ public class ApiUtils {
         Volley.newRequestQueue(context).add(request);
     }
 
-    // Méthode pour mettre à jour un utilisateur
+    /**
+     * Update user.
+     *
+     * @param context       the context
+     * @param updateRequest the update request
+     * @param listener      the listener
+     * @param errorListener the error listener
+     */
+// Méthode pour mettre à jour un utilisateur
     public static void updateUser(Context context, UserUpdateRequest updateRequest, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = ApiConstants.UPDATE_USER_URL;
         StringRequest request = new StringRequest(StringRequest.Method.PUT, url, listener, errorListener) {
@@ -132,6 +140,13 @@ public class ApiUtils {
         Volley.newRequestQueue(context).add(request);
     }
 
+    /**
+     * Fetch genders.
+     *
+     * @param context       the context
+     * @param listener      the listener
+     * @param errorListener the error listener
+     */
     public static void fetchGenders(Context context, Response.Listener<List<Gender>> listener, Response.ErrorListener errorListener) {
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, ApiConstants.GENDERS_URL, null,
                 response -> {
@@ -143,6 +158,13 @@ public class ApiUtils {
         Volley.newRequestQueue(context).add(request);
     }
 
+    /**
+     * Delete account.
+     *
+     * @param context       the context
+     * @param listener      the listener
+     * @param errorListener the error listener
+     */
     public static void deleteAccount(Context context, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         StringRequest request = new StringRequest(Request.Method.DELETE, ApiConstants.DELETE_URL,
                 listener, errorListener) {

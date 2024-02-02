@@ -11,12 +11,12 @@ public class UserUpdateRequest implements Serializable {
     private String firstname;
     private String password;
     private Double weight;
-    private Date birthdate; // Assurez-vous d'utiliser le format de date attendu par votre API
+    private String birthdate;
     private Gender gender; // Ajoute ce champ
 
     public UserUpdateRequest(){}
 
-    public UserUpdateRequest(String email, String lastname, String firstname, String password, Double weight, Date birthdate, Gender gender) {
+    public UserUpdateRequest(String email, String lastname, String firstname, String password, Double weight, String birthdate, Gender gender) {
         this.email = email;
         this.lastname = lastname;
         this.firstname = firstname;
@@ -66,11 +66,11 @@ public class UserUpdateRequest implements Serializable {
         this.weight = weight;
     }
 
-    public Date getBirthdate() {
+    public String getBirthdate() {
         return birthdate;
     }
 
-    public void setBirthdate(Date birthdate) {
+    public void setBirthdate(String birthdate) {
         this.birthdate = birthdate;
     }
 

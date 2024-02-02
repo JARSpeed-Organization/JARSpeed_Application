@@ -38,8 +38,16 @@ import fr.iutrodez.jarspeed.utils.ValidationUtils;
  */
 public class EditProfilActivity extends AppCompatActivity {
 
+    /**
+     * The Edit text birthdate.
+     */
     private EditText editTextBirthdate;
 
+    /**
+     * On create.
+     *
+     * @param savedInstanceState the saved instance state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -239,15 +247,13 @@ public class EditProfilActivity extends AppCompatActivity {
         buttonConfirm.setOnClickListener(v -> {
             try {
                 double weight = Double.parseDouble(editTextWeight.getText().toString());
-                String birthdatetext = textViewBirthdate.getText().toString();
-
-                Date birthdate = dateFormat.parse(textViewBirthdate.getText().toString());
+                String birthdate = textViewBirthdate.getText().toString(); // Utilisez directement le String
 
                 int genderId = spinnerGender.getSelectedItemPosition() + 1;
                 Gender gender = new Gender(genderId, "Femme"); // Assurez-vous que cela correspond à votre logique
 
                 UserUpdateRequest updateRequest = new UserUpdateRequest();
-                updateRequest.setBirthdate(birthdate);
+                updateRequest.setBirthdate(birthdate); // Envoyez la date comme String
                 updateRequest.setWeight(weight);
                 updateRequest.setGender(gender);
 
@@ -257,7 +263,7 @@ public class EditProfilActivity extends AppCompatActivity {
 
                 sendUpdateRequest(updateRequest);
                 dialog.dismiss();
-            } catch (NumberFormatException | ParseException e) {
+            } catch (NumberFormatException e) {
                 Toast.makeText(this, "Veuillez entrer des données valides.", Toast.LENGTH_SHORT).show();
             }
         });
@@ -273,7 +279,11 @@ public class EditProfilActivity extends AppCompatActivity {
     }
 
 
-
+    /**
+     * Send update request.
+     *
+     * @param updateRequest the update request
+     */
     private void sendUpdateRequest(UserUpdateRequest updateRequest) {
         ApiUtils.updateUser(this, updateRequest, response -> {
             Toast.makeText(EditProfilActivity.this, "Mise à jour réussie", Toast.LENGTH_SHORT).show();
@@ -282,6 +292,12 @@ public class EditProfilActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Send update request based on field.
+     *
+     * @param fieldId  the field id
+     * @param newValue the new value
+     */
     private void sendUpdateRequestBasedOnField(int fieldId, String newValue) {
         UserUpdateRequest updateRequest = new UserUpdateRequest();
         if (fieldId == R.id.nameItem) {

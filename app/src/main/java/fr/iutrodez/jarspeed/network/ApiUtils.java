@@ -1,6 +1,8 @@
 package fr.iutrodez.jarspeed.network;
 
 import android.content.Context;
+import android.util.Log;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -16,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.iutrodez.jarspeed.model.RouteDTO;
+import fr.iutrodez.jarspeed.model.UserRegistrationRequest;
 import fr.iutrodez.jarspeed.model.gender.Gender;
 import fr.iutrodez.jarspeed.model.user.UserRegistrationRequest;
 import fr.iutrodez.jarspeed.model.user.UserUpdateRequest;
@@ -35,7 +39,6 @@ public class ApiUtils {
      * @param listener      the listener
      * @param errorListener the error listener
      */
-// Méthode pour envoyer une requête de connexion à l'API.
     public static void loginUser(Context context, String email, String password, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         StringRequest request = new StringRequest(Request.Method.POST, ApiConstants.LOGIN_URL, listener, errorListener) {
             @Override
@@ -55,7 +58,6 @@ public class ApiUtils {
      * @param context the context
      * @return the auth headers
      */
-// Méthode utilitaire pour obtenir les headers d'authentification
     private static Map<String, String> getAuthHeaders(Context context) {
         Map<String, String> headers = new HashMap<>();
         String token = SharedPreferencesManager.getAuthToken(context);
@@ -73,12 +75,27 @@ public class ApiUtils {
      * @param listener            the listener
      * @param errorListener       the error listener
      */
-// Méthode pour inscrire un nouvel utilisateur
     public static void registerUser(Context context, UserRegistrationRequest registrationRequest, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         StringRequest request = new StringRequest(Request.Method.POST, ApiConstants.REGISTER_URL, listener, errorListener) {
             @Override
             public byte[] getBody() {
                 return new Gson().toJson(registrationRequest).getBytes(StandardCharsets.UTF_8);
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+        };
+        Volley.newRequestQueue(context).add(request);
+    }
+
+    public static void saveRoute(Context context, RouteDTO routeDTO, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        StringRequest request = new StringRequest(Request.Method.POST, ApiConstants.ROUTE_BASE_URL, listener, errorListener) {
+            @Override
+            public byte[] getBody() {
+                Log.d("Body", new Gson().toJson(routeDTO));
+                return new Gson().toJson(routeDTO).getBytes(StandardCharsets.UTF_8);
             }
 
             @Override

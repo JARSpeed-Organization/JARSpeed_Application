@@ -10,11 +10,10 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
@@ -38,23 +37,28 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.example.jarspeed.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.Polygon;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import fr.iutrodez.jarspeed.utils.ValidationUtils;
+import fr.iutrodez.jarspeed.model.RouteDTO;
+import fr.iutrodez.jarspeed.network.ApiUtils;
+import fr.iutrodez.jarspeed.network.RouteUtils;
 
 /**
  * The type Map activity.
@@ -66,6 +70,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     /**
      * The Sensor manager.
      */
+    private boolean isStarted;
     private SensorManager sensorManager;
     /**
      * The Compass.
@@ -94,10 +99,8 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     private Marker currentLocationMarker;
 
     private Polyline line;
-
-    private RoadManager roadManager = new OSRMRoadManager(this, MY_USER_AGENT);
-    private boolean isStarted;
     private ImageButton btnRun;
+    private LocalDateTime startDate;
 
     /**
      * Create location request location request.
@@ -150,7 +153,6 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
 
         // Gestion de la localisation
         isOngoing = false;
-        isStarted = false;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
@@ -187,51 +189,13 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      */
     public void onRunButtonClick(View view) {
         if (isOngoing) {
-            if (isStarted) {
-                // TODO afficher 2 boutons reprendre ou stopper
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                View dialogView = getLayoutInflater().inflate(R.layout.popup_pause, null);
-                builder.setView(dialogView);
-
-                TextView textViewTextGeneric = dialogView.findViewById(R.id.pauseTextView);
-                textViewTextGeneric.setText("Voulez-vous arréter votre activité ?");
-                textViewTextGeneric.setTextSize(16);
-                textViewTextGeneric.setTextColor(Color.BLACK);
-                Button buttonCancel = dialogView.findViewById(R.id.buttonStop);
-                Button buttonConfirm = dialogView.findViewById(R.id.buttonKeepGoing);
-                AlertDialog dialog = builder.create();
-
-                final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
-                final Drawable originalBackground = rootView.getBackground();
-                final WindowManager.LayoutParams params = getWindow().getAttributes();
-                params.alpha = 0.2f;
-                getWindow().setAttributes(params);
-                buttonCancel.setOnClickListener(v -> {
-                    dialog.dismiss();
-                    params.alpha = 1.0f;
-                    getWindow().setAttributes(params);
-                });
-                buttonConfirm.setOnClickListener(v -> {
-
-                });
-                dialog.setOnDismissListener(d -> {
-                    rootView.setBackground(originalBackground);
-                    params.alpha = 1.0f;
-                    getWindow().setAttributes(params);
-                });
-                dialog.setCanceledOnTouchOutside(false);
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialog.show();
-
-                btnRun.setImageResource(R.drawable.ic_add);
-                isStarted = false;
-            }
-            isOngoing = false;
+            openPopupPause();
         } else {
             // Lancement de l'enregistrement
             btnRun.setImageResource(R.drawable.ic_pause);
-            isStarted = true;
             isOngoing = true;
+            isStarted = true;
+            startDate = LocalDateTime.now();
             List<GeoPoint> geoPoints = new ArrayList<>(); // Points de la route
             setupLocation();
             line = new Polyline(); // Créez une nouvelle polyline
@@ -239,6 +203,76 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             mapView.getOverlays().add(line); // Ajoutez la polyline à la carte
             mapView.invalidate(); // Rafraîchissez la carte
         }
+    }
+
+    private void openPopupPause() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.popup_pause, null);
+        builder.setView(dialogView);
+
+        TextView textViewTextGeneric = dialogView.findViewById(R.id.pauseTextView);
+        textViewTextGeneric.setText(R.string.popUpPauseString);
+        textViewTextGeneric.setTextSize(16);
+        textViewTextGeneric.setTextColor(Color.BLACK);
+        Button buttonCancel = dialogView.findViewById(R.id.buttonStop);
+        Button buttonConfirm = dialogView.findViewById(R.id.buttonKeepGoing);
+        AlertDialog dialog = builder.create();
+
+        final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+        final Drawable originalBackground = rootView.getBackground();
+        final WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.alpha = 0.2f;
+        getWindow().setAttributes(params);
+        buttonCancel.setOnClickListener(v -> {
+            dialog.dismiss();
+            params.alpha = 1.0f;
+            getWindow().setAttributes(params);
+        });
+        buttonConfirm.setOnClickListener(v -> {
+
+            RouteDTO routeDTO =
+                    new RouteDTO(null,
+                            startDate.toString(),
+                            LocalDateTime.now().toString(),
+                            RouteUtils.pointsToCoordinates(line.getPoints()),
+                            new ArrayList<>(),
+                            "Title",
+                            "Description");
+
+            ApiUtils.saveRoute(this, routeDTO, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    if (isStarted) {
+                        Toast.makeText(MapActivity.this, getText(R.string.route_register), Toast.LENGTH_SHORT).show();
+                        mapView.getOverlays().remove(line);
+                        line = null;
+                        mapView.invalidate();
+                        btnRun.setImageResource(R.drawable.ic_add);
+                        isOngoing = false;
+                        isStarted = false;
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    Toast.makeText(MapActivity.this, "Erreur : " + error + " " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    // TODO Manage errors
+                }
+            });
+            dialog.dismiss();
+            params.alpha = 1.0f;
+            getWindow().setAttributes(params);
+        });
+        dialog.setOnDismissListener(d -> {
+            rootView.setBackground(originalBackground);
+            params.alpha = 1.0f;
+            getWindow().setAttributes(params);
+        });
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
     }
 
     private void setupLocation() {

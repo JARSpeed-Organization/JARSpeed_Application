@@ -13,7 +13,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
@@ -22,8 +21,6 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.osmdroid.api.IMapController;
-import org.osmdroid.bonuspack.routing.OSRMRoadManager;
-import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -37,6 +34,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,10 +48,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import fr.iutrodez.jarspeed.model.RouteDTO;
@@ -208,15 +204,11 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     private void openPopupPause() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View dialogView = getLayoutInflater().inflate(R.layout.popup_pause, null);
+        View dialogView = getLayoutInflater().inflate(R.layout.pause_dialog, null);
         builder.setView(dialogView);
 
-        TextView textViewTextGeneric = dialogView.findViewById(R.id.pauseTextView);
-        textViewTextGeneric.setText(R.string.popUpPauseString);
-        textViewTextGeneric.setTextSize(16);
-        textViewTextGeneric.setTextColor(Color.BLACK);
-        Button buttonCancel = dialogView.findViewById(R.id.buttonStop);
-        Button buttonConfirm = dialogView.findViewById(R.id.buttonKeepGoing);
+        Button buttonStopAndSave = dialogView.findViewById(R.id.buttonStopAndSave);
+        Button buttonCancel = dialogView.findViewById(R.id.buttonCancel);
         AlertDialog dialog = builder.create();
 
         final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
@@ -229,16 +221,20 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             params.alpha = 1.0f;
             getWindow().setAttributes(params);
         });
-        buttonConfirm.setOnClickListener(v -> {
+        buttonStopAndSave.setOnClickListener(v -> {
 
+            // Get informations of route
+            EditText title = dialogView.findViewById(R.id.editTextTitle);
+            EditText description = dialogView.findViewById(R.id.editTextDescription);
+            LocalDateTime endDate = LocalDateTime.now();
             RouteDTO routeDTO =
                     new RouteDTO(null,
                             startDate.toString(),
-                            LocalDateTime.now().toString(),
+                            endDate.toString(),
                             RouteUtils.pointsToCoordinates(line.getPoints()),
                             new ArrayList<>(),
-                            "Title",
-                            "Description");
+                            RouteUtils.generateTitle(title.getText().toString(), endDate),
+                            description.getText().toString());
 
             ApiUtils.saveRoute(this, routeDTO, new Response.Listener<String>() {
                 @Override

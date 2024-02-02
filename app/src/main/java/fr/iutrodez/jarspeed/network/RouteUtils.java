@@ -2,6 +2,8 @@ package fr.iutrodez.jarspeed.network;
 
 import org.osmdroid.util.GeoPoint;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,5 +17,12 @@ public class RouteUtils {
             coordinates.add(new Coordinate(point.getLongitude(), point.getLatitude()));
         }
         return coordinates;
+    }
+
+    public static String generateTitle(String pTitle, LocalDateTime pDate) {
+        if (pTitle != null && !pTitle.trim().equals("")) {
+            return pTitle;
+        }
+        return "Parcours du " + pDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 }

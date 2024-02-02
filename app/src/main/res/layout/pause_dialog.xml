@@ -1,7 +1,6 @@
 <!-- res/layout/nom_dialog.xml -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/transparent">
@@ -25,47 +24,38 @@
             app:cardElevation="10dp">
 
             <LinearLayout
-                android:orientation="vertical"
-                android:padding="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <TextView
-                    android:id="@+id/pauseTextView"
+                <EditText
+                    android:id="@+id/editTextTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="24dp"
-                    android:minHeight="48dp"
                     android:background="@drawable/edittext_background"
-                    android:paddingLeft="14dp"
-                    android:paddingRight="14dp"
-                    android:maxLines="1"
-                    android:maxLength="40"/>
+                    android:hint="@string/title"
+                    android:inputType="text"
+                    android:padding="14dp" />
 
-                <!-- Boutons Annuler et Confirmer -->
+                <EditText
+                    android:id="@+id/editTextDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    android:background="@drawable/edittext_background"
+                    android:hint="@string/description"
+                    android:inputType="text"
+                    android:padding="14dp" />
+
+                <!-- Boutons Stop and save et Cancel -->
                 <Button
-                    android:id="@+id/buttonStop"
-                    android:text="@string/cancel"
+                    android:id="@+id/buttonStopAndSave"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:background="@drawable/button_with_border_gradient"
-                    android:textColor="@color/gradient_button_start"
-                    android:fontFamily="@font/righteous"
-                    android:minWidth="10dp"
-                    android:minHeight="10dp"
-                    android:paddingLeft="30dp"
-                    android:paddingTop="10dp"
-                    android:paddingRight="30dp"
-                    android:paddingBottom="10dp"
-                    android:layout_marginBottom="10dp"/>
-
-                <Button
-                    android:id="@+id/buttonKeepGoing"
-                    android:text="@string/confirm"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="10dp"
                     android:background="@drawable/button_gradient"
                     android:fontFamily="@font/righteous"
                     android:minWidth="10dp"
@@ -74,7 +64,24 @@
                     android:paddingTop="10dp"
                     android:paddingRight="22dp"
                     android:paddingBottom="10dp"
-                    android:textColor="@color/white"/>
+                    android:text="@string/stopAndSave"
+                    android:textColor="@color/white" />
+
+                <Button
+                    android:id="@+id/buttonCancel"
+                    android:layout_width="227dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/button_with_border_gradient"
+                    android:fontFamily="@font/righteous"
+                    android:minWidth="10dp"
+                    android:minHeight="10dp"
+                    android:paddingLeft="30dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="30dp"
+                    android:paddingBottom="10dp"
+                    android:text="@string/keep"
+                    android:textColor="@color/gradient_button_start" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </RelativeLayout>

@@ -76,7 +76,8 @@
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
             android:padding="16dp"
-            android:background="@drawable/selectable_item_with_bottom_border"/>
+            android:background="@drawable/selectable_item_with_bottom_border"
+            android:onClick="onDeleteAccountClick"/>
     </LinearLayout>
 
     <!-- Bottom Navigation View -->

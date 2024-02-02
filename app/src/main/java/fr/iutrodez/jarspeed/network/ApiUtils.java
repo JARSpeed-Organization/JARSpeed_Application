@@ -50,24 +50,6 @@ public class ApiUtils {
     }
 
     /**
-     * Load user profile.
-     *
-     * @param context       the context
-     * @param listener      the listener
-     * @param errorListener the error listener
-     */
-// Méthode pour charger le profil utilisateur
-    public static void loadUserProfile(Context context, Response.Listener<String> listener, Response.ErrorListener errorListener) {
-        StringRequest request = new StringRequest(Request.Method.GET, ApiConstants.USER_INFO_URL, listener, errorListener) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                return getAuthHeaders(context);
-            }
-        };
-        Volley.newRequestQueue(context).add(request);
-    }
-
-    /**
      * Gets auth headers.
      *
      * @param context the context
@@ -168,6 +150,17 @@ public class ApiUtils {
     public static void deleteAccount(Context context, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         StringRequest request = new StringRequest(Request.Method.DELETE, ApiConstants.DELETE_URL,
                 listener, errorListener) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return getAuthHeaders(context);
+            }
+        };
+        Volley.newRequestQueue(context).add(request);
+    }
+
+    public static void loadUserProfile(Context context, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = ApiConstants.USER_INFO_URL; // Assurez-vous que cela pointe vers votre endpoint /profile
+        StringRequest request = new StringRequest(Request.Method.GET, url, listener, errorListener) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 return getAuthHeaders(context);

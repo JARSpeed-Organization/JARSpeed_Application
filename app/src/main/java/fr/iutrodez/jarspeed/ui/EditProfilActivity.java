@@ -19,8 +19,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Response;
 import com.example.jarspeed.R;
 import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,8 +35,9 @@ import java.util.Locale;
 import fr.iutrodez.jarspeed.model.gender.Gender;
 import fr.iutrodez.jarspeed.model.user.UserUpdateRequest;
 import fr.iutrodez.jarspeed.network.ApiUtils;
+import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
 import fr.iutrodez.jarspeed.utils.ValidationUtils;
-
+import com.android.volley.VolleyError;
 
 /**
  * The type Edit profil activity.
@@ -42,8 +47,12 @@ public class EditProfilActivity extends AppCompatActivity {
     /**
      * The Edit text birthdate.
      */
-    private EditText editTextBirthdate;
-
+    private EditText editTextFirstName;
+    private EditText editTextLastName;
+    private EditText editTextEmail;
+    private TextView textViewBirthdate;
+    private EditText editTextWeight;
+    private Spinner spinnerGender;
     /**
      * On create.
      *
@@ -55,7 +64,50 @@ public class EditProfilActivity extends AppCompatActivity {
         setContentView(R.layout.edit_profil_activity);
         View dialogView = getLayoutInflater().inflate(R.layout.health_data_dialog, null);
 
+        // Initialisation des vues
+        editTextFirstName = findViewById(R.id.firstNameItem);
+        editTextLastName = findViewById(R.id.nameItem);
+        editTextEmail = findViewById(R.id.emailItem);
+
+        loadUserProfile();
+
     }
+
+    private void loadUserProfile() {
+        String token = SharedPreferencesManager.getAuthToken(this);
+        if (token == null || token.isEmpty()) {
+            Toast.makeText(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ApiUtils.loadUserProfile(this, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jsonResponse = new JSONObject(response);
+                    String firstName = jsonResponse.optString("firstname");
+                    String lastName = jsonResponse.optString("lastname");
+                    String email = jsonResponse.optString("email");
+
+                    // Mise à jour de l'interface utilisateur avec les données reçues
+                    editTextFirstName.setText(firstName);
+                    editTextLastName.setText(lastName);
+                    editTextEmail.setText(email);
+                } catch (JSONException e) {
+                    Log.e("LoadUserProfile", "Error parsing JSON", e);
+                    Toast.makeText(EditProfilActivity.this, "Erreur lors du parsing des données", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("LoadUserProfile", "Error loading profile: " + error.toString());
+                Toast.makeText(EditProfilActivity.this, "Erreur lors du chargement du profil", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
 
     /**
      * Return to profil page.
@@ -223,6 +275,9 @@ public class EditProfilActivity extends AppCompatActivity {
         EditText editTextWeight = dialogView.findViewById(R.id.editTextWeight);
         Button buttonCancel = dialogView.findViewById(R.id.buttonCancelHealthData);
         Button buttonConfirm = dialogView.findViewById(R.id.buttonConfirmHealthData);
+
+
+
 
         // Peupler le Spinner avec les genres dès que les données sont disponibles
         ApiUtils.fetchGenders(this, genders -> {

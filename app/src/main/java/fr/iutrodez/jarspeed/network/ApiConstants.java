@@ -15,7 +15,7 @@ public class ApiConstants {
     /**
      * The constant USER_INFO_URL.
      */
-    public static final String USER_INFO_URL = BASE_URL + "/users/findById";
+    public static final String USER_INFO_URL = BASE_URL + "/users/profile";
     /**
      * The constant UPDATE_USER_URL.
      */

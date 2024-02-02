@@ -251,6 +251,16 @@ public class EditProfilActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Sets dialog buttons.
+     *
+     * @param dialog            the dialog
+     * @param buttonCancel      the button cancel
+     * @param buttonConfirm     the button confirm
+     * @param textViewBirthdate the text view birthdate
+     * @param editTextWeight    the edit text weight
+     * @param spinnerGender     the spinner gender
+     */
     private void setupDialogButtons(AlertDialog dialog, Button buttonCancel, Button buttonConfirm, TextView textViewBirthdate, EditText editTextWeight, Spinner spinnerGender) {
         dialog.setOnDismissListener(d -> {
             resetDialogBackground();
@@ -266,6 +276,9 @@ public class EditProfilActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Reset dialog background.
+     */
     private void resetDialogBackground() {
         final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
         final Drawable originalBackground = rootView.getBackground();
@@ -274,6 +287,14 @@ public class EditProfilActivity extends AppCompatActivity {
         getWindow().setAttributes(params);
     }
 
+    /**
+     * Perform health data update.
+     *
+     * @param textViewBirthdate the text view birthdate
+     * @param editTextWeight    the edit text weight
+     * @param spinnerGender     the spinner gender
+     * @param dialog            the dialog
+     */
     private void performHealthDataUpdate(TextView textViewBirthdate, EditText editTextWeight, Spinner spinnerGender, AlertDialog dialog) {
         try {
             double weight = Double.parseDouble(editTextWeight.getText().toString());
@@ -330,6 +351,4 @@ public class EditProfilActivity extends AppCompatActivity {
         }
         sendUpdateRequest(updateRequest);
     }
-
-
 }

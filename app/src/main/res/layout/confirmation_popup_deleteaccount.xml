@@ -1,67 +1,51 @@
+<!-- res/layout/nom_dialog.xml -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/transparent">
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginStart="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="30dp"
         android:layout_marginTop="30dp"
-        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
         android:layout_marginBottom="30dp"
         android:background="@drawable/border_gradient"
         android:padding="4dp">
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewNom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="35dp"
-            app:cardElevation="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            app:cardElevation="10dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/textViewBirthdate"
+                    android:id="@+id/editTextGeneric"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="24dp"
-                    android:background="@drawable/edittext_background"
-                    android:hint="@string/newAgeHint"
-                    android:padding="14dp"
-                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp"
+                    android:text="@string/confirm_supp_account"
+                    android:fontFamily="@font/righteous"
                     android:textColor="@color/black"
-                    android:textSize="18dp"/>
-
-                <Spinner
-                    android:id="@+id/spinnerGender"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:background="@drawable/edittext_background"
-                    android:entries="@array/gender_options"
-                    android:padding="14dp"/>
-
-                <EditText
-                    android:id="@+id/editTextWeight"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:background="@drawable/edittext_background"
-                    android:hint="@string/newWeightHint"
-                    android:inputType="numberDecimal"
-                    android:padding="14dp" />
+                    android:textAlignment="center"
+                    android:textSize="19dp"/>
 
                 <!-- Boutons Annuler et Confirmer -->
                 <Button
-                    android:id="@+id/buttonCancelHealthData"
+                    android:id="@+id/buttonCancelGeneric"
                     android:text="@string/cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -78,7 +62,7 @@
                     android:layout_marginBottom="10dp"/>
 
                 <Button
-                    android:id="@+id/buttonConfirmHealthData"
+                    android:id="@+id/buttonConfirmGeneric"
                     android:text="@string/confirm"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

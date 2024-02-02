@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -223,10 +224,17 @@ public class EditProfilActivity extends AppCompatActivity {
         Button buttonCancel = dialogView.findViewById(R.id.buttonCancelHealthData);
         Button buttonConfirm = dialogView.findViewById(R.id.buttonConfirmHealthData);
 
+        // Peupler le Spinner avec les genres dès que les données sont disponibles
+        ApiUtils.fetchGenders(this, genders -> {
+            ArrayAdapter<Gender> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, genders);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerGender.setAdapter(adapter);
+        }, error -> Toast.makeText(this, "Erreur lors de la récupération des genres", Toast.LENGTH_LONG).show());
+
         final Calendar calendar = Calendar.getInstance();
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         textViewBirthdate.setOnClickListener(v -> {
-            DatePickerDialog datePickerDialog = new DatePickerDialog(EditProfilActivity.this, (view12, year, monthOfYear, dayOfMonth) -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(EditProfilActivity.this, (view1, year, monthOfYear, dayOfMonth) -> {
                 calendar.set(Calendar.YEAR, year);
                 calendar.set(Calendar.MONTH, monthOfYear);
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -237,45 +245,57 @@ public class EditProfilActivity extends AppCompatActivity {
         });
 
         AlertDialog dialog = builder.create();
+        setupDialogButtons(dialog, buttonCancel, buttonConfirm, textViewBirthdate, editTextWeight, spinnerGender);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.show();
 
-        buttonCancel.setOnClickListener(v -> {
-            dialog.dismiss();
-            params.alpha = 1.0f;
-            getWindow().setAttributes(params);
+    }
+
+    private void setupDialogButtons(AlertDialog dialog, Button buttonCancel, Button buttonConfirm, TextView textViewBirthdate, EditText editTextWeight, Spinner spinnerGender) {
+        dialog.setOnDismissListener(d -> {
+            resetDialogBackground();
         });
 
         buttonConfirm.setOnClickListener(v -> {
-            try {
-                double weight = Double.parseDouble(editTextWeight.getText().toString());
-                String birthdate = textViewBirthdate.getText().toString(); // Utilisez directement le String
-
-                int genderId = spinnerGender.getSelectedItemPosition() + 1;
-                Gender gender = new Gender(genderId, "Femme"); // Assurez-vous que cela correspond à votre logique
-
-                UserUpdateRequest updateRequest = new UserUpdateRequest();
-                updateRequest.setBirthdate(birthdate); // Envoyez la date comme String
-                updateRequest.setWeight(weight);
-                updateRequest.setGender(gender);
-
-                Gson gson = new Gson();
-                String json = gson.toJson(updateRequest);
-                Log.d("UpdateRequest", "Sending Update Request: " + json);
-
-                sendUpdateRequest(updateRequest);
-                dialog.dismiss();
-            } catch (NumberFormatException e) {
-                Toast.makeText(this, "Veuillez entrer des données valides.", Toast.LENGTH_SHORT).show();
-            }
+            performHealthDataUpdate(textViewBirthdate, editTextWeight, spinnerGender, dialog);
         });
 
-        dialog.setOnDismissListener(d -> {
-            rootView.setBackground(originalBackground);
-            params.alpha = 1.0f;
-            getWindow().setAttributes(params);
+        buttonCancel.setOnClickListener(v -> {
+            dialog.dismiss();
+            resetDialogBackground();
         });
+    }
 
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.show();
+    private void resetDialogBackground() {
+        final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+        final Drawable originalBackground = rootView.getBackground();
+        final WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.alpha = 1.0f;
+        getWindow().setAttributes(params);
+    }
+
+    private void performHealthDataUpdate(TextView textViewBirthdate, EditText editTextWeight, Spinner spinnerGender, AlertDialog dialog) {
+        try {
+            double weight = Double.parseDouble(editTextWeight.getText().toString());
+            String birthdate = textViewBirthdate.getText().toString(); // Directement le String
+
+            // Récupération de l'objet Gender sélectionné dans le Spinner
+            Gender selectedGender = (Gender) spinnerGender.getSelectedItem();
+
+            UserUpdateRequest updateRequest = new UserUpdateRequest();
+            updateRequest.setBirthdate(birthdate);
+            updateRequest.setWeight(weight);
+            updateRequest.setGender(selectedGender); // Directement l'objet Gender
+
+            Gson gson = new Gson();
+            String json = gson.toJson(updateRequest);
+            Log.d("UpdateRequest", "Sending Update Request: " + json);
+
+            sendUpdateRequest(updateRequest);
+            dialog.dismiss();
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Veuillez entrer des données valides.", Toast.LENGTH_SHORT).show();
+        }
     }
 
 

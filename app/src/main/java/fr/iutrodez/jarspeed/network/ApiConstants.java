@@ -4,6 +4,7 @@ package fr.iutrodez.jarspeed.network;
  * The type Api constants.
  */
 public class ApiConstants {
+    
     /**
      * The constant BASE_URL.
      */
@@ -24,9 +25,16 @@ public class ApiConstants {
      * The constant REGISTER_URL.
      */
     public static final String REGISTER_URL = BASE_URL + "/users/register";
-
-
+    /**
+     * The constant GENDER_URL.
+     */
     public static final String GENDERS_URL = BASE_URL + "/genders/";
-
+    /**
+     * The constant ROUTE_BASE_URL.
+     */
+    public static final String ROUTE_BASE_URL = BASE_URL + "/routes";
+    /**
+     * The constant DELETE_URL.
+     */
     public static final String DELETE_URL = BASE_URL + "/users/deleteAccount";
 }

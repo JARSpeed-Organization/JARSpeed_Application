@@ -42,11 +42,21 @@
     <string name="newNameHint">Nouveau nom</string>
     <string name="newFirstNameHint">Nouveau prénom</string>
     <string name="newEmailHint">Nouveau mail</string>
-    <string name="newAgeHint">Date de Naissance</string>
+    <string name="newAgeHint">Date de naissance</string>
     <string name="newWeightHint">Nouveau poids</string>
 
     <string name="preference_file_key">my_preference_file_key</string>
     <string name="saved_token">saved_token</string>
 
+    <!-- String for save route -->
+    <string name="title">Titre</string>
+    <string name="description">Description</string>
+    <string name="stopAndSave">Terminer et enregistrer</string>
+    <string name="keep">Continuer</string>
+
     <string name="confirm_supp_account">Confirmez-vous la suppression définitive de votre compte ?</string>
+
+    <!-- String for Pop Up -->
+    <string name="popUpPauseString">Voulez-vous arréter votre activité ?</string>
+    <string name="route_register">Le parcours a bien été enregistré.</string>
 </resources>

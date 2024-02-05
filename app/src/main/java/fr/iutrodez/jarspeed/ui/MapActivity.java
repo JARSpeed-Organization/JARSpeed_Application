@@ -5,16 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.view.View;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,12 +26,21 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.example.jarspeed.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -38,13 +48,25 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import fr.iutrodez.jarspeed.model.RouteDTO;
+import fr.iutrodez.jarspeed.network.ApiUtils;
+import fr.iutrodez.jarspeed.network.RouteUtils;
+
 /**
  * The type Map activity.
  */
 public class MapActivity extends AppCompatActivity implements SensorEventListener {
+
+    private static final String MY_USER_AGENT = "USER_AGENT";
+    private boolean isOngoing;
     /**
      * The Sensor manager.
      */
+    private boolean isStarted;
     private SensorManager sensorManager;
     /**
      * The Compass.
@@ -71,6 +93,10 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      * The Current location marker.
      */
     private Marker currentLocationMarker;
+
+    private Polyline line;
+    private ImageButton btnRun;
+    private LocalDateTime startDate;
 
     /**
      * Create location request location request.
@@ -119,8 +145,10 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         mapView.setMultiTouchControls(true);
         mapController = mapView.getController();
         mapController.setZoom(20.0);
+        btnRun = findViewById(R.id.fabAdd);
 
         // Gestion de la localisation
+        isOngoing = false;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
@@ -146,15 +174,103 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      *
      * @param view the view
      */
-// Méthode pour gérer le clic sur le bouton de profil
     public void onProfileButtonClick(View view) {
         Intent intent = new Intent(this, ProfilActivity.class);
         startActivity(intent);
     }
 
     /**
-     * Sets location.
+     * Start recording.
+     * @param view View
      */
+    public void onRunButtonClick(View view) {
+        if (isOngoing) {
+            openPopupPause();
+        } else {
+            // Lancement de l'enregistrement
+            btnRun.setImageResource(R.drawable.ic_pause);
+            isOngoing = true;
+            isStarted = true;
+            startDate = LocalDateTime.now();
+            List<GeoPoint> geoPoints = new ArrayList<>(); // Points de la route
+            setupLocation();
+            line = new Polyline(); // Créez une nouvelle polyline
+            line.setPoints(geoPoints); // Ajoutez les points à la polyline
+            mapView.getOverlays().add(line); // Ajoutez la polyline à la carte
+            mapView.invalidate(); // Rafraîchissez la carte
+        }
+    }
+
+    private void openPopupPause() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.pause_dialog, null);
+        builder.setView(dialogView);
+
+        Button buttonStopAndSave = dialogView.findViewById(R.id.buttonStopAndSave);
+        Button buttonCancel = dialogView.findViewById(R.id.buttonCancel);
+        AlertDialog dialog = builder.create();
+
+        final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+        final Drawable originalBackground = rootView.getBackground();
+        final WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.alpha = 0.2f;
+        getWindow().setAttributes(params);
+        buttonCancel.setOnClickListener(v -> {
+            dialog.dismiss();
+            params.alpha = 1.0f;
+            getWindow().setAttributes(params);
+        });
+        buttonStopAndSave.setOnClickListener(v -> {
+
+            // Get informations of route
+            EditText title = dialogView.findViewById(R.id.editTextTitle);
+            EditText description = dialogView.findViewById(R.id.editTextDescription);
+            LocalDateTime endDate = LocalDateTime.now();
+            RouteDTO routeDTO =
+                    new RouteDTO(null,
+                            startDate.toString(),
+                            endDate.toString(),
+                            RouteUtils.pointsToCoordinates(line.getPoints()),
+                            new ArrayList<>(),
+                            RouteUtils.generateTitle(title.getText().toString(), endDate),
+                            description.getText().toString());
+
+            ApiUtils.saveRoute(this, routeDTO, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    if (isStarted) {
+                        Toast.makeText(MapActivity.this, getText(R.string.route_register), Toast.LENGTH_SHORT).show();
+                        mapView.getOverlays().remove(line);
+                        line = null;
+                        mapView.invalidate();
+                        btnRun.setImageResource(R.drawable.ic_add);
+                        isOngoing = false;
+                        isStarted = false;
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    Toast.makeText(MapActivity.this, "Erreur : " + error + " " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    // TODO Manage errors
+                }
+            });
+            dialog.dismiss();
+            params.alpha = 1.0f;
+            getWindow().setAttributes(params);
+        });
+        dialog.setOnDismissListener(d -> {
+            rootView.setBackground(originalBackground);
+            params.alpha = 1.0f;
+            getWindow().setAttributes(params);
+        });
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
+    }
+
     private void setupLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, null)
@@ -176,6 +292,13 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      */
     private void updateMarker(Location location) {
         GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
+
+        // Manamgment line overlay
+        if (line != null && isStarted) {
+            line.addPoint(newLocation);
+            mapView.invalidate(); // Rafraîchissez la carte
+        }
+
         if (currentLocationMarker == null) {
             currentLocationMarker = new Marker(mapView);
             currentLocationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);

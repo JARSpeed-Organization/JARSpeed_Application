@@ -10,7 +10,7 @@ import com.example.jarspeed.R;
 
 import java.util.List;
 
-import fr.iutrodez.jarspeed.model.Route;
+import fr.iutrodez.jarspeed.model.Route.Route;
 
 public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
 

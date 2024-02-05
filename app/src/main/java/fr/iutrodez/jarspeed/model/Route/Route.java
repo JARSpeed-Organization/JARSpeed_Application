@@ -1,4 +1,4 @@
-package fr.iutrodez.jarspeed.model;
+package fr.iutrodez.jarspeed.model.Route;
 
 public class Route {
     private String title;

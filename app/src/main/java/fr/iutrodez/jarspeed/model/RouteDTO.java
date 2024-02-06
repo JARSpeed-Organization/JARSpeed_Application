@@ -17,11 +17,11 @@ public class RouteDTO {
     /**
      * The start date.
      */
-    private String startDate;
+    private long startDate;
     /**
      * The end date.
      */
-    private String endDate;
+    private long endDate;
     /**
      * The Path.
      */
@@ -50,7 +50,7 @@ public class RouteDTO {
      * @param pTitle            the p title
      * @param pDescription      the p description
      */
-    public RouteDTO(String pId, String pStartDate, String pEndDate, List<Coordinate> pPath, List<PointOfInterest> pPointsOfInterest, String pTitle, String pDescription) {
+    public RouteDTO(String pId, long pStartDate, long pEndDate, List<Coordinate> pPath, List<PointOfInterest> pPointsOfInterest, String pTitle, String pDescription) {
         id = pId;
         startDate = pStartDate;
         endDate = pEndDate;
@@ -85,7 +85,7 @@ public class RouteDTO {
      *
      * @return the start date
      */
-    public String getStartDate() {
+    public long getStartDate() {
         return startDate;
     }
 
@@ -94,7 +94,7 @@ public class RouteDTO {
      *
      * @param pStartDate the p start date
      */
-    public void setStartDate(String pStartDate) {
+    public void setStartDate(long pStartDate) {
         startDate = pStartDate;
     }
 
@@ -103,7 +103,7 @@ public class RouteDTO {
      *
      * @return the end date
      */
-    public String getEndDate() {
+    public long getEndDate() {
         return endDate;
     }
 
@@ -112,7 +112,7 @@ public class RouteDTO {
      *
      * @param pEndDate the p end date
      */
-    public void setEndDate(String pEndDate) {
+    public void setEndDate(long pEndDate) {
         endDate = pEndDate;
     }
 

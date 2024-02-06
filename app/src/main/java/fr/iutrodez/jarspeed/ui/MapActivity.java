@@ -99,7 +99,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
 
     private Polyline line;
     private ImageButton btnRun;
-    private LocalDateTime startDate;
+    private long startDate;
     private ImageView imgAccount;
     private ImageView imgListRoute;
     private List<PointOfInterest> listPointOfInterests;
@@ -152,8 +152,6 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         mapController = mapView.getController();
         mapController.setZoom(20.0);
         btnRun = findViewById(R.id.fabAdd);
-        imgAccount = findViewById(R.id.imageViewProfile);
-        imgListRoute = findViewById(R.id.imageViewAllParcours);
 
         // Gestion de la localisation
         isOngoing = false;
@@ -165,6 +163,15 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             startLocationUpdates();
         }
 
+        /* Lancer l'activité pour voir tout les parcours */
+        ImageView imageViewAllParcours = findViewById(R.id.imageViewAllParcours);
+        imageViewAllParcours.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapActivity.this, AllCoursesActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     /**
@@ -254,7 +261,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             imgListRoute.setImageResource(R.drawable.vector);
             isOngoing = true;
             isStarted = true;
-            startDate = LocalDateTime.now();
+            startDate = System.currentTimeMillis();
             List<GeoPoint> geoPoints = new ArrayList<>(); // Points de la route
             setupLocation();
             line = new Polyline(); // Créez une nouvelle polyline
@@ -290,11 +297,11 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             // Get informations of route
             EditText title = dialogView.findViewById(R.id.editTextTitle);
             EditText description = dialogView.findViewById(R.id.editTextDescription);
-            LocalDateTime endDate = LocalDateTime.now();
+            long endDate = System.currentTimeMillis();
             RouteDTO routeDTO =
                     new RouteDTO(null,
-                            startDate.toString(),
-                            endDate.toString(),
+                            startDate,
+                            endDate,
                             RouteUtils.pointsToCoordinates(line.getPoints()),
                             listPointOfInterests,
                             RouteUtils.generateTitle(title.getText().toString(), endDate),

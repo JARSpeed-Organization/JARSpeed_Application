@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import fr.iutrodez.jarspeed.model.RouteDTO;
-import fr.iutrodez.jarspeed.model.user.UserRegistrationRequest;
 import fr.iutrodez.jarspeed.model.gender.Gender;
 import fr.iutrodez.jarspeed.model.user.UserRegistrationRequest;
 import fr.iutrodez.jarspeed.model.user.UserUpdateRequest;

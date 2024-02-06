@@ -42,7 +42,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:src="@drawable/ic_parcours"
-            android:layout_marginLeft="20dp"/>
+            android:layout_marginLeft="20dp"
+            android:onClick="onListRouteOnClicked"/>
 
         <Space
             android:layout_width="0dp"

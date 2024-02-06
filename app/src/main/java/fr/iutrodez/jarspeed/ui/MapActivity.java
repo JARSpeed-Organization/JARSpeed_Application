@@ -36,7 +36,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.ImageView;
 
@@ -53,9 +53,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.iutrodez.jarspeed.model.Coordinate;
 import fr.iutrodez.jarspeed.model.RouteDTO;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.network.RouteUtils;
+import fr.iutrodez.jarspeed.model.RouteDTO.PointOfInterest;
 
 /**
  * The type Map activity.
@@ -98,6 +100,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     private Polyline line;
     private ImageButton btnRun;
     private LocalDateTime startDate;
+    private ImageView imgAccount;
+    private ImageView imgListRoute;
+    private List<PointOfInterest> listPointOfInterests;
 
     /**
      * Create location request location request.
@@ -147,6 +152,8 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         mapController = mapView.getController();
         mapController.setZoom(20.0);
         btnRun = findViewById(R.id.fabAdd);
+        imgAccount = findViewById(R.id.imageViewProfile);
+        imgListRoute = findViewById(R.id.imageViewAllParcours);
 
         // Gestion de la localisation
         isOngoing = false;
@@ -190,6 +197,56 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         startActivity(intent);
     }
 
+    public void onListRouteOnClicked(View view) {
+        if (isStarted) {
+            //durant une course lancé (point of interest)
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            View dialogView = getLayoutInflater().inflate(R.layout.point_of_interest_dialog, null);
+            builder.setView(dialogView);
+
+            Button buttonAddPointOfInterest = dialogView.findViewById(R.id.buttonAddPointOfInterest);
+            Button buttonCancel = dialogView.findViewById(R.id.buttonCancelPointOfInterest);
+            AlertDialog dialog = builder.create();
+
+            final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+            final Drawable originalBackground = rootView.getBackground();
+            final WindowManager.LayoutParams params = getWindow().getAttributes();
+            params.alpha = 0.2f;
+            getWindow().setAttributes(params);
+            buttonCancel.setOnClickListener(v -> {
+                dialog.dismiss();
+                params.alpha = 1.0f;
+                getWindow().setAttributes(params);
+            });
+
+            buttonAddPointOfInterest.setOnClickListener(v -> {
+                EditText title = dialogView.findViewById(R.id.editTextTitlePointOfInterest);
+                String titleOfThePointOfInterest = title.getText().toString();
+                double latitude = line.getPoints().get(line.getPoints().size() - 1).getLatitude();
+                double longitude = line.getPoints().get(line.getPoints().size() - 1).getLongitude();
+                Coordinate coor = new Coordinate(latitude, longitude);
+                PointOfInterest point = new PointOfInterest(titleOfThePointOfInterest, coor);
+                listPointOfInterests.add(point);
+                dialog.dismiss();
+                params.alpha = 1.0f;
+                getWindow().setAttributes(params);
+            });
+
+            dialog.setOnDismissListener(d -> {
+                rootView.setBackground(originalBackground);
+                params.alpha = 1.0f;
+                getWindow().setAttributes(params);
+            });
+
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
+        } else {
+            //course pas lancé (burger Menu pour liste de route)
+
+        }
+    }
+
     /**
      * Start recording.
      * @param view View
@@ -199,13 +256,16 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             openPopupPause();
         } else {
             // Lancement de l'enregistrement
+            imgAccount.setVisibility(View.GONE);
             btnRun.setImageResource(R.drawable.ic_pause);
+            imgListRoute.setImageResource(R.drawable.vector);
             isOngoing = true;
             isStarted = true;
             startDate = LocalDateTime.now();
             List<GeoPoint> geoPoints = new ArrayList<>(); // Points de la route
             setupLocation();
             line = new Polyline(); // Créez une nouvelle polyline
+            listPointOfInterests = new ArrayList<PointOfInterest>();
             line.setPoints(geoPoints); // Ajoutez les points à la polyline
             mapView.getOverlays().add(line); // Ajoutez la polyline à la carte
             mapView.invalidate(); // Rafraîchissez la carte
@@ -243,7 +303,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                             startDate.toString(),
                             endDate.toString(),
                             RouteUtils.pointsToCoordinates(line.getPoints()),
-                            new ArrayList<>(),
+                            listPointOfInterests,
                             RouteUtils.generateTitle(title.getText().toString(), endDate),
                             description.getText().toString());
 
@@ -258,6 +318,8 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                         btnRun.setImageResource(R.drawable.ic_add);
                         isOngoing = false;
                         isStarted = false;
+                        imgAccount.setVisibility(View.VISIBLE);
+                        imgListRoute.setImageResource(R.drawable.ic_parcours);
                     }
                 }
             }, new Response.ErrorListener() {

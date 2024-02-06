@@ -165,15 +165,6 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             startLocationUpdates();
         }
 
-        /* Lancer l'activité pour voir tout les parcours */
-        ImageView imageViewAllParcours = findViewById(R.id.imageViewAllParcours);
-        imageViewAllParcours.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MapActivity.this, AllCoursesActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     /**
@@ -243,7 +234,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             dialog.show();
         } else {
             //course pas lancé (burger Menu pour liste de route)
-
+            /* Lancer l'activité pour voir tout les parcours */
+            Intent intent = new Intent(MapActivity.this, AllCoursesActivity.class);
+            startActivity(intent);
         }
     }
 

@@ -37,4 +37,5 @@ public class ApiConstants {
      * The constant DELETE_URL.
      */
     public static final String DELETE_URL = BASE_URL + "/users/deleteAccount";
+    public static final String ALL_ROUTES_URL = BASE_URL + "/routes";
 }

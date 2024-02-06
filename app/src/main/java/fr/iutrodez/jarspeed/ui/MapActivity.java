@@ -38,6 +38,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -156,6 +157,16 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             setupLocation();
             startLocationUpdates();
         }
+
+        /* Lancer l'activité pour voir tout les parcours */
+        ImageView imageViewAllParcours = findViewById(R.id.imageViewAllParcours);
+        imageViewAllParcours.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapActivity.this, AllCoursesActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     /**

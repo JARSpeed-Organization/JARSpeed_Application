@@ -186,5 +186,16 @@ public class ApiUtils {
         Volley.newRequestQueue(context).add(request);
     }
 
+    public static void loadAllRoutes(Context context, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        String url = ApiConstants.ALL_ROUTES_URL; // Assurez-vous que cela pointe vers votre endpoint "/routes"
+        StringRequest request = new StringRequest(Request.Method.GET, url, listener, errorListener) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return getAuthHeaders(context);
+            }
+        };
+        Volley.newRequestQueue(context).add(request);
+    }
+
 }
 

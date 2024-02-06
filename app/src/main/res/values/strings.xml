@@ -59,4 +59,6 @@
     <!-- String for Pop Up -->
     <string name="popUpPauseString">Voulez-vous arréter votre activité ?</string>
     <string name="route_register">Le parcours a bien été enregistré.</string>
+    <string name="popUpPointOfInterestCancel">Annuler</string>
+    <string name="popUpPointOfInterestValide">Créer point</string>
 </resources>

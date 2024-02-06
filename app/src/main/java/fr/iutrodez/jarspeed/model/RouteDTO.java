@@ -193,6 +193,12 @@ public class RouteDTO {
      * Inner class representing a point of interest along a route.
      */
     public static class PointOfInterest {
+
+        public PointOfInterest(final String pName, final Coordinate pCoordinates) {
+            name = pName;
+            coordinates = pCoordinates;
+        }
+
         /**
          * The Name.
          */

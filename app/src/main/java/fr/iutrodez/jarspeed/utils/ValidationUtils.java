@@ -79,4 +79,6 @@ public class ValidationUtils {
             editText.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
         }
     }
+
+
 }

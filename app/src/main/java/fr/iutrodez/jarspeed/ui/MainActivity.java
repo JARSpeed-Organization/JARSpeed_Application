@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
+import fr.iutrodez.jarspeed.utils.ValidationUtils;
 
 /**
  * The type Main activity.
@@ -70,7 +72,17 @@ public class MainActivity extends AppCompatActivity {
         String email = emailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
 
-        loginUser(email, password);
+        // Réinitialisez les bordures des champs à chaque tentative
+        ValidationUtils.resetFieldBorders(this, emailEditText, passwordEditText);
+
+        // Vérifiez si les champs sont vides
+        if (email.trim().isEmpty() || password.trim().isEmpty()) {
+            ValidationUtils.setErrorBorder(this, emailEditText);
+            ValidationUtils.setErrorBorder(this, passwordEditText);
+            Toast.makeText(this, "Le champ ne doit pas être vide.", Toast.LENGTH_SHORT).show();
+        } else {
+            loginUser(email, password);
+        }
     }
 
     /**
@@ -83,24 +95,24 @@ public class MainActivity extends AppCompatActivity {
         ApiUtils.loginUser(this, email, password, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                try {
-                    JSONObject jsonResponse = new JSONObject(response);
-                    String token = jsonResponse.getString("token");
-                    String refreshToken = jsonResponse.getString("refreshToken");
-
-                    SharedPreferencesManager.saveAuthToken(MainActivity.this, token);
-
-                    goToMapActivity();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                // Gestion de la réponse réussie
+                goToMapActivity();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
+                // Gestion des erreurs d'identifiants invalides
+                setErrorFields();
+                Toast.makeText(MainActivity.this, "Identifiants invalides.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void setErrorFields() {
+        EditText emailEditText = findViewById(R.id.email);
+        EditText passwordEditText = findViewById(R.id.password);
+        ValidationUtils.setErrorBorder(this, emailEditText);
+        ValidationUtils.setErrorBorder(this, passwordEditText);
     }
 
     /**

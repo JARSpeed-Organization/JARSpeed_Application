@@ -10,14 +10,21 @@ import com.example.jarspeed.R;
 
 import java.util.List;
 
-import fr.iutrodez.jarspeed.model.Route.Route;
+import fr.iutrodez.jarspeed.model.route.Route;
 
 public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
 
     private List<Route> routeList;
 
-    public RouteAdapter(List<Route> routeList) {
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void showEditRoutePopup(Route route);
+    }
+
+    public RouteAdapter(List<Route> routeList, OnItemClickListener listener) {
         this.routeList = routeList;
+        this.listener = listener;
     }
 
     @Override
@@ -31,8 +38,11 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
     public void onBindViewHolder(RouteViewHolder holder, int position) {
         Route route = routeList.get(position);
         holder.title.setText(route.getTitle());
-        holder.date.setText(route.getDate());
-        holder.time.setText(route.getTime());
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.showEditRoutePopup(route);
+            }
+        });
     }
 
     @Override
@@ -46,8 +56,6 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
         public RouteViewHolder(View view) {
             super(view);
             title = view.findViewById(R.id.title);
-            date = view.findViewById(R.id.date);
-            time = view.findViewById(R.id.time);
         }
     }
 }

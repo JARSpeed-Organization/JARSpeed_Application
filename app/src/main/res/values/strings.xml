@@ -62,4 +62,9 @@
     <string name="route_register">Le parcours a bien été enregistré.</string>
     <string name="popUpPointOfInterestCancel">Annuler</string>
     <string name="popUpPointOfInterestValide">Créer point</string>
+
+
+    <string name="hintTitre">Titre du parcours</string>
+    <string name="hintDescription">Description du parcours</string>
+    <string name="enregistrer">Enregister</string>
 </resources>

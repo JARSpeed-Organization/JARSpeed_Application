@@ -41,6 +41,7 @@
                     android:maxLines="1"
                     android:maxLength="40"/>
 
+
                 <!-- Boutons Annuler et Confirmer -->
                 <Button
                     android:id="@+id/buttonCancelGeneric"

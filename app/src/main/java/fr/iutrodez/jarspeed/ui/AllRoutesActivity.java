@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import fr.iutrodez.jarspeed.network.ApiConstants;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.RouteAdapter;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
@@ -72,27 +73,45 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         recyclerView.setAdapter(adapter);
     }
 
-    @Override
-    public void showEditRoutePopup(Route route) {
-        // Assombrir l'arrière-plan
-        final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
-        final WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.alpha = 0.2f; // Assombrir l'arrière-plan
-        getWindow().setAttributes(params);
 
-        // Construit la boîte de dialogue
+    private void darkenBackground() {
+        final WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.alpha = 0.2f;
+        getWindow().setAttributes(params);
+    }
+
+    private void restoreBackgroundOnDismiss(AlertDialog dialog) {
+        dialog.setOnDismissListener(d -> {
+            final WindowManager.LayoutParams params = getWindow().getAttributes();
+            params.alpha = 1.0f;
+            getWindow().setAttributes(params);
+        });
+    }
+
+    private AlertDialog createEditRouteDialog(Route route) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.edit_route_dialog, null);
         builder.setView(dialogView);
-        final AlertDialog dialog = builder.create();
 
+        AlertDialog dialog = builder.create();
+
+        configureDialogFields(dialogView, route);
+        // Modification ici pour passer 'dialog' au lieu de 'dialogView'
+        setupSaveButtonListener(dialog, dialogView, route);
+        setupCancelButton(dialogView, dialog); // Ajoutez cette ligne pour gérer le bouton Annuler
+
+        restoreBackgroundOnDismiss(dialog);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        return dialog;
+    }
+
+    private void configureDialogFields(View dialogView, Route route) {
         // Initialisation des composants du dialogue
         EditText editTextTitle = dialogView.findViewById(R.id.editTextTitle);
         EditText editTextDescription = dialogView.findViewById(R.id.editTextDescription);
         TextView textViewStartDate = dialogView.findViewById(R.id.textViewStartDate);
         TextView textViewEndDate = dialogView.findViewById(R.id.textViewEndDate);
         TextView textViewPointsOfInterest = dialogView.findViewById(R.id.textViewPointsOfInterest);
-        Button buttonSave = dialogView.findViewById(R.id.buttonSave);
 
         // Configuration initiale des champs
         editTextTitle.setText(route.getTitle() != null && !route.getTitle().isEmpty() ? route.getTitle() : "");
@@ -111,51 +130,48 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
             poiBuilder.append("Aucun");
         }
         textViewPointsOfInterest.setText(poiBuilder.toString());
+    }
 
-        // Gestion du clic sur le bouton Enregistrer
-        buttonSave.setOnClickListener(v -> {
-            String newTitle = editTextTitle.getText().toString().trim();
-            String newDescription = editTextDescription.getText().toString().trim();
+    private void setupSaveButtonListener(AlertDialog dialog, View dialogView, Route route) {
+        Button buttonSave = dialogView.findViewById(R.id.buttonSave);
+        buttonSave.setOnClickListener(v -> updateRoute(dialog, route));
+    }
+    private void setupCancelButton(View dialogView, AlertDialog dialog) {
+        Button buttonCancel = dialogView.findViewById(R.id.buttonCancelEditRoute);
+        buttonCancel.setOnClickListener(v -> dialog.dismiss());
+    }
+    private void updateRoute(AlertDialog dialog, Route route) {
+        String newTitle = ((EditText) dialog.findViewById(R.id.editTextTitle)).getText().toString().trim();
+        String newDescription = ((EditText) dialog.findViewById(R.id.editTextDescription)).getText().toString().trim();
+        Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("title", newTitle);
+        paramsMap.put("description", newDescription);
+        JSONObject parameters = new JSONObject(paramsMap);
 
-            // Construction de l'objet de requête
-            Map<String, String> paramsMap = new HashMap<>();
-            paramsMap.put("title", newTitle);
-            paramsMap.put("description", newDescription);
-            // Ajoutez ici plus de champs si nécessaire
-            JSONObject parameters = new JSONObject(paramsMap);
+        String url = ApiConstants.ROUTE_BASE_URL + "/" + route.getId();
 
-            // Remplacer 'localhost' par '10.0.2.2' pour l'émulateur Android Studio ou par l'adresse IP de votre serveur
-            String baseUrl = "http://10.0.2.2:8080/routes/";
-            String url = baseUrl + route.getId(); // Assurez-vous que l'ID est correctement attaché à l'URL
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, url, parameters, response -> {
+            loadAllRoutes();
+            Toast.makeText(getApplicationContext(), "Votre parcours a été mis à jour avec succès", Toast.LENGTH_SHORT).show();
+            dialog.dismiss(); // Fermez directement le dialogue ici
+        }, error -> Toast.makeText(getApplicationContext(), "Erreur de réseau: " + error.getMessage(), Toast.LENGTH_SHORT).show()) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
 
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, url, parameters, response -> {
-                // Le code de réponse est géré par Volley, afficher un toast directement en cas de succès
-                loadAllRoutes(); // Assurez-vous que cette méthode rafraîchit correctement l'affichage des routes
-                Toast.makeText(getApplicationContext(), "Votre parcours a été mis à jour avec succès", Toast.LENGTH_SHORT).show();
-                dialog.dismiss(); // Fermeture de la popup après enregistrement
-            }, error -> {
-                // Gestion des erreurs
-                Toast.makeText(getApplicationContext(), "Erreur de réseau: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("Content-Type", "application/json");
-                    // Ajoutez ici tout en-tête supplémentaire nécessaire, par exemple un token d'authentification
-                    return headers;
-                }
-            };
+        Volley.newRequestQueue(this).add(jsonObjectRequest);
+    }
 
-            // Ajout de la requête à la file d'attente de Volley
-            Volley.newRequestQueue(this).add(jsonObjectRequest);
-        });
-
-        // Restauration de l'arrière-plan à la fermeture du dialogue
-        dialog.setOnDismissListener(d -> {
-            params.alpha = 1.0f; // Restaurer la transparence
-            getWindow().setAttributes(params);
-        });
-
+    @Override
+    public void showEditRoutePopup(Route route) {
+        // Assombrir l'arrière-plan
+        darkenBackground();
+        createEditRouteDialog(route);
+        AlertDialog dialog = createEditRouteDialog(route);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
     }

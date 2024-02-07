@@ -31,8 +31,6 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
     public void onBindViewHolder(RouteViewHolder holder, int position) {
         Route route = routeList.get(position);
         holder.title.setText(route.getTitle());
-        holder.date.setText(route.getDate());
-        holder.time.setText(route.getTime());
     }
 
     @Override
@@ -46,8 +44,6 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
         public RouteViewHolder(View view) {
             super(view);
             title = view.findViewById(R.id.title);
-            date = view.findViewById(R.id.date);
-            time = view.findViewById(R.id.time);
         }
     }
 }

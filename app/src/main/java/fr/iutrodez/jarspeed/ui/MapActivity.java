@@ -235,7 +235,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         } else {
             //course pas lancé (burger Menu pour liste de route)
             /* Lancer l'activité pour voir tout les parcours */
-            Intent intent = new Intent(MapActivity.this, AllCoursesActivity.class);
+            Intent intent = new Intent(MapActivity.this, AllRoutesActivity.class);
             startActivity(intent);
         }
     }

@@ -47,7 +47,7 @@
             android:screenOrientation="portrait"
         />
         <activity
-            android:name="fr.iutrodez.jarspeed.ui.AllCoursesActivity"
+            android:name="fr.iutrodez.jarspeed.ui.AllRoutesActivity"
             android:screenOrientation="portrait"
         />
     </application>

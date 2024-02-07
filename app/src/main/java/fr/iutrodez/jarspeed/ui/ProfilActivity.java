@@ -63,6 +63,17 @@ public class ProfilActivity extends AppCompatActivity {
     }
 
     /**
+     * On routes click.
+     *
+     * @param view the view
+     */
+    public void onRoutesClick(View view) {
+        /* Lancer l'activité pour voir tout les parcours */
+        Intent intent = new Intent(ProfilActivity.this, AllRoutesActivity.class);
+        startActivity(intent);
+    }
+
+    /**
      * On delete account click.
      *
      * @param view the view

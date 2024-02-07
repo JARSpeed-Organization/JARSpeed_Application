@@ -1,8 +1,12 @@
 package fr.iutrodez.jarspeed.ui;
 
 import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -39,6 +43,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import fr.iutrodez.jarspeed.network.ApiConstants;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.RouteAdapter;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
@@ -68,26 +73,50 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         recyclerView.setAdapter(adapter);
     }
 
-    @Override
-    public void showEditRoutePopup(Route route) {
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.layout_edit_route);
 
-        EditText editTextTitle = dialog.findViewById(R.id.editTextTitle);
-        EditText editTextDescription = dialog.findViewById(R.id.editTextDescription);
-        TextView textViewStartDate = dialog.findViewById(R.id.textViewStartDate);
-        TextView textViewEndDate = dialog.findViewById(R.id.textViewEndDate);
-        TextView textViewPointsOfInterest = dialog.findViewById(R.id.textViewPointsOfInterest);
-        Button buttonSave = dialog.findViewById(R.id.buttonSave);
+    private void darkenBackground() {
+        final WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.alpha = 0.2f;
+        getWindow().setAttributes(params);
+    }
 
-        // Titre et description avec vérification de nullité et de vacuité
+    private void restoreBackgroundOnDismiss(AlertDialog dialog) {
+        dialog.setOnDismissListener(d -> {
+            final WindowManager.LayoutParams params = getWindow().getAttributes();
+            params.alpha = 1.0f;
+            getWindow().setAttributes(params);
+        });
+    }
+
+    private AlertDialog createEditRouteDialog(Route route) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.edit_route_dialog, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+
+        configureDialogFields(dialogView, route);
+        // Modification ici pour passer 'dialog' au lieu de 'dialogView'
+        setupSaveButtonListener(dialog, dialogView, route);
+        setupCancelButton(dialogView, dialog); // Ajoutez cette ligne pour gérer le bouton Annuler
+
+        restoreBackgroundOnDismiss(dialog);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        return dialog;
+    }
+
+    private void configureDialogFields(View dialogView, Route route) {
+        // Initialisation des composants du dialogue
+        EditText editTextTitle = dialogView.findViewById(R.id.editTextTitle);
+        EditText editTextDescription = dialogView.findViewById(R.id.editTextDescription);
+        TextView textViewStartDate = dialogView.findViewById(R.id.textViewStartDate);
+        TextView textViewEndDate = dialogView.findViewById(R.id.textViewEndDate);
+        TextView textViewPointsOfInterest = dialogView.findViewById(R.id.textViewPointsOfInterest);
+
+        // Configuration initiale des champs
         editTextTitle.setText(route.getTitle() != null && !route.getTitle().isEmpty() ? route.getTitle() : "");
         editTextDescription.setText(route.getDescription() != null && !route.getDescription().isEmpty() ? route.getDescription() : "");
-
-        // Affichage conditionnel des dates de début et de fin
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE dd MMMM yyyy à HH:mm", Locale.FRANCE);
-
-        // Utilisez formatter pour convertir LocalDateTime en String
         textViewStartDate.setText(route.getStartDate() != null ? route.getStartDate().format(formatter) : "Non spécifiée");
         textViewEndDate.setText(route.getEndDate() != null ? route.getEndDate().format(formatter) : "Non spécifiée");
 
@@ -101,61 +130,52 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
             poiBuilder.append("Aucun");
         }
         textViewPointsOfInterest.setText(poiBuilder.toString());
+    }
 
-        // Gestion du clic sur le bouton Enregistrer
-        buttonSave.setOnClickListener(v -> {
-            String newTitle = editTextTitle.getText().toString().trim();
-            String newDescription = editTextDescription.getText().toString().trim();
+    private void setupSaveButtonListener(AlertDialog dialog, View dialogView, Route route) {
+        Button buttonSave = dialogView.findViewById(R.id.buttonSave);
+        buttonSave.setOnClickListener(v -> updateRoute(dialog, route));
+    }
+    private void setupCancelButton(View dialogView, AlertDialog dialog) {
+        Button buttonCancel = dialogView.findViewById(R.id.buttonCancelEditRoute);
+        buttonCancel.setOnClickListener(v -> dialog.dismiss());
+    }
+    private void updateRoute(AlertDialog dialog, Route route) {
+        String newTitle = ((EditText) dialog.findViewById(R.id.editTextTitle)).getText().toString().trim();
+        String newDescription = ((EditText) dialog.findViewById(R.id.editTextDescription)).getText().toString().trim();
+        Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("title", newTitle);
+        paramsMap.put("description", newDescription);
+        JSONObject parameters = new JSONObject(paramsMap);
 
-            // Remplacer 'localhost' par '10.0.2.2' pour l'émulateur Android Studio ou par l'adresse IP de votre machine
-            String baseUrl = "http://10.0.2.2:8080/routes/";
-            // Assurez-vous de remplacer {id} par l'ID réel de la route
-            String url = baseUrl + route.getId();
+        String url = ApiConstants.ROUTE_BASE_URL + "/" + route.getId();
 
-            // Construction de l'objet de requête
-            Map<String, String> params = new HashMap<>();
-            params.put("title", newTitle);
-            params.put("description", newDescription);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, url, parameters, response -> {
+            loadAllRoutes();
+            Toast.makeText(getApplicationContext(), "Votre parcours a été mis à jour avec succès", Toast.LENGTH_SHORT).show();
+            dialog.dismiss(); // Fermez directement le dialogue ici
+        }, error -> Toast.makeText(getApplicationContext(), "Erreur de réseau: " + error.getMessage(), Toast.LENGTH_SHORT).show()) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
 
-            // Vérification et ajout de startDate s'il n'est pas null
-            if (route.getStartDate() != null) {params.put("startDate", route.getStartDate().toString());}
+        Volley.newRequestQueue(this).add(jsonObjectRequest);
+    }
 
-            // Vérification et ajout de endDate s'il n'est pas null
-            if (route.getEndDate() != null) {params.put("endDate", route.getEndDate().toString());}
-
-            // Supposons que getPath retourne une liste, vérification et ajout si non vide
-            if (route.getPath() != null && !route.getPath().isEmpty()) {params.put("path", route.getPath().toString());}
-
-            // Vérification et ajout de pointsOfInterest s'il n'est pas vide
-            if (route.getPointsOfInterest() != null && !route.getPointsOfInterest().isEmpty()) {params.put("pointsOfInterest", route.getPointsOfInterest().toString());}
-            JSONObject parameters = new JSONObject(params);
-
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                    (Request.Method.PUT, url, parameters, response -> {
-                        // Le code de réponse est géré par Volley, afficher un toast directement en cas de succès
-                        loadAllRoutes();
-                        Toast.makeText(getApplicationContext(), "Votre parcour a été mis a jour avec succès", Toast.LENGTH_SHORT).show();
-                    }, error -> {
-                        // Gestion des erreurs
-                        Toast.makeText(getApplicationContext(), "Erreur de réseau", Toast.LENGTH_SHORT).show();
-                    }) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("Content-Type", "application/json");
-                    // Ajoutez ici tout en-tête supplémentaire nécessaire, par exemple un token d'authentification
-                    return headers;
-                }
-            };
-
-            // Ajout de la requête à la file d'attente de Volley
-            Volley.newRequestQueue(this).add(jsonObjectRequest);
-
-            dialog.dismiss(); // Fermeture de la popup après enregistrement
-        });
-
+    @Override
+    public void showEditRoutePopup(Route route) {
+        // Assombrir l'arrière-plan
+        darkenBackground();
+        createEditRouteDialog(route);
+        AlertDialog dialog = createEditRouteDialog(route);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
     }
+
 
     private void loadAllRoutes() {
         String token = SharedPreferencesManager.getAuthToken(this);

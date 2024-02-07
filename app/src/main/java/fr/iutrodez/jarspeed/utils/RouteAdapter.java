@@ -19,7 +19,7 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onItemClick(Route route);
+        void showEditRoutePopup(Route route);
     }
 
     public RouteAdapter(List<Route> routeList, OnItemClickListener listener) {
@@ -40,7 +40,7 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
         holder.title.setText(route.getTitle());
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onItemClick(route);
+                listener.showEditRoutePopup(route);
             }
         });
     }

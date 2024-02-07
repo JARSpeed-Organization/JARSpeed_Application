@@ -1,12 +1,13 @@
 package fr.iutrodez.jarspeed.model.route;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
 public class Route {
     private String id;
-    private Date startDate;
-    private Date endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private List<Coordinate> path;
     private List<PointOfInterest> pointsOfInterest;
     private String title;
@@ -29,19 +30,19 @@ public class Route {
         this.id = id;
     }
 
-    public Date getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
     }
 

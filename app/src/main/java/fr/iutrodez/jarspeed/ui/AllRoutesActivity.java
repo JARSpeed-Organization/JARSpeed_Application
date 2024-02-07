@@ -28,6 +28,7 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -72,7 +73,6 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.layout_edit_route);
 
-        TextView textViewId = dialog.findViewById(R.id.textViewId);
         EditText editTextTitle = dialog.findViewById(R.id.editTextTitle);
         EditText editTextDescription = dialog.findViewById(R.id.editTextDescription);
         TextView textViewStartDate = dialog.findViewById(R.id.textViewStartDate);
@@ -80,15 +80,12 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         TextView textViewPointsOfInterest = dialog.findViewById(R.id.textViewPointsOfInterest);
         Button buttonSave = dialog.findViewById(R.id.buttonSave);
 
-        // Affichage conditionnel de l'ID
-        textViewId.setText(route.getId() != null ? route.getId() : "Non spécifié");
-
         // Titre et description avec vérification de nullité et de vacuité
         editTextTitle.setText(route.getTitle() != null && !route.getTitle().isEmpty() ? route.getTitle() : "");
         editTextDescription.setText(route.getDescription() != null && !route.getDescription().isEmpty() ? route.getDescription() : "");
 
         // Affichage conditionnel des dates de début et de fin
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE dd MMMM yyyy à HH:mm", Locale.FRANCE);
 
         // Utilisez formatter pour convertir LocalDateTime en String
         textViewStartDate.setText(route.getStartDate() != null ? route.getStartDate().format(formatter) : "Non spécifiée");

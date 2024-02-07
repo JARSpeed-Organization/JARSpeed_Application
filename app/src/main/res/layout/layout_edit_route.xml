@@ -4,21 +4,10 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
-
-        <!-- Affichage de l'ID -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ID"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
-        <TextView
-            android:id="@+id/textViewId"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
 
         <!-- Zones modifiables pour Titre et Description -->
         <EditText

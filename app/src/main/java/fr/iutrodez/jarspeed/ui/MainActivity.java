@@ -95,13 +95,20 @@ public class MainActivity extends AppCompatActivity {
         ApiUtils.loginUser(this, email, password, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                // Gestion de la réponse réussie
-                goToMapActivity();
+                try {
+                    JSONObject jsonResponse = new JSONObject(response);
+                    String token = jsonResponse.getString("token");
+
+                    SharedPreferencesManager.saveAuthToken(MainActivity.this, token);
+
+                    goToMapActivity();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                // Gestion des erreurs d'identifiants invalides
                 setErrorFields();
                 Toast.makeText(MainActivity.this, "Identifiants invalides.", Toast.LENGTH_SHORT).show();
             }

@@ -270,6 +270,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         timeForOneKilometer = findViewById(R.id.time_km);
         timeInHour = 0;
         kilocal = findViewById(R.id.kcal);
+        weight = "";
 
         // Gestion de la localisation
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -279,7 +280,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             setupLocation();
             startLocationUpdates();
         }
-
+        loadUserWeight();
     }
 
     /**
@@ -516,10 +517,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 strValue = String.format("%02d:%02d", minutes, secondes);
                 timeForOneKilometer.setText(strValue + " /km");
 
-                loadUserWeight();
                 double userWeight = Double.parseDouble(weight);
                 double kcalBurn = userWeight * kilometersRun * CONSTANTE_CALCUL_KCAL;
-                strValue = String.format("%.2F", kcalBurn);
+                strValue = String.format("%.2f", kcalBurn);
                 kilocal.setText(strValue + " Kcal");
             }
         }

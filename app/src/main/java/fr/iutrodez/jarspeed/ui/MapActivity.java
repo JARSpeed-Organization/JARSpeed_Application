@@ -1,6 +1,7 @@
 package fr.iutrodez.jarspeed.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,8 +12,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
@@ -20,6 +23,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -33,12 +38,15 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ImageView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -55,21 +63,32 @@ import java.util.List;
 
 import fr.iutrodez.jarspeed.model.Coordinate;
 import fr.iutrodez.jarspeed.model.RouteDTO;
+import fr.iutrodez.jarspeed.model.user.User;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.network.RouteUtils;
 import fr.iutrodez.jarspeed.model.RouteDTO.PointOfInterest;
+import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
 
 /**
  * The type Map activity.
  */
 public class MapActivity extends AppCompatActivity implements SensorEventListener {
 
+    /**
+     * The constant MY_USER_AGENT.
+     */
     private static final String MY_USER_AGENT = "USER_AGENT";
+    /**
+     * The Is ongoing.
+     */
     private boolean isOngoing;
     /**
      * The Sensor manager.
      */
     private boolean isStarted;
+    /**
+     * The Sensor manager.
+     */
     private SensorManager sensorManager;
     /**
      * The Compass.
@@ -97,12 +116,98 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      */
     private Marker currentLocationMarker;
 
+    /**
+     * The Line.
+     */
     private Polyline line;
+    /**
+     * The Btn run.
+     */
     private ImageButton btnRun;
+    /**
+     * The Start date.
+     */
     private LocalDateTime startDate;
+    /**
+     * The Img account.
+     */
     private ImageView imgAccount;
+    /**
+     * The Img list route.
+     */
     private ImageView imgListRoute;
+    /**
+     * The List point of interests.
+     */
     private List<PointOfInterest> listPointOfInterests;
+    /**
+     * The Datas block.
+     */
+    private RelativeLayout datasBlock;
+    /**
+     * The Text view timer.
+     */
+    private TextView textViewTimer;
+    /**
+     * The Handler.
+     */
+    private Handler handler;
+    /**
+     * The Time spend millisecond.
+     */
+    private long timeSpendMillisecond;
+
+    /**
+     * The Timer in pause.
+     */
+    private boolean timerInPause;
+
+    /**
+     * The Runnable.
+     */
+    private Runnable runnable;
+    /**
+     * The Initialise time.
+     */
+    private final String INITIALISE_TIME = "00:00:00";
+
+    /**
+     * The constant EARTH_RADIUS.
+     */
+    private static final double EARTH_RADIUS = 6371;
+
+    /**
+     * The Kilometers run.
+     */
+    private double kilometersRun;
+
+    /**
+     * The Kilometers.
+     */
+    private TextView kilometers;
+
+    /**
+     * The Time for one kilometer.
+     */
+    private TextView timeForOneKilometer;
+
+    /**
+     * The Time in hour.
+     */
+    private double timeInHour;
+
+    /**
+     * The Constante calcul kcal.
+     */
+    private final double CONSTANTE_CALCUL_KCAL = 1.036;
+
+    /**
+     * The Kilocal.
+     */
+    private TextView kilocal;
+
+    private String weight;
+
 
     /**
      * Create location request location request.
@@ -154,9 +259,19 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         btnRun = findViewById(R.id.fabAdd);
         imgAccount = findViewById(R.id.imageViewProfile);
         imgListRoute = findViewById(R.id.imageViewAllParcours);
+        datasBlock = findViewById(R.id.datas_while_running);
+        datasBlock.setVisibility(View.INVISIBLE);
+        textViewTimer = findViewById(R.id.timerText);
+        handler = new Handler();
+        timeSpendMillisecond = -1;
+        timerInPause = false;
+        isOngoing = false;
+        kilometers = findViewById(R.id.km);
+        timeForOneKilometer = findViewById(R.id.time_km);
+        timeInHour = 0;
+        kilocal = findViewById(R.id.kcal);
 
         // Gestion de la localisation
-        isOngoing = false;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
@@ -188,6 +303,11 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         startActivity(intent);
     }
 
+    /**
+     * On list route on clicked.
+     *
+     * @param view the view
+     */
     public void onListRouteOnClicked(View view) {
         if (isStarted) {
             //durant une course lancé (point of interest)
@@ -242,13 +362,16 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
 
     /**
      * Start recording.
+     *
      * @param view View
      */
+    @SuppressLint("ResourceType")
     public void onRunButtonClick(View view) {
         if (isOngoing) {
             openPopupPause();
         } else {
             // Lancement de l'enregistrement
+
             imgAccount.setVisibility(View.GONE);
             btnRun.setImageResource(R.drawable.ic_pause);
             imgListRoute.setImageResource(R.drawable.vector);
@@ -262,11 +385,21 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             line.setPoints(geoPoints); // Ajoutez les points à la polyline
             mapView.getOverlays().add(line); // Ajoutez la polyline à la carte
             mapView.invalidate(); // Rafraîchissez la carte
+            Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_to_bot);
+            datasBlock.setVisibility(View.VISIBLE);
+            datasBlock.startAnimation(animation);
+            startTimer();
+            kilometersRun = 0;
+            String strValue = String.format("%.2f", kilometersRun);
+            kilometers.setText(strValue + " km");
         }
     }
 
+    /**
+     * Open popup pause.
+     */
     private void openPopupPause() {
-
+        pauseTimer();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.pause_dialog, null);
         builder.setView(dialogView);
@@ -281,6 +414,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         params.alpha = 0.2f;
         getWindow().setAttributes(params);
         buttonCancel.setOnClickListener(v -> {
+            restartTimer();
             dialog.dismiss();
             params.alpha = 1.0f;
             getWindow().setAttributes(params);
@@ -313,6 +447,8 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                         isStarted = false;
                         imgAccount.setVisibility(View.VISIBLE);
                         imgListRoute.setImageResource(R.drawable.ic_parcours);
+                        animationEndForBlockData();
+                        reinitialiserTimer();
                     }
                 }
             }, new Response.ErrorListener() {
@@ -337,6 +473,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         dialog.show();
     }
 
+    /**
+     * Sets location.
+     */
     private void setupLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, null)
@@ -363,6 +502,26 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         if (line != null && isStarted) {
             line.addPoint(newLocation);
             mapView.invalidate(); // Rafraîchissez la carte
+            if (line.getPoints().size() > 1) {
+                GeoPoint beforeLast = line.getPoints().get(line.getPoints().size()-2);
+                GeoPoint last = line.getPoints().get(line.getPoints().size()-1);
+                kilometersRun += calculateDistanceBetweenTwoPoints(beforeLast, last);
+                String strValue = String.format("%.2f", kilometersRun);
+                kilometers.setText(strValue + " km");
+
+                double forOneKmInHour = timeInHour / kilometersRun;
+                double forOneKmInMin = forOneKmInHour*60;
+                int minutes = (int) forOneKmInMin;
+                int secondes = (int) ((forOneKmInMin - minutes) * 60);
+                strValue = String.format("%02d:%02d", minutes, secondes);
+                timeForOneKilometer.setText(strValue + " /km");
+
+                loadUserWeight();
+                double userWeight = Double.parseDouble(weight);
+                double kcalBurn = userWeight * kilometersRun * CONSTANTE_CALCUL_KCAL;
+                strValue = String.format("%.2F", kcalBurn);
+                kilocal.setText(strValue + " Kcal");
+            }
         }
 
         if (currentLocationMarker == null) {
@@ -380,6 +539,129 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         currentLocationMarker.setIcon(resizedIcon);
 
         mapView.invalidate(); // Rafraîchir la carte
+    }
+
+    private void loadUserWeight() {
+        String token = SharedPreferencesManager.getAuthToken(this);
+        if (token == null || token.isEmpty()) {
+            Toast.makeText(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ApiUtils.loadUserProfile(this, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jsonResponse = new JSONObject(response);
+                    weight = jsonResponse.optString("weight");
+
+                } catch (JSONException e) {
+                    Log.e("LoadUserProfile", "Error parsing JSON", e);
+                    Toast.makeText(MapActivity.this, "Erreur lors du parsing des données", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("LoadUserProfile", "Error loading weight: " + error.toString());
+                Toast.makeText(MapActivity.this, "Erreur lors du chargement du poids", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Animation end for block data.
+     */
+    private void animationEndForBlockData() {
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_to_top);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                datasBlock.setVisibility(View.INVISIBLE);
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+        datasBlock.startAnimation(animation);
+    }
+
+    /**
+     * Start timer.
+     */
+    private void startTimer() {
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                timeSpendMillisecond += 1000;
+
+                int hour = (int) (timeSpendMillisecond / 3600000);
+                int minutes = (int) ((timeSpendMillisecond % 3600000) / 60000);
+                int secondes = (int) ((timeSpendMillisecond % 60000) / 1000);
+
+                timeInHour = hour + (minutes / 60.0) + (secondes / 3600.0);
+                String timeSpend = String.format("%02d:%02d:%02d", hour, minutes, secondes);
+                textViewTimer.setText(timeSpend);
+
+                handler.postDelayed(runnable, 1000);
+            }
+        };
+        handler.post(runnable);
+    }
+
+
+    /**
+     * Pause timer.
+     */
+    private void pauseTimer() {
+        if (!timerInPause) {
+            timerInPause = true;
+            handler.removeCallbacks(runnable);
+        }
+    }
+
+    /**
+     * Restart timer.
+     */
+    private void restartTimer() {
+        if (timerInPause) {
+            timerInPause = false;
+            handler.postDelayed(runnable, 1000);
+        }
+    }
+
+    /**
+     * Reinitialiser timer.
+     */
+    private void reinitialiserTimer() {
+        timeSpendMillisecond = -1;
+        textViewTimer.setText(INITIALISE_TIME);
+        handler.removeCallbacks(runnable);
+    }
+
+    /**
+     * Calculate distance between two points double.
+     *
+     * @param coord1 the coord 1
+     * @param coord2 the coord 2
+     * @return the double
+     */
+    public static double calculateDistanceBetweenTwoPoints(GeoPoint coord1, GeoPoint coord2) {
+        double lat1 = Math.toRadians(coord1.getLatitude());
+        double lon1 = Math.toRadians(coord1.getLongitude());
+        double lat2 = Math.toRadians(coord2.getLatitude());
+        double lon2 = Math.toRadians(coord2.getLongitude());
+
+        double dLat = lat2 - lat1;
+        double dLon = lon2 - lon1;
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(lat1) * Math.cos(lat2)
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return EARTH_RADIUS * c;
     }
 
     @Override
@@ -420,6 +702,13 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     protected void onPause() {
         super.onPause();
         sensorManager.unregisterListener(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Assurez-vous de supprimer les callbacks du Handler lorsque l'activité est détruite
+        handler.removeCallbacksAndMessages(null);
     }
 
     // TODO Arret recuperer position quand arret application

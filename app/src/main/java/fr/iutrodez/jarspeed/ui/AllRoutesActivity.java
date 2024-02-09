@@ -200,6 +200,8 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject routeObject = jsonArray.getJSONObject(i);
 
+
+
                         Route route = new Route();
 
                         // Supposons que votre objet Route a des setters pour chaque champ
@@ -213,14 +215,11 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
                             route.setDescription(routeObject.getString("description"));
                         }
 
-                        // Définir le formateur pour le parsing des dates
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-
                         if(routeObject.has("startDate") && !routeObject.isNull("startDate")) {
                             try {
                                 String startDateStr = routeObject.getString("startDate");
                                 // Parsing de la chaîne de caractères en LocalDateTime
-                                LocalDateTime startDate = LocalDateTime.parse(startDateStr, formatter);
+                                LocalDateTime startDate = LocalDateTime.parse(startDateStr);
                                 route.setStartDate(startDate);
                             } catch (DateTimeParseException e) {
                                 e.printStackTrace();
@@ -232,14 +231,14 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
                             try {
                                 String endDateStr = routeObject.getString("endDate");
                                 // Parsing de la chaîne de caractères en LocalDateTime
-                                LocalDateTime endDate = LocalDateTime.parse(endDateStr, formatter);
+
+                                LocalDateTime endDate = LocalDateTime.parse(endDateStr);
                                 route.setEndDate(endDate);
                             } catch (DateTimeParseException e) {
                                 e.printStackTrace();
                                 // Gérer l'exception si la date n'est pas au format attendu
                             }
                         }
-
                         routeList.add(route);
                     }
 
@@ -247,7 +246,6 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
                     adapter.notifyDataSetChanged();
 
                 } catch (JSONException e) {
-                    Log.e("LoadRoutes", "Error parsing JSON", e);
                     Toast.makeText(AllRoutesActivity.this, "Erreur lors du chargement des données", Toast.LENGTH_SHORT).show();
                 }
             }

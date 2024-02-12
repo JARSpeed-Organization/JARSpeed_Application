@@ -194,7 +194,7 @@ public class ApiUtils {
     }
 
     public static void loadAllRoutes(Context context, Response.Listener<String> listener, Response.ErrorListener errorListener) {
-        String url = ApiConstants.ALL_ROUTES_URL; // Assurez-vous que cela pointe vers votre endpoint "/routes"
+        String url = ApiConstants.ALL_ROUTES_URL;
         StringRequest request = new StringRequest(Request.Method.GET, url, listener, errorListener) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -203,4 +203,17 @@ public class ApiUtils {
         };
         Volley.newRequestQueue(context).add(request);
     }
+
+    public static void deleteRoute(Context context, String url, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        StringRequest request = new StringRequest(Request.Method.DELETE, url, listener, errorListener) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return getAuthHeaders(context);
+            }
+        };
+        Volley.newRequestQueue(context).add(request);
+    }
+
+
+
 }

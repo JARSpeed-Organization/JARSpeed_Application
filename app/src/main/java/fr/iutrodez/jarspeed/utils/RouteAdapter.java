@@ -1,8 +1,11 @@
 package fr.iutrodez.jarspeed.utils;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,8 +21,12 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
 
     private OnItemClickListener listener;
 
+    public ImageButton deleteButton;
+
     public interface OnItemClickListener {
         void showEditRoutePopup(Route route);
+        void onDeleteRouteClicked(Route route);
+
     }
 
     public RouteAdapter(List<Route> routeList, OnItemClickListener listener) {
@@ -43,6 +50,11 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
                 listener.showEditRoutePopup(route);
             }
         });
+        holder.deleteButton.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onDeleteRouteClicked(route);
+            }
+        });
     }
 
     @Override
@@ -51,11 +63,13 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
     }
 
     public static class RouteViewHolder extends RecyclerView.ViewHolder {
-        public TextView title, date, time;
+        public TextView title;
+        public ImageView deleteButton;
 
         public RouteViewHolder(View view) {
             super(view);
             title = view.findViewById(R.id.title);
+            deleteButton = view.findViewById(R.id.deleteButton);
         }
     }
 }

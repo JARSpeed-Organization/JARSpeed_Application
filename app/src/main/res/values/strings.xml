@@ -74,5 +74,6 @@
     <string name="time_for_one_kilometer">0:00 /km</string>
 
     <string name="confirm_logout">Êtes-vous sûr de vouloir vous déconnecter ?</string>
+    <string name="confirm_delete_route">Êtes-vous sûr de vouloir supprimer ce parcours ?</string>
 
 </resources>

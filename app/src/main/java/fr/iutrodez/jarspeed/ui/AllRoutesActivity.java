@@ -260,38 +260,50 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
 
 
     public void onDeleteRouteClicked(Route route) {
-        new AlertDialog.Builder(this)
-                .setTitle("Confirmer la suppression")
-                .setMessage("Êtes-vous sûr de vouloir supprimer ce parcours ?")
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                    // Effectuer la requête de suppression à l'API ici
-                    String url = ApiConstants.ROUTE_BASE_URL + "/" + route.getId();
+        View dialogView = getLayoutInflater().inflate(R.layout.confirmation_popup, null);
 
-                    String token = SharedPreferencesManager.getAuthToken(this);
-                    if (token == null || token.isEmpty()) {
-                        Toast.makeText(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+        // Configure le texte de confirmation pour la suppression du parcours
+        TextView textViewGeneric = dialogView.findViewById(R.id.editTextGeneric);
+        textViewGeneric.setText(getString(R.string.confirm_delete_route));
 
-                    // Préparation des écouteurs de réponse et d'erreur
-                    Response.Listener<String> responseListener = response -> {
-                        // Gérer la réponse réussie ici
-                        Toast.makeText(this, "Parcours supprimé avec succès.", Toast.LENGTH_SHORT).show();
-                        loadAllRoutes();
-                    };
-                    Response.ErrorListener errorListener = error -> {
-                        // Gérer l'erreur ici
-                        Toast.makeText(this, "Erreur lors de la suppression du parcours.", Toast.LENGTH_SHORT).show();
-                    };
+        // Construit la boîte de dialogue
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+        final AlertDialog dialog = builder.create();
 
-                    // Effectuer la requête de suppression
-                    ApiUtils.deleteRoute(this, url, responseListener, errorListener);
+        // Gère le clic sur le bouton Annuler
+        dialogView.findViewById(R.id.buttonCancelGeneric).setOnClickListener(v -> dialog.dismiss());
 
-                })
-                .setNegativeButton(android.R.string.no, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+        // Gère le clic sur le bouton Confirmer pour la suppression du parcours
+        dialogView.findViewById(R.id.buttonConfirmGeneric).setOnClickListener(v -> {
+            String url = ApiConstants.ROUTE_BASE_URL + "/" + route.getId();
+            String token = SharedPreferencesManager.getAuthToken(this);
+            if (token == null || token.isEmpty()) {
+                Toast.makeText(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT).show();
+                dialog.dismiss(); // Ferme la boîte de dialogue
+                return;
+            }
+
+            Response.Listener<String> responseListener = response -> {
+                Toast.makeText(this, "Parcours supprimé avec succès.", Toast.LENGTH_SHORT).show();
+                loadAllRoutes(); // Recharge les parcours après suppression
+                dialog.dismiss(); // Ferme la boîte de dialogue
+            };
+
+            Response.ErrorListener errorListener = error -> {
+                Toast.makeText(this, "Erreur lors de la suppression du parcours.", Toast.LENGTH_SHORT).show();
+                dialog.dismiss(); // Ferme la boîte de dialogue
+            };
+
+            ApiUtils.deleteRoute(this, url, responseListener, errorListener);
+        });
+
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.show();
     }
+
+
+
 
 
     /**

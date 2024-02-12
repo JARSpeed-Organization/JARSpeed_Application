@@ -1,6 +1,7 @@
 package fr.iutrodez.jarspeed.ui;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -294,4 +295,12 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
     }
 
 
+    /**
+     * On home button click.
+     * @param view the view
+     */
+    public void onHomeButtonClick(View view) {
+        Intent intent = new Intent(this, MapActivity.class);
+        startActivity(intent);
+    }
 }

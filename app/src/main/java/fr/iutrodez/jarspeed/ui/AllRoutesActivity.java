@@ -145,8 +145,12 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         String newTitle = ((EditText) dialog.findViewById(R.id.editTextTitle)).getText().toString().trim();
         String newDescription = ((EditText) dialog.findViewById(R.id.editTextDescription)).getText().toString().trim();
         Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("id", route.getId());
         paramsMap.put("title", newTitle);
         paramsMap.put("description", newDescription);
+        paramsMap.put("endDate", route.getEndDate().toString());
+        paramsMap.put("startDate", route.getStartDate().toString());
+
         JSONObject parameters = new JSONObject(paramsMap);
 
         String url = ApiConstants.ROUTE_BASE_URL + "/" + route.getId();
@@ -189,8 +193,6 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
             @Override
             public void onResponse(String response) {
                 try {
-
-
                     JSONArray jsonArray = new JSONArray(response);
                     Log.e("reponse", jsonArray.toString());
 
@@ -200,8 +202,6 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
                     // Boucle pour ajouter chaque parcours dans la liste
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject routeObject = jsonArray.getJSONObject(i);
-
-
 
                         Route route = new Route();
 
@@ -215,7 +215,6 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
                         if(routeObject.has("description") && !routeObject.isNull("description")) {
                             route.setDescription(routeObject.getString("description"));
                         }
-
                         if(routeObject.has("startDate") && !routeObject.isNull("startDate")) {
                             try {
                                 String startDateStr = routeObject.getString("startDate");
@@ -227,7 +226,6 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
                                 // Gérer l'exception si la date n'est pas au format attendu
                             }
                         }
-
                         if(routeObject.has("endDate") && !routeObject.isNull("endDate")) {
                             try {
                                 String endDateStr = routeObject.getString("endDate");
@@ -240,6 +238,7 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
                                 // Gérer l'exception si la date n'est pas au format attendu
                             }
                         }
+
                         routeList.add(route);
                     }
 

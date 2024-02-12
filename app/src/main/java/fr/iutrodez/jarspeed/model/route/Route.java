@@ -15,8 +15,7 @@ public class Route {
 
     // Constructeurs, getters et setters
 
-    public Route() {
-    }
+    public Route() {}
 
     public Route(String title) {
         this.title = title;

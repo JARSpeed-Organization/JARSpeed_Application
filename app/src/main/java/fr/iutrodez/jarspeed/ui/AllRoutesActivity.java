@@ -1,10 +1,12 @@
 package fr.iutrodez.jarspeed.ui;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -29,6 +31,12 @@ import com.example.jarspeed.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Polyline;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -103,8 +111,47 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
 
         restoreBackgroundOnDismiss(dialog);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        setupMinimap(dialogView, route); // Configurez la minimap ici
         return dialog;
     }
+
+    private void setupMinimap(View dialogView, Route route) {
+        // Assurez-vous que la route et son chemin ne sont pas nuls
+        if (route == null || route.getPath() == null || route.getPath().isEmpty()) {
+            Log.d("setupMinimap", "Parcours ou liste des points est nulle ou vide.");
+            return; // Sortez de la méthode si la route ou le chemin est nul ou vide
+        }
+
+        MapView miniMapView = dialogView.findViewById(R.id.mapViewMini);
+        Context ctx = getApplicationContext();
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        miniMapView.setTileSource(TileSourceFactory.MAPNIK);
+        miniMapView.setBuiltInZoomControls(false);
+        miniMapView.setMultiTouchControls(true);
+
+        IMapController mapController = miniMapView.getController();
+        mapController.setZoom(15.0);
+
+        Polyline line = new Polyline();
+        line.setColor(Color.RED);
+        line.setWidth(2.0f);
+
+        List<GeoPoint> geoPoints = new ArrayList<>();
+        for (Route.Coordinate coord : route.getPath()) {
+            geoPoints.add(new GeoPoint(coord.getLatitude(), coord.getLongitude()));
+        }
+
+        line.setPoints(geoPoints);
+        miniMapView.getOverlays().add(line);
+
+        // Centrez la carte sur le premier point du parcours
+        if (!geoPoints.isEmpty()) {
+            mapController.setCenter(geoPoints.get(0));
+        }
+
+        miniMapView.invalidate(); // Rafraîchissez la carte pour afficher les modifications
+    }
+
 
     private void configureDialogFields(View dialogView, Route route) {
         // Initialisation des composants du dialogue
@@ -142,16 +189,44 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         buttonCancel.setOnClickListener(v -> dialog.dismiss());
     }
     private void updateRoute(AlertDialog dialog, Route route) {
+        // Récupération des nouvelles valeurs
         String newTitle = ((EditText) dialog.findViewById(R.id.editTextTitle)).getText().toString().trim();
         String newDescription = ((EditText) dialog.findViewById(R.id.editTextDescription)).getText().toString().trim();
-        Map<String, String> paramsMap = new HashMap<>();
-        paramsMap.put("id", route.getId());
-        paramsMap.put("title", newTitle);
-        paramsMap.put("description", newDescription);
-        paramsMap.put("endDate", route.getEndDate().toString());
-        paramsMap.put("startDate", route.getStartDate().toString());
 
-        JSONObject parameters = new JSONObject(paramsMap);
+        // Préparation de l'objet JSON pour la requête
+        JSONObject parameters = new JSONObject();
+        try {
+            parameters.put("id", route.getId());
+            parameters.put("title", newTitle);
+            parameters.put("description", newDescription);
+            parameters.put("endDate", route.getEndDate().toString());
+            parameters.put("startDate", route.getStartDate().toString());
+
+            // Ajout du chemin
+            JSONArray pathArray = new JSONArray();
+            for (Route.Coordinate coord : route.getPath()) {
+                JSONObject coordJSON = new JSONObject();
+                coordJSON.put("latitude", coord.getLatitude());
+                coordJSON.put("longitude", coord.getLongitude());
+                pathArray.put(coordJSON);
+            }
+            parameters.put("path", pathArray);
+
+            // Ajout des points d'intérêt
+            JSONArray poiArray = new JSONArray();
+            for (Route.PointOfInterest poi : route.getPointsOfInterest()) {
+                JSONObject poiJSON = new JSONObject();
+                poiJSON.put("name", poi.getName());
+                JSONObject coordJSON = new JSONObject();
+                coordJSON.put("latitude", poi.getCoordinates().getLatitude());
+                coordJSON.put("longitude", poi.getCoordinates().getLongitude());
+                poiJSON.put("coordinates", coordJSON);
+                poiArray.put(poiJSON);
+            }
+            parameters.put("pointsOfInterest", poiArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         String url = ApiConstants.ROUTE_BASE_URL + "/" + route.getId();
 
@@ -238,6 +313,36 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
                                 // Gérer l'exception si la date n'est pas au format attendu
                             }
                         }
+                        // À l'intérieur de la boucle for, après avoir extrait les autres champs
+                        List<Route.Coordinate> path = new ArrayList<>();
+                        JSONArray pathArray = routeObject.optJSONArray("path");
+                        if (pathArray != null) {
+                            for (int j = 0; j < pathArray.length(); j++) {
+                                JSONObject pathObject = pathArray.getJSONObject(j);
+                                double latitude = pathObject.optDouble("latitude");
+                                double longitude = pathObject.optDouble("longitude");
+                                Route.Coordinate coordinate = new Route.Coordinate(latitude, longitude);
+                                path.add(coordinate);
+                            }
+                        }
+                        route.setPath(path); // Assurez-vous que votre classe Route a une méthode setPath(List<Coordinate> path)
+
+                        List<Route.PointOfInterest> pointsOfInterest = new ArrayList<>();
+                        JSONArray poiArray = routeObject.optJSONArray("pointsOfInterest");
+                        if (poiArray != null) {
+                            for (int k = 0; k < poiArray.length(); k++) {
+                                JSONObject poiObject = poiArray.getJSONObject(k);
+                                String name = poiObject.optString("name");
+                                JSONObject coordObject = poiObject.optJSONObject("coordinates");
+                                double latitude = coordObject.optDouble("latitude");
+                                double longitude = coordObject.optDouble("longitude");
+                                Route.Coordinate coordinate = new Route.Coordinate(latitude, longitude);
+                                Route.PointOfInterest poi = new Route.PointOfInterest(name, coordinate);
+                                pointsOfInterest.add(poi);
+                            }
+                        }
+                        route.setPointsOfInterest(pointsOfInterest); // Assurez-vous que votre classe Route a une méthode setPointsOfInterest(List<PointOfInterest> pointsOfInterest)
+
 
                         routeList.add(route);
                     }
@@ -260,38 +365,50 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
 
 
     public void onDeleteRouteClicked(Route route) {
-        new AlertDialog.Builder(this)
-                .setTitle("Confirmer la suppression")
-                .setMessage("Êtes-vous sûr de vouloir supprimer ce parcours ?")
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                    // Effectuer la requête de suppression à l'API ici
-                    String url = ApiConstants.ROUTE_BASE_URL + "/" + route.getId();
+        View dialogView = getLayoutInflater().inflate(R.layout.confirmation_popup, null);
 
-                    String token = SharedPreferencesManager.getAuthToken(this);
-                    if (token == null || token.isEmpty()) {
-                        Toast.makeText(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+        // Configure le texte de confirmation pour la suppression du parcours
+        TextView textViewGeneric = dialogView.findViewById(R.id.editTextGeneric);
+        textViewGeneric.setText(getString(R.string.confirm_delete_route));
 
-                    // Préparation des écouteurs de réponse et d'erreur
-                    Response.Listener<String> responseListener = response -> {
-                        // Gérer la réponse réussie ici
-                        Toast.makeText(this, "Parcours supprimé avec succès.", Toast.LENGTH_SHORT).show();
-                        loadAllRoutes();
-                    };
-                    Response.ErrorListener errorListener = error -> {
-                        // Gérer l'erreur ici
-                        Toast.makeText(this, "Erreur lors de la suppression du parcours.", Toast.LENGTH_SHORT).show();
-                    };
+        // Construit la boîte de dialogue
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+        final AlertDialog dialog = builder.create();
 
-                    // Effectuer la requête de suppression
-                    ApiUtils.deleteRoute(this, url, responseListener, errorListener);
+        // Gère le clic sur le bouton Annuler
+        dialogView.findViewById(R.id.buttonCancelGeneric).setOnClickListener(v -> dialog.dismiss());
 
-                })
-                .setNegativeButton(android.R.string.no, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+        // Gère le clic sur le bouton Confirmer pour la suppression du parcours
+        dialogView.findViewById(R.id.buttonConfirmGeneric).setOnClickListener(v -> {
+            String url = ApiConstants.ROUTE_BASE_URL + "/" + route.getId();
+            String token = SharedPreferencesManager.getAuthToken(this);
+            if (token == null || token.isEmpty()) {
+                Toast.makeText(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT).show();
+                dialog.dismiss(); // Ferme la boîte de dialogue
+                return;
+            }
+
+            Response.Listener<String> responseListener = response -> {
+                Toast.makeText(this, "Parcours supprimé avec succès.", Toast.LENGTH_SHORT).show();
+                loadAllRoutes(); // Recharge les parcours après suppression
+                dialog.dismiss(); // Ferme la boîte de dialogue
+            };
+
+            Response.ErrorListener errorListener = error -> {
+                Toast.makeText(this, "Erreur lors de la suppression du parcours.", Toast.LENGTH_SHORT).show();
+                dialog.dismiss(); // Ferme la boîte de dialogue
+            };
+
+            ApiUtils.deleteRoute(this, url, responseListener, errorListener);
+        });
+
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.show();
     }
+
+
+
 
 
     /**

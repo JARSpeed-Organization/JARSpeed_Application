@@ -72,4 +72,8 @@
     <string name="kilometers_distance">0,0 km</string>
     <string name="kilocalories_burn">0 kcal</string>
     <string name="time_for_one_kilometer">0:00 /km</string>
+
+    <string name="confirm_logout">Êtes-vous sûr de vouloir vous déconnecter ?</string>
+    <string name="confirm_delete_route">Êtes-vous sûr de vouloir supprimer ce parcours ?</string>
+
 </resources>

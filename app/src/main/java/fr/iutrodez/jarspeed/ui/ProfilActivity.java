@@ -5,13 +5,12 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.example.jarspeed.R;
 
 import fr.iutrodez.jarspeed.network.ApiUtils;
@@ -58,9 +57,29 @@ public class ProfilActivity extends AppCompatActivity {
      * @param view the view
      */
     public void onLogoutClick(View view) {
-        clearUserSession();
-        redirectToLoginScreen();
+        View dialogView = getLayoutInflater().inflate(R.layout.confirmation_popup, null);
+
+        TextView textViewGeneric = dialogView.findViewById(R.id.editTextGeneric);
+        textViewGeneric.setText(R.string.confirm_logout);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+        final AlertDialog dialog = builder.create();
+
+        // Gère le clic sur le bouton Annuler
+        dialogView.findViewById(R.id.buttonCancelGeneric).setOnClickListener(v -> dialog.dismiss());
+
+        // Gère le clic sur le bouton Confirmer pour la déconnexion
+        dialogView.findViewById(R.id.buttonConfirmGeneric).setOnClickListener(v -> {
+            clearUserSession();
+            redirectToLoginScreen();
+            dialog.dismiss();
+        });
+
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.show();
     }
+
 
     /**
      * On routes click.
@@ -81,7 +100,7 @@ public class ProfilActivity extends AppCompatActivity {
 // Ajoutez cette méthode pour être appelée lorsque l'utilisateur souhaite supprimer son compte
     public void onDeleteAccountClick(View view) {
         // Inflate le layout de la popup de confirmation
-        View dialogView = getLayoutInflater().inflate(R.layout.confirmation_popup_deleteaccount, null);
+        View dialogView = getLayoutInflater().inflate(R.layout.confirmation_popup, null);
 
         // Construit la boîte de dialogue
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -128,5 +147,7 @@ public class ProfilActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
+        Toast.makeText(ProfilActivity.this, "Déconnexion réussie", Toast.LENGTH_SHORT).show();
+
     }
 }

@@ -9,7 +9,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -47,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
 
         emailEditText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));
         passwordEditText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));
+
+        // Application de l'animation au logo
+        ImageView logoImageView = findViewById(R.id.logo);
+        Animation logoAnimation = AnimationUtils.loadAnimation(this, R.anim.logo_animation);
+        logoImageView.startAnimation(logoAnimation);
     }
 
     /**

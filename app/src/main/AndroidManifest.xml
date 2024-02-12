@@ -22,7 +22,8 @@
         >
         <activity
             android:name="fr.iutrodez.jarspeed.ui.EditProfilActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name="fr.iutrodez.jarspeed.ui.MainActivity"
             android:exported="true"

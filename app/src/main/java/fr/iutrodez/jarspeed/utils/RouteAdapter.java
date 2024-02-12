@@ -1,6 +1,6 @@
 package fr.iutrodez.jarspeed.utils;
 
-import android.annotation.SuppressLint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,13 +11,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jarspeed.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import fr.iutrodez.jarspeed.model.route.Route;
 
 public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
 
-    private List<Route> routeList;
+    private List<Route> originalRoutes;
+    private List<Route> filteredRoutes;
 
     private OnItemClickListener listener;
 
@@ -29,9 +31,28 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
 
     }
 
-    public RouteAdapter(List<Route> routeList, OnItemClickListener listener) {
-        this.routeList = routeList;
+    public RouteAdapter(List<Route> pOriginalRoutes, OnItemClickListener listener) {
+        this.originalRoutes = pOriginalRoutes;
         this.listener = listener;
+        this.filteredRoutes = new ArrayList<>(originalRoutes);
+    }
+
+    public void filter(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            Log.e("filtre", "Vide");
+            Log.e("original", originalRoutes.toString());
+            filteredRoutes = new ArrayList<>(originalRoutes);
+        } else {
+            filteredRoutes = new ArrayList<>();
+            Log.e("filtre", "Plein");
+            for (Route route : originalRoutes) {
+                if (route.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                    filteredRoutes.add(route); // Ajouter l'élément à la liste filtrée si le nom correspond à la requête
+                }
+            }
+        }
+        Log.e("filtre", filteredRoutes.toString());
+        notifyDataSetChanged(); // Actualiser l'affichage
     }
 
     @Override
@@ -43,7 +64,7 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
 
     @Override
     public void onBindViewHolder(RouteViewHolder holder, int position) {
-        Route route = routeList.get(position);
+        Route route = filteredRoutes.get(position);
         holder.title.setText(route.getTitle());
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
@@ -59,7 +80,7 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
 
     @Override
     public int getItemCount() {
-        return routeList.size();
+        return filteredRoutes.size();
     }
 
     public static class RouteViewHolder extends RecyclerView.ViewHolder {

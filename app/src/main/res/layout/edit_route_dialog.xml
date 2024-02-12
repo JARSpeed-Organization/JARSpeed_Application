@@ -104,7 +104,14 @@
                     android:textColor="@color/black"
                     android:textSize="16dp"/>
 
-            <LinearLayout
+                <org.osmdroid.views.MapView
+                    android:id="@+id/mapViewMini"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_margin="8dp"/>
+
+
+                <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

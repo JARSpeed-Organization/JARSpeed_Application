@@ -89,17 +89,25 @@ public class ApiUtils {
         Volley.newRequestQueue(context).add(request);
     }
 
-    public static void saveRoute(Context context, RouteDTO routeDTO, Response.Listener<String> listener, Response.ErrorListener errorListener) {
-        StringRequest request = new StringRequest(Request.Method.POST, ApiConstants.ROUTE_BASE_URL, listener, errorListener) {
+    public static void saveRoute(Context context, RouteDTO pRoute, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        StringRequest request = new StringRequest(StringRequest.Method.POST, ApiConstants.ROUTE_BASE_URL, listener, errorListener) {
             @Override
             public byte[] getBody() {
-                Log.d("Body", new Gson().toJson(routeDTO));
-                return new Gson().toJson(routeDTO).getBytes(StandardCharsets.UTF_8);
+                return new Gson().toJson(pRoute).getBytes();
             }
 
             @Override
             public String getBodyContentType() {
                 return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                String token = SharedPreferencesManager.getAuthToken(context);
+                headers.put("Authorization", "Bearer " + token);
+                return headers;
             }
         };
         Volley.newRequestQueue(context).add(request);
@@ -195,8 +203,4 @@ public class ApiUtils {
         };
         Volley.newRequestQueue(context).add(request);
     }
-
-
-
 }
-

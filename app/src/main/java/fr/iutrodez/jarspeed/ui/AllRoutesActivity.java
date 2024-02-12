@@ -258,4 +258,40 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         });
     }
 
+
+    public void onDeleteRouteClicked(Route route) {
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmer la suppression")
+                .setMessage("Êtes-vous sûr de vouloir supprimer ce parcours ?")
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    // Effectuer la requête de suppression à l'API ici
+                    String url = ApiConstants.ROUTE_BASE_URL + "/" + route.getId();
+
+                    String token = SharedPreferencesManager.getAuthToken(this);
+                    if (token == null || token.isEmpty()) {
+                        Toast.makeText(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Préparation des écouteurs de réponse et d'erreur
+                    Response.Listener<String> responseListener = response -> {
+                        // Gérer la réponse réussie ici
+                        Toast.makeText(this, "Parcours supprimé avec succès.", Toast.LENGTH_SHORT).show();
+                        loadAllRoutes();
+                    };
+                    Response.ErrorListener errorListener = error -> {
+                        // Gérer l'erreur ici
+                        Toast.makeText(this, "Erreur lors de la suppression du parcours.", Toast.LENGTH_SHORT).show();
+                    };
+
+                    // Effectuer la requête de suppression
+                    ApiUtils.deleteRoute(this, url, responseListener, errorListener);
+
+                })
+                .setNegativeButton(android.R.string.no, null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
+
 }

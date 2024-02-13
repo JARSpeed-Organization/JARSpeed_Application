@@ -28,11 +28,13 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 import fr.iutrodez.jarspeed.model.gender.Gender;
+import fr.iutrodez.jarspeed.model.user.User;
 import fr.iutrodez.jarspeed.model.user.UserUpdateRequest;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
@@ -53,6 +55,7 @@ public class EditProfilActivity extends AppCompatActivity {
     private TextView textViewBirthdate;
     private EditText editTextWeight;
     private Spinner spinnerGender;
+    private User user;
     /**
      * On create.
      *
@@ -85,14 +88,27 @@ public class EditProfilActivity extends AppCompatActivity {
             public void onResponse(String response) {
                 try {
                     JSONObject jsonResponse = new JSONObject(response);
-                    String firstName = jsonResponse.optString("firstname");
-                    String lastName = jsonResponse.optString("lastname");
-                    String email = jsonResponse.optString("email");
+                    user = new User();
+                    user.setFirstname(jsonResponse.optString("firstname"));
+                    user.setLastname(jsonResponse.optString("lastname"));
+                    user.setEmail(jsonResponse.optString("email"));
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    try {
+                        user.setBirthday(dateFormat.parse(jsonResponse.optString("birthdate")));
+                    } catch (ParseException pE) {
+                        user.setBirthday(new Date());
+                    }
+                    user.setWeight(jsonResponse.optDouble("weight"));
+                    JSONObject genderJSON = jsonResponse.optJSONObject("gender");
+                    Gender gender = new Gender();
+                    gender.setId(genderJSON.optInt("id"));
+                    gender.setLabel(genderJSON.optString("label"));
+                    user.setGender(gender);
 
                     // Mise à jour de l'interface utilisateur avec les données reçues
-                    editTextFirstName.setText(firstName);
-                    editTextLastName.setText(lastName);
-                    editTextEmail.setText(email);
+                    editTextFirstName.setText(user.getFirstname());
+                    editTextLastName.setText(user.getLastname());
+                    editTextEmail.setText(user.getEmail());
                 } catch (JSONException e) {
                     Log.e("LoadUserProfile", "Error parsing JSON", e);
                     Toast.makeText(EditProfilActivity.this, "Erreur lors du parsing des données", Toast.LENGTH_SHORT).show();
@@ -271,23 +287,27 @@ public class EditProfilActivity extends AppCompatActivity {
         builder.setView(dialogView);
 
         TextView textViewBirthdate = dialogView.findViewById(R.id.textViewBirthdate);
-        Spinner spinnerGender = dialogView.findViewById(R.id.spinnerGender);
+        spinnerGender = dialogView.findViewById(R.id.spinnerGender);
         EditText editTextWeight = dialogView.findViewById(R.id.editTextWeight);
         Button buttonCancel = dialogView.findViewById(R.id.buttonCancelHealthData);
         Button buttonConfirm = dialogView.findViewById(R.id.buttonConfirmHealthData);
-
-
-
 
         // Peupler le Spinner avec les genres dès que les données sont disponibles
         ApiUtils.fetchGenders(this, genders -> {
             ArrayAdapter<Gender> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, genders);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerGender.setAdapter(adapter);
+            // Pré-sélectionner le genre de l'utilisateur
+            Log.e("gender", user.getGender().getId().toString());
+            spinnerGender.setSelection(getGenderIndex(user.getGender()));
         }, error -> Toast.makeText(this, "Erreur lors de la récupération des genres", Toast.LENGTH_LONG).show());
+
+        // Initialize data with data base
+        editTextWeight.setText(user.getWeight().toString());
 
         final Calendar calendar = Calendar.getInstance();
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        textViewBirthdate.setText(dateFormat.format(user.getBirthday()));
         textViewBirthdate.setOnClickListener(v -> {
             DatePickerDialog datePickerDialog = new DatePickerDialog(EditProfilActivity.this, (view1, year, monthOfYear, dayOfMonth) -> {
                 calendar.set(Calendar.YEAR, year);
@@ -368,6 +388,15 @@ public class EditProfilActivity extends AppCompatActivity {
             Log.d("UpdateRequest", "Sending Update Request: " + json);
 
             sendUpdateRequest(updateRequest);
+
+            final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            user.setWeight(weight);
+            user.setGender(selectedGender);
+            try {
+                user.setBirthday(dateFormat.parse(birthdate));
+            } catch (ParseException pE) {
+                Log.e("Save", "Load new information");
+            }
             dialog.dismiss();
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Veuillez entrer des données valides.", Toast.LENGTH_SHORT).show();
@@ -405,5 +434,17 @@ public class EditProfilActivity extends AppCompatActivity {
 
         }
         sendUpdateRequest(updateRequest);
+    }
+
+    private int getGenderIndex(Gender userGender) {
+        // Parcourir la liste des genres pour trouver l'index du genre de l'utilisateur
+        for (int i = 0; i < spinnerGender.getCount(); i++) {
+            Gender gender = (Gender) spinnerGender.getItemAtPosition(i);
+            Log.e("gender", gender.getId() + " " + gender.getLabel());
+            if (gender.getId() == userGender.getId()) {
+                return i; // Retourner l'index lorsque le genre correspond
+            }
+        }
+        return 0; // Par défaut, retourner 0 si le genre de l'utilisateur n'est pas trouvé
     }
 }

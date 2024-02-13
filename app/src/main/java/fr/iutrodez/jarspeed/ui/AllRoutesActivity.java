@@ -1,12 +1,13 @@
 package fr.iutrodez.jarspeed.ui;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -75,11 +76,26 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
 
         routeList = new ArrayList<>();
 
-        // On charge les routes dans routeList
+        // On charge les routes dans routeList et initialise l'adaptateur
         loadAllRoutes();
 
-        adapter = new RouteAdapter(routeList, this);
-        recyclerView.setAdapter(adapter);
+        // Ecouteur de texte modifié à l'EditText pour déclencher le filtrage
+        EditText filterTitle = findViewById(R.id.filterTitle); // Ajoutez cette ligne pour récupérer l'EditText de filtrage
+        filterTitle.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String query = s.toString().trim(); // Obtenir le texte saisi
+                adapter.filter(query); // Appliquer le filtrage avec le texte saisi
+            }
+        });
     }
 
 
@@ -347,9 +363,9 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
                         routeList.add(route);
                     }
 
-                    // Notifier l'adaptateur du changement de données
-                    adapter.notifyDataSetChanged();
-
+                    // Une fois les données chargées avec succès, configurez l'adaptateur et définissez-le sur le RecyclerView
+                    adapter = new RouteAdapter(routeList, AllRoutesActivity.this);
+                    recyclerView.setAdapter(adapter);
                 } catch (JSONException e) {
                     Toast.makeText(AllRoutesActivity.this, "Erreur lors du chargement des données", Toast.LENGTH_SHORT).show();
                 }
@@ -407,10 +423,6 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         dialog.show();
     }
 
-
-
-
-
     /**
      * On home button click.
      * @param view the view
@@ -418,5 +430,21 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
     public void onHomeButtonClick(View view) {
         Intent intent = new Intent(this, MapActivity.class);
         startActivity(intent);
+    }
+
+    /**
+     * Sort ascending on start date for all routes.
+     * @param view the view
+     */
+    public void onSortAscendingButtonClick(View view) {
+        adapter.sortAscending();
+    }
+
+    /**
+     * Sort descending on start date for all routes.
+     * @param view the view
+     */
+    public void onSortDescendingButtonClick(View view) {
+        adapter.sortDescending();
     }
 }

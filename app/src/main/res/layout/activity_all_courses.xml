@@ -17,28 +17,32 @@
             android:id="@+id/filterTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_weight="1"
             android:hint="Titre" />
 
-        <EditText
-            android:id="@+id/filterDate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Date" />
-
-        <EditText
-            android:id="@+id/filterTime"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Heure" />
-
-        <Button
-            android:id="@+id/btnFilter"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Filtrer" />
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+
+            <ImageButton
+                android:id="@+id/buttonSortDown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:src="@drawable/calendar_sort_down"
+                android:onClick="onSortDescendingButtonClick" />
+
+            <ImageButton
+                android:id="@+id/buttonSortUp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:src="@drawable/calendar_sort_up"
+                android:onClick="onSortAscendingButtonClick" />
+        </LinearLayout>
     </LinearLayout>
 
     <!-- RecyclerView pour les parcours -->

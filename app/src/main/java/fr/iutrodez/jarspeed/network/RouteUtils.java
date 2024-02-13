@@ -14,7 +14,7 @@ public class RouteUtils {
     public static List<Coordinate> pointsToCoordinates(List<GeoPoint> points) {
         List<Coordinate> coordinates = new ArrayList<>();
         for (GeoPoint point : points) {
-            coordinates.add(new Coordinate(point.getLongitude(), point.getLatitude()));
+            coordinates.add(new Coordinate(point.getLatitude(), point.getLongitude()));
         }
         return coordinates;
     }

@@ -431,4 +431,20 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         Intent intent = new Intent(this, MapActivity.class);
         startActivity(intent);
     }
+
+    /**
+     * Sort ascending on start date for all routes.
+     * @param view the view
+     */
+    public void onSortAscendingButtonClick(View view) {
+        adapter.sortAscending();
+    }
+
+    /**
+     * Sort descending on start date for all routes.
+     * @param view the view
+     */
+    public void onSortDescendingButtonClick(View view) {
+        adapter.sortDescending();
+    }
 }

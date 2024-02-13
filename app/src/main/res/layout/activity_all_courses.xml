@@ -32,14 +32,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
-                android:src="@drawable/calendar_sort_down" />
+                android:src="@drawable/calendar_sort_down"
+                android:onClick="onSortDescendingButtonClick" />
 
             <ImageButton
                 android:id="@+id/buttonSortUp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
-                android:src="@drawable/calendar_sort_up" />
+                android:src="@drawable/calendar_sort_up"
+                android:onClick="onSortAscendingButtonClick" />
         </LinearLayout>
     </LinearLayout>
 

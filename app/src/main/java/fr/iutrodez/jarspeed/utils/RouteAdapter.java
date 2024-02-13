@@ -11,7 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jarspeed.R;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import fr.iutrodez.jarspeed.model.route.Route;
@@ -39,20 +42,40 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
 
     public void filter(String query) {
         if (query == null || query.trim().isEmpty()) {
-            Log.e("filtre", "Vide");
-            Log.e("original", originalRoutes.toString());
             filteredRoutes = new ArrayList<>(originalRoutes);
         } else {
             filteredRoutes = new ArrayList<>();
-            Log.e("filtre", "Plein");
             for (Route route : originalRoutes) {
                 if (route.getTitle().toLowerCase().contains(query.toLowerCase())) {
                     filteredRoutes.add(route); // Ajouter l'élément à la liste filtrée si le nom correspond à la requête
                 }
             }
         }
-        Log.e("filtre", filteredRoutes.toString());
         notifyDataSetChanged(); // Actualiser l'affichage
+    }
+
+    public void sortAscending() {
+        Collections.sort(filteredRoutes, new Comparator<Route>() {
+            @Override
+            public int compare(Route route1, Route route2) {
+                LocalDateTime date1 = route1.getStartDate();
+                LocalDateTime date2 = route2.getStartDate();
+                return date1.compareTo(date2);
+            }
+        });
+        notifyDataSetChanged();
+    }
+
+    public void sortDescending() {
+        Collections.sort(filteredRoutes, new Comparator<Route>() {
+            @Override
+            public int compare(Route route1, Route route2) {
+                LocalDateTime date1 = route1.getStartDate();
+                LocalDateTime date2 = route2.getStartDate();
+                return date2.compareTo(date1);
+            }
+        });
+        notifyDataSetChanged();
     }
 
     @Override

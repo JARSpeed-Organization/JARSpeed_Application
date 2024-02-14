@@ -1,5 +1,9 @@
 package fr.iutrodez.jarspeed.model.user;
 
+import java.util.Date;
+
+import fr.iutrodez.jarspeed.model.gender.Gender;
+
 /**
  * The type User.
  */
@@ -21,9 +25,13 @@ public class User {
      */
     private String firstname;
     /**
-     * The Age.
+     * The Birthday.
      */
-    private Integer age;
+    private Date birthday;
+    /**
+     * The Gender.
+     */
+    private Gender gender;
     /**
      * The Weight.
      */
@@ -47,16 +55,16 @@ public class User {
      * @param lastname  the lastname
      * @param firstname the firstname
      * @param email     the email
-     * @param age       the age
+     * @param birthday  the birthday
      * @param weight    the weight
      * @param password  the password
      */
 // Constructeur avec tous les paramètres
-    public User(String lastname, String firstname, String email, Integer age/* , Gender gender*/, Double weight, String password) {
+    public User(String lastname, String firstname, String email, Date birthday/* , Gender gender*/, Double weight, String password) {
         this.lastname = lastname;
         this.firstname = firstname;
         this.email = email;
-        this.age = age;
+        this.birthday = birthday;
         //this.gender = gender;
         this.weight = weight;
         this.password = password;
@@ -136,30 +144,40 @@ public class User {
     }
 
     /**
-     * Gets age.
+     * Gets birthday.
      *
-     * @return the age
+     * @return the birthday
      */
-    public Integer getAge() {
-        return age;
+    public Date getBirthday() {
+        return birthday;
     }
 
     /**
-     * Sets age.
+     * Sets birthday.
      *
-     * @param age the age
+     * @param pBirthday the p birthday
      */
-    public void setAge(Integer age) {
-        this.age = age;
+    public void setBirthday(Date pBirthday) {
+        birthday = pBirthday;
     }
 
-//    public Gender getGender() {
-//        return gender;
-//    }
-//
-//    public void setGender(Gender gender) {
-//        this.gender = gender;
-//    }
+    /**
+     * Gets gender.
+     *
+     * @return the gender
+     */
+    public Gender getGender() {
+        return gender;
+    }
+
+    /**
+     * Sets gender.
+     *
+     * @param pGender the p gender
+     */
+    public void setGender(Gender pGender) {
+        gender = pGender;
+    }
 
     /**
      * Gets weight.

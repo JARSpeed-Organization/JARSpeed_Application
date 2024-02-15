@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -330,6 +331,17 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             startLocationUpdates();
         }
         loadUserWeight();
+
+        // Création d'un callback pour l'appui sur le bouton de retour
+        // désactivation du bouton retour.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+
+            }
+        };
+        // Obtention du OnBackPressedDispatcher et ajout du callback
+        getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     /**

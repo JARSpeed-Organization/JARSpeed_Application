@@ -28,7 +28,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -53,10 +53,11 @@ public class EditProfilActivity extends AppCompatActivity {
     private EditText editTextFirstName;
     private EditText editTextLastName;
     private EditText editTextEmail;
-    private TextView textViewBirthdate;
-    private EditText editTextWeight;
+
     private Spinner spinnerGender;
     private User user;
+
+    private String oldPasswordBd;
     /**
      * On create.
      *
@@ -66,7 +67,6 @@ public class EditProfilActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_profil_activity);
-        View dialogView = getLayoutInflater().inflate(R.layout.health_data_dialog, null);
 
         // Initialisation des vues
         editTextFirstName = findViewById(R.id.firstNameItem);
@@ -93,6 +93,7 @@ public class EditProfilActivity extends AppCompatActivity {
                     user.setFirstname(jsonResponse.optString("firstname"));
                     user.setLastname(jsonResponse.optString("lastname"));
                     user.setEmail(jsonResponse.optString("email"));
+                    oldPasswordBd = jsonResponse.optString("password");
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                     try {
                         user.setBirthday(dateFormat.parse(jsonResponse.optString("birthdate")));
@@ -143,12 +144,14 @@ public class EditProfilActivity extends AppCompatActivity {
      * @param view the view
      */
     public void onChangePasswordClick(View view) {
+        loadUserProfile(); // pour récupérer le mot de passe si il a déjà été changé
+
         // Assombrir l'arrière-plan
         final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
         final Drawable originalBackground = rootView.getBackground();
 
         final WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.alpha = 0.2f; // Modifier selon les besoins pour l'effet d'assombrissement
+        params.alpha = 0.2f;
         getWindow().setAttributes(params);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -171,21 +174,48 @@ public class EditProfilActivity extends AppCompatActivity {
             getWindow().setAttributes(params);
         });
         buttonConfirm.setOnClickListener(v -> {
+            String oldPassword = editTextOldPassword.getText().toString();
             String newPassword = editTextPassword.getText().toString();
             String confirmPassword = editTextConfirmPassword.getText().toString();
 
-            if (!newPassword.equals(confirmPassword)) {
-                Toast.makeText(this, "Les mots de passe ne correspondent pas.", Toast.LENGTH_LONG).show();
+            // vérifier que le champ "ancien mot de passe" est correctement saisi
+            if (!oldPassword.equals(oldPasswordBd)) {
+                Toasty.error(this, "L'ancien mot de passe saisi est incorrect", Toast.LENGTH_LONG, true).show();
+                editTextPassword.requestFocus();
+                return;
+            }
+            // Valider le nouveau mot de passe
+            if (!ValidationUtils.isValidPassword(newPassword)) {
+                Toasty.warning(this, "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule, un chiffre et un caractère spécial.", Toast.LENGTH_LONG, true).show();
+                editTextPassword.requestFocus();
                 return;
             }
 
-            // Création de l'objet de demande de mise à jour pour le mot de passe
+            // Vérifier que les mots de passe correspondent
+            if (!newPassword.equals(confirmPassword)) {
+                Toasty.error(this, "Les mots de passe ne correspondent pas.", Toast.LENGTH_LONG, true).show();
+                editTextConfirmPassword.requestFocus();
+                return;
+            }
+
+            // Vérifier que l'ancien mot de passe est différent du nouveau
+            if (oldPasswordBd.equals(newPassword)) {
+                Toasty.error(this, "Le nouveau mot de passe doit être différent de l'ancien.", Toast.LENGTH_LONG, true).show();
+                editTextPassword.requestFocus();
+                return;
+            }
+
+            // Si tout est valide, créez la demande de mise à jour et envoyez-la
             UserUpdateRequest updateRequest = new UserUpdateRequest();
-            updateRequest.setPassword(newPassword);
+            updateRequest.setPassword(newPassword); // Assurez-vous que le mot de passe est haché côté serveur
 
             sendUpdateRequest(updateRequest);
 
             dialog.dismiss();
+            // Restaurer l'arrière-plan à la fermeture de la boîte de dialogue
+            rootView.setBackground(originalBackground);
+            params.alpha = 1.0f;
+            getWindow().setAttributes(params);
         });
 
 
@@ -209,9 +239,10 @@ public class EditProfilActivity extends AppCompatActivity {
         // Assombrir l'arrière-plan
         final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
         final Drawable originalBackground = rootView.getBackground();
-        final WindowManager.LayoutParams params = getWindow().getAttributes();
         final EditText targetEditText = (EditText) view; // Conserver une référence au EditText cliqué
 
+
+        final WindowManager.LayoutParams params = getWindow().getAttributes();
         params.alpha = 0.2f;
         getWindow().setAttributes(params);
 
@@ -279,6 +310,7 @@ public class EditProfilActivity extends AppCompatActivity {
     public void onChangeHealthData(View view) {
         final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
         final Drawable originalBackground = rootView.getBackground();
+
         final WindowManager.LayoutParams params = getWindow().getAttributes();
         params.alpha = 0.2f;
         getWindow().setAttributes(params);
@@ -354,6 +386,11 @@ public class EditProfilActivity extends AppCompatActivity {
         });
     }
 
+    private void darkenBackground() {
+        final WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.alpha = 0.2f;
+        getWindow().setAttributes(params);
+    }
     /**
      * Reset dialog background.
      */

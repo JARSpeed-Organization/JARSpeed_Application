@@ -1,5 +1,6 @@
 package fr.iutrodez.jarspeed.ui;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
@@ -56,6 +57,16 @@ public class MainActivity extends AppCompatActivity {
         ImageView logoImageView = findViewById(R.id.logo);
         Animation logoAnimation = AnimationUtils.loadAnimation(this, R.anim.logo_animation);
         logoImageView.startAnimation(logoAnimation);
+
+        // Création d'un callback pour l'appui sur le bouton de retour
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+
+            }
+        };
+        // Obtention du OnBackPressedDispatcher et ajout du callback
+        getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     /**

@@ -1,5 +1,6 @@
 package fr.iutrodez.jarspeed.ui;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -59,6 +60,16 @@ public class RegisterActivity extends AppCompatActivity {
         passwordConfirmationEditText = findViewById(R.id.password_confirmation);
 
         setHintColors(nameEditText, firstnameEditText, emailEditText, passwordEditText, passwordConfirmationEditText);
+        // Création d'un callback pour l'appui sur le bouton de retour
+        // désactivation du bouton retour.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+
+            }
+        };
+        // Obtention du OnBackPressedDispatcher et ajout du callback
+        getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     /**

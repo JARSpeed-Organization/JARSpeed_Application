@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -97,8 +98,18 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
                 adapter.filter(query); // Appliquer le filtrage avec le texte saisi
             }
         });
-    }
 
+        // Création d'un callback pour l'appui sur le bouton de retour
+        // désactivation du bouton retour.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+
+            }
+        };
+        // Obtention du OnBackPressedDispatcher et ajout du callback
+        getOnBackPressedDispatcher().addCallback(this, callback);
+    }
 
     private void darkenBackground() {
         final WindowManager.LayoutParams params = getWindow().getAttributes();
@@ -450,5 +461,11 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
      */
     public void onSortDescendingButtonClick(View view) {
         adapter.sortDescending();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Laissez vide pour ne rien faire sur le pression du bouton Retour
+        // Ou ajoutez votre propre logique ici
     }
 }

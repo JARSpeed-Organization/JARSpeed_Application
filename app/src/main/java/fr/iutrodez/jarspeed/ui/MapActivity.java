@@ -64,6 +64,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.dmoral.toasty.Toasty;
 import fr.iutrodez.jarspeed.model.Coordinate;
 import fr.iutrodez.jarspeed.model.RouteDTO;
 import fr.iutrodez.jarspeed.model.user.User;
@@ -491,7 +492,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 @Override
                 public void onResponse(String response) {
                     if (isStarted) {
-                        Toast.makeText(MapActivity.this, getText(R.string.route_register), Toast.LENGTH_SHORT).show();
+                        Toasty.success(MapActivity.this,  getText(R.string.route_register), Toast.LENGTH_SHORT, true).show();
                         mapView.getOverlays().remove(line);
                         line = null;
                         mapView.invalidate();
@@ -507,8 +508,8 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    Toasty.error(MapActivity.this, "Erreur : " + error + " " + error.getMessage(), Toast.LENGTH_SHORT, true).show();
 
-                    Toast.makeText(MapActivity.this, "Erreur : " + error + " " + error.getMessage(), Toast.LENGTH_SHORT).show();
                     // TODO Manage errors
                 }
             });
@@ -607,7 +608,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     private void loadUserWeight() {
         String token = SharedPreferencesManager.getAuthToken(this);
         if (token == null || token.isEmpty()) {
-            Toast.makeText(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT, true).show();
             return;
         }
         ApiUtils.loadUserProfile(this, new Response.Listener<String>() {
@@ -619,14 +620,16 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
 
                 } catch (JSONException e) {
                     Log.e("LoadUserProfile", "Error parsing JSON", e);
-                    Toast.makeText(MapActivity.this, "Erreur lors du parsing des données", Toast.LENGTH_SHORT).show();
+                    Toasty.error(MapActivity.this, "Erreur lors du parsing des données", Toast.LENGTH_SHORT, true).show();
+
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("LoadUserProfile", "Error loading weight: " + error.toString());
-                Toast.makeText(MapActivity.this, "Erreur lors du chargement du poids", Toast.LENGTH_SHORT).show();
+                Toasty.error(MapActivity.this, "Erreur lors du chargement du poids", Toast.LENGTH_SHORT, true).show();
+
             }
         });
     }

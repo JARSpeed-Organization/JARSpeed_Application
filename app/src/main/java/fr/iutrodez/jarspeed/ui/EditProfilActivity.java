@@ -33,6 +33,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import es.dmoral.toasty.Toasty;
 import fr.iutrodez.jarspeed.model.gender.Gender;
 import fr.iutrodez.jarspeed.model.user.User;
 import fr.iutrodez.jarspeed.model.user.UserUpdateRequest;
@@ -253,7 +254,7 @@ public class EditProfilActivity extends AppCompatActivity {
                 sendUpdateRequestBasedOnField(view.getId(), newValue);
                 dialog.dismiss();
             } else {
-                Toast.makeText(this, "Veuillez entrer une valeur valide.", Toast.LENGTH_LONG).show();
+                Toasty.warning(this, "Veuillez entrer une valeur valide.", Toast.LENGTH_SHORT, true).show();
                 if (isEmailField) editTextGeneric.setError("Format de l'email invalide");
             }
         });
@@ -300,7 +301,9 @@ public class EditProfilActivity extends AppCompatActivity {
             // Pré-sélectionner le genre de l'utilisateur
             Log.e("gender", user.getGender().getId().toString());
             spinnerGender.setSelection(getGenderIndex(user.getGender()));
-        }, error -> Toast.makeText(this, "Erreur lors de la récupération des genres", Toast.LENGTH_LONG).show());
+        }, error -> Toasty.error(this, "Erreur lors de la récupération des genres", Toast.LENGTH_SHORT, true).show());
+
+
 
         // Initialize data with data base
         editTextWeight.setText(user.getWeight().toString());
@@ -399,7 +402,7 @@ public class EditProfilActivity extends AppCompatActivity {
             }
             dialog.dismiss();
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "Veuillez entrer des données valides.", Toast.LENGTH_SHORT).show();
+            Toasty.warning(this, "Veuillez entrer des données valides.", Toast.LENGTH_SHORT, true).show();
         }
     }
 
@@ -411,9 +414,9 @@ public class EditProfilActivity extends AppCompatActivity {
      */
     private void sendUpdateRequest(UserUpdateRequest updateRequest) {
         ApiUtils.updateUser(this, updateRequest, response -> {
-            Toast.makeText(EditProfilActivity.this, "Mise à jour réussie", Toast.LENGTH_SHORT).show();
+            Toasty.success(EditProfilActivity.this, "Mise à jour réussie", Toast.LENGTH_SHORT, true).show();
         }, error -> {
-            Toast.makeText(EditProfilActivity.this, "Erreur lors de la mise à jour", Toast.LENGTH_LONG).show();
+            Toasty.error(EditProfilActivity.this, "Erreur lors de la mise à jour", Toast.LENGTH_SHORT, true).show();
         });
     }
 

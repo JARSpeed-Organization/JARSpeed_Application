@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import es.dmoral.toasty.Toasty;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
 import fr.iutrodez.jarspeed.utils.ValidationUtils;
@@ -87,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         if (email.trim().isEmpty() || password.trim().isEmpty()) {
             ValidationUtils.setErrorBorder(this, emailEditText);
             ValidationUtils.setErrorBorder(this, passwordEditText);
-            Toast.makeText(this, "Le champ ne doit pas être vide.", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "Le champ ne doit pas être vide.", Toast.LENGTH_SHORT, true).show();
         } else {
             loginUser(email, password);
         }
@@ -118,7 +119,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 setErrorFields();
-                Toast.makeText(MainActivity.this, "Identifiants invalides.", Toast.LENGTH_SHORT).show();
+                Toasty.error(MainActivity.this, "Identifiants invalides.", Toast.LENGTH_SHORT, true).show();
+
             }
         });
     }

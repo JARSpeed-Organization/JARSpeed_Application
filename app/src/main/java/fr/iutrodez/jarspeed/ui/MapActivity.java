@@ -388,6 +388,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 Coordinate coor = new Coordinate(latitude, longitude);
                 PointOfInterest point = new PointOfInterest(titleOfThePointOfInterest, coor);
                 listPointOfInterests.add(point);
+                Toasty.success(MapActivity.this, "Point d'intérêt créé.", Toast.LENGTH_SHORT, true).show();
                 dialog.dismiss();
                 params.alpha = 1.0f;
                 getWindow().setAttributes(params);

@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
@@ -47,6 +48,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.GestureDetector;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -56,6 +58,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -208,6 +211,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
 
     private String weight;
 
+    private FloatingActionButton longPressButton;
 
     /**
      * Create location request location request.
@@ -271,6 +275,29 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         timeInHour = 0;
         kilocal = findViewById(R.id.kcal);
         weight = "";
+        longPressButton = findViewById(R.id.fabAdd);
+
+        longPressButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                // Déclarez et initialisez un Handler
+                final Handler handler = new Handler();
+                // Définissez un délai de 3 secondes (3000 millisecondes)
+                final int longPressDuration = 2000;
+
+                // Postez un runnable qui sera exécuté après 3 secondes
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Action à effectuer après l'appui prolongé de 3 secondes
+                        onRunButtonClick(v);
+                    }
+                }, longPressDuration);
+
+                // Indiquez que l'événement de clic long a été géré
+                return true;
+            }
+        });
 
         // Gestion de la localisation
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);

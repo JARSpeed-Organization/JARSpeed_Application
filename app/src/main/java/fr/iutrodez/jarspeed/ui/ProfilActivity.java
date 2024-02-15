@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.jarspeed.R;
 
+import es.dmoral.toasty.Toasty;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 
 /**
@@ -115,12 +116,12 @@ public class ProfilActivity extends AppCompatActivity {
         // Gère le clic sur le bouton Confirmer
         dialogView.findViewById(R.id.buttonConfirmGeneric).setOnClickListener(v -> {
             ApiUtils.deleteAccount(this, response -> {
-                Toast.makeText(ProfilActivity.this, "Compte supprimé avec succès.", Toast.LENGTH_SHORT).show();
+                Toasty.success(ProfilActivity.this, "Compte supprimé avec succès.", Toast.LENGTH_SHORT, true).show();
                 clearUserSession();
                 redirectToLoginScreen();
                 dialog.dismiss();
             }, error -> {
-                Toast.makeText(ProfilActivity.this, "Erreur lors de la suppression du compte.", Toast.LENGTH_SHORT).show();
+                Toasty.error(ProfilActivity.this, "Erreur lors de la suppression du compte.", Toast.LENGTH_SHORT, true).show();
                 dialog.dismiss();
             });
         });
@@ -147,7 +148,8 @@ public class ProfilActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
-        Toast.makeText(ProfilActivity.this, "Déconnexion réussie", Toast.LENGTH_SHORT).show();
+        Toasty.success(ProfilActivity.this, "Déconnexion réussie", Toast.LENGTH_SHORT, true).show();
+
 
     }
 }

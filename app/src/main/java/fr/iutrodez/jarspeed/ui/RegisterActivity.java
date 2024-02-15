@@ -15,6 +15,7 @@ import com.example.jarspeed.R;
 
 import java.nio.charset.StandardCharsets;
 
+import es.dmoral.toasty.Toasty;
 import fr.iutrodez.jarspeed.model.user.UserRegistrationRequest;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.ValidationUtils;
@@ -89,7 +90,7 @@ public class RegisterActivity extends AppCompatActivity {
             ApiUtils.registerUser(this, registrationRequest, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Toast.makeText(RegisterActivity.this, "Inscription réussie", Toast.LENGTH_SHORT).show();
+                    Toasty.success(RegisterActivity.this, "Inscription réussie", Toast.LENGTH_SHORT, true).show();
                     goToLoginActivity();
                 }
             }, new Response.ErrorListener() {
@@ -97,9 +98,9 @@ public class RegisterActivity extends AppCompatActivity {
                 public void onErrorResponse(VolleyError error) {
                     if (error.networkResponse != null && error.networkResponse.data != null) {
                         String errorMsg = new String(error.networkResponse.data, StandardCharsets.UTF_8);
-                        Toast.makeText(RegisterActivity.this, "Erreur d'inscription : " + errorMsg, Toast.LENGTH_SHORT).show();
+                        Toasty.error(RegisterActivity.this, "Erreur d'inscription : " + errorMsg, Toast.LENGTH_SHORT, true).show();
                     } else {
-                        Toast.makeText(RegisterActivity.this, "Erreur de connexion", Toast.LENGTH_SHORT).show();
+                        Toasty.error(RegisterActivity.this, "Erreur de connexion " , Toast.LENGTH_SHORT, true).show();
                     }
                 }
             });
@@ -156,26 +157,27 @@ public class RegisterActivity extends AppCompatActivity {
 
         // If email is the only invalid field
         if (emailInvalid && !ValidationUtils.isEmpty(nameEditText) && !ValidationUtils.isEmpty(firstnameEditText) && !ValidationUtils.isEmpty(passwordEditText) && !ValidationUtils.isEmpty(passwordConfirmationEditText)) {
-            Toast.makeText(this, "Format email non respecté", Toast.LENGTH_LONG).show();
+            Toasty.warning(this, "Format email non respecté", Toast.LENGTH_SHORT, true).show();
             return false;
         }
 
         // If other fields are also invalid
         if (!isValid) {
-            Toast.makeText(this, "Veuillez remplir tous les champs pour vous inscrire", Toast.LENGTH_LONG).show();
+            Toasty.warning(this, "Veuillez remplir tous les champs pour vous inscrire", Toast.LENGTH_SHORT, true).show();
             return false;
         }
         // Check Strength password
         if (!ValidationUtils.isValidPassword(passwordEditText.getText().toString())) {
             ValidationUtils.setErrorBorder(this, passwordEditText);
-            Toast.makeText(this, "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule et un caractère spécial", Toast.LENGTH_LONG).show();
+            Toasty.warning(this, "Le mot de passe doit contenir au moins 8 caractères, dont une majuscule et un caractère spécial", Toast.LENGTH_SHORT, true).show();
             isValid = false;
         }
         // check passwords
         if (!passwordEditText.getText().toString().equals(passwordConfirmationEditText.getText().toString())) {
             ValidationUtils.setErrorBorder(this, passwordEditText);
             ValidationUtils.setErrorBorder(this, passwordConfirmationEditText);
-            Toast.makeText(this, "Veuillez saisir deux mots de passe identiques", Toast.LENGTH_LONG).show();
+            Toasty.warning(this, "Veuillez saisir deux mots de passe identiques", Toast.LENGTH_SHORT, true).show();
+
             return false;
         }
 

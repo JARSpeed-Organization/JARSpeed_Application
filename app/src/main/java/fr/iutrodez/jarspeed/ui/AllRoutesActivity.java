@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import es.dmoral.toasty.Toasty;
 import fr.iutrodez.jarspeed.network.ApiConstants;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.RouteAdapter;
@@ -248,9 +249,11 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, url, parameters, response -> {
             loadAllRoutes();
-            Toast.makeText(getApplicationContext(), "Votre parcours a été mis à jour avec succès", Toast.LENGTH_SHORT).show();
+            Toasty.success(getApplicationContext(), "Votre parcours a été mis à jour avec succès", Toast.LENGTH_SHORT, true).show();
             dialog.dismiss(); // Fermez directement le dialogue ici
-        }, error -> Toast.makeText(getApplicationContext(), "Erreur de réseau: " + error.getMessage(), Toast.LENGTH_SHORT).show()) {
+        }, error -> Toasty.error(getApplicationContext(), "Erreur de réseau: " + error.getMessage(), Toast.LENGTH_SHORT, true).show())
+
+        {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
@@ -276,7 +279,7 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
     private void loadAllRoutes() {
         String token = SharedPreferencesManager.getAuthToken(this);
         if (token == null || token.isEmpty()) {
-            Toast.makeText(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT, true).show();
             return;
         }
 
@@ -367,14 +370,14 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
                     adapter = new RouteAdapter(routeList, AllRoutesActivity.this);
                     recyclerView.setAdapter(adapter);
                 } catch (JSONException e) {
-                    Toast.makeText(AllRoutesActivity.this, "Erreur lors du chargement des données", Toast.LENGTH_SHORT).show();
+                    Toasty.error(AllRoutesActivity.this, "Erreur lors du chargement des données", Toast.LENGTH_SHORT, true).show();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("LoadRoutes", "Error loading routes: " + error.toString());
-                Toast.makeText(AllRoutesActivity.this, "Erreur lors du chargement des parcours", Toast.LENGTH_SHORT).show();
+                Toasty.error(AllRoutesActivity.this, "Erreur lors du chargement des parcours", Toast.LENGTH_SHORT, true).show();
             }
         });
     }
@@ -400,19 +403,20 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
             String url = ApiConstants.ROUTE_BASE_URL + "/" + route.getId();
             String token = SharedPreferencesManager.getAuthToken(this);
             if (token == null || token.isEmpty()) {
-                Toast.makeText(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT).show();
+                Toasty.error(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT, true).show();
+
                 dialog.dismiss(); // Ferme la boîte de dialogue
                 return;
             }
 
             Response.Listener<String> responseListener = response -> {
-                Toast.makeText(this, "Parcours supprimé avec succès.", Toast.LENGTH_SHORT).show();
+                Toasty.success(this, "Parcours supprimé avec succès.", Toast.LENGTH_SHORT, true).show();
                 loadAllRoutes(); // Recharge les parcours après suppression
                 dialog.dismiss(); // Ferme la boîte de dialogue
             };
 
             Response.ErrorListener errorListener = error -> {
-                Toast.makeText(this, "Erreur lors de la suppression du parcours.", Toast.LENGTH_SHORT).show();
+                Toasty.error(this, "Erreur lors de la suppression du parcours.", Toast.LENGTH_SHORT, true).show();
                 dialog.dismiss(); // Ferme la boîte de dialogue
             };
 

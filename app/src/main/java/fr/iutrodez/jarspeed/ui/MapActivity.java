@@ -209,8 +209,29 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      */
     private TextView kilocal;
 
+    /**
+     * The Weight.
+     */
     private String weight;
 
+    /**
+     * The Elevation gain.
+     */
+    private double elevationGain;
+
+    /**
+     * The Elevation loss.
+     */
+    private double elevationLoss;
+
+    /**
+     * The Last altitude.
+     */
+    private double lastAltitude;
+
+    /**
+     * The Long press button.
+     */
     private FloatingActionButton longPressButton;
 
     /**
@@ -407,6 +428,8 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             isStarted = true;
             startDate = LocalDateTime.now();
             List<GeoPoint> geoPoints = new ArrayList<>(); // Points de la route
+            elevationGain = 0;
+            elevationLoss = 0;
             setupLocation();
             line = new Polyline(); // Créez une nouvelle polyline
             listPointOfInterests = new ArrayList<PointOfInterest>();
@@ -460,7 +483,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                             RouteUtils.pointsToCoordinates(line.getPoints()),
                             listPointOfInterests,
                             RouteUtils.generateTitle(title.getText().toString(), endDate),
-                            description.getText().toString());
+                            description.getText().toString(),
+                            elevationGain,
+                            elevationLoss);
 
             ApiUtils.saveRoute(this, routeDTO, new Response.Listener<String>() {
                 @Override
@@ -509,6 +534,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, null)
                 .addOnSuccessListener(this, location -> {
                     if (location != null) {
+                        lastAltitude = location.getAltitude();
                         updateMarker(location);
                     }
                 })
@@ -548,6 +574,13 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 double kcalBurn = userWeight * kilometersRun * CONSTANTE_CALCUL_KCAL;
                 strValue = String.format("%.2f", kcalBurn);
                 kilocal.setText(strValue + " Kcal");
+
+                if (lastAltitude < location.getAltitude()) {
+                    elevationGain += location.getAltitude() - lastAltitude;
+                } else {
+                    elevationLoss += lastAltitude - location.getAltitude();
+                }
+                lastAltitude = location.getAltitude();
             }
         }
 
@@ -568,6 +601,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         mapView.invalidate(); // Rafraîchir la carte
     }
 
+    /**
+     * Load user weight.
+     */
     private void loadUserWeight() {
         String token = SharedPreferencesManager.getAuthToken(this);
         if (token == null || token.isEmpty()) {

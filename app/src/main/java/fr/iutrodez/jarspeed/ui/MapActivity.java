@@ -209,14 +209,29 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      */
     private TextView kilocal;
 
+    /**
+     * The Weight.
+     */
     private String weight;
 
+    /**
+     * The Elevation gain.
+     */
     private double elevationGain;
 
+    /**
+     * The Elevation loss.
+     */
     private double elevationLoss;
 
+    /**
+     * The Last altitude.
+     */
     private double lastAltitude;
 
+    /**
+     * The Long press button.
+     */
     private FloatingActionButton longPressButton;
 
     /**
@@ -586,6 +601,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         mapView.invalidate(); // Rafraîchir la carte
     }
 
+    /**
+     * Load user weight.
+     */
     private void loadUserWeight() {
         String token = SharedPreferencesManager.getAuthToken(this);
         if (token == null || token.isEmpty()) {

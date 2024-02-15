@@ -1,7 +1,5 @@
 package fr.iutrodez.jarspeed.model;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,6 +36,14 @@ public class RouteDTO {
      * The Description.
      */
     private String description;
+    /**
+     * The Elevation gain.
+     */
+    private double elevationGain;
+    /**
+     * The Elevation loss.
+     */
+    private double elevationLoss;
 
     /**
      * Instantiates a new Route dto.
@@ -50,7 +56,7 @@ public class RouteDTO {
      * @param pTitle            the p title
      * @param pDescription      the p description
      */
-    public RouteDTO(String pId, String pStartDate, String pEndDate, List<Coordinate> pPath, List<PointOfInterest> pPointsOfInterest, String pTitle, String pDescription) {
+    public RouteDTO(String pId, String pStartDate, String pEndDate, List<Coordinate> pPath, List<PointOfInterest> pPointsOfInterest, String pTitle, String pDescription, double pElevationGain, double pElevationLoss) {
         id = pId;
         startDate = pStartDate;
         endDate = pEndDate;
@@ -58,6 +64,8 @@ public class RouteDTO {
         pointsOfInterest = pPointsOfInterest;
         title = pTitle;
         description = pDescription;
+        elevationGain = pElevationGain;
+        elevationLoss = pElevationLoss;
     }
 
     // Getters and Setters
@@ -194,6 +202,12 @@ public class RouteDTO {
      */
     public static class PointOfInterest {
 
+        /**
+         * Instantiates a new Point of interest.
+         *
+         * @param pName        the p name
+         * @param pCoordinates the p coordinates
+         */
         public PointOfInterest(final String pName, final Coordinate pCoordinates) {
             name = pName;
             coordinates = pCoordinates;
@@ -243,5 +257,41 @@ public class RouteDTO {
         public void setCoordinates(final Coordinate pCoordinates) {
             coordinates = pCoordinates;
         }
+    }
+
+    /**
+     * Gets elevation gain.
+     *
+     * @return the elevation gain
+     */
+    public double getElevationGain() {
+        return elevationGain;
+    }
+
+    /**
+     * Sets elevation gain.
+     *
+     * @param pElevationGain the p elevation gain
+     */
+    public void setElevationGain(double pElevationGain) {
+        elevationGain = pElevationGain;
+    }
+
+    /**
+     * Gets elevation loss.
+     *
+     * @return the elevation loss
+     */
+    public double getElevationLoss() {
+        return elevationLoss;
+    }
+
+    /**
+     * Sets elevation loss.
+     *
+     * @param pElevationLoss the p elevation loss
+     */
+    public void setElevationLoss(double pElevationLoss) {
+        elevationLoss = pElevationLoss;
     }
 }

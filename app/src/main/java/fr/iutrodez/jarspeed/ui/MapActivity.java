@@ -49,7 +49,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.view.GestureDetector;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -68,7 +67,6 @@ import java.util.List;
 import es.dmoral.toasty.Toasty;
 import fr.iutrodez.jarspeed.model.Coordinate;
 import fr.iutrodez.jarspeed.model.RouteDTO;
-import fr.iutrodez.jarspeed.model.user.User;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.network.RouteUtils;
 import fr.iutrodez.jarspeed.model.RouteDTO.PointOfInterest;
@@ -300,25 +298,29 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         weight = "";
         longPressButton = findViewById(R.id.fabAdd);
 
-        longPressButton.setOnLongClickListener(new View.OnLongClickListener() {
+        longPressButton.setOnTouchListener(new View.OnTouchListener() {
+            private Handler handler = new Handler();
+            private Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    // Action à effectuer après l'appui prolongé de 3 secondes
+                    onRunButtonClick(longPressButton);
+                }
+            };
+
             @Override
-            public boolean onLongClick(View v) {
-                // Déclarez et initialisez un Handler
-                final Handler handler = new Handler();
-                // Définissez un délai de 3 secondes (3000 millisecondes)
-                final int longPressDuration = 2000;
-
-                // Postez un runnable qui sera exécuté après 3 secondes
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Action à effectuer après l'appui prolongé de 3 secondes
-                        onRunButtonClick(v);
-                    }
-                }, longPressDuration);
-
-                // Indiquez que l'événement de clic long a été géré
-                return true;
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Commence le timer lorsque l'utilisateur commence à appuyer
+                        handler.postDelayed(runnable, 2500);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        // Annule le timer si l'utilisateur relâche le bouton avant 3 secondes
+                        handler.removeCallbacks(runnable);
+                        return true;
+                }
+                return false;
             }
         });
 

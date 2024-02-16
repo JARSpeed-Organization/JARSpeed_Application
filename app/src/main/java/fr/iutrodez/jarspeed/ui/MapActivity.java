@@ -434,7 +434,6 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             openPopupPause();
         } else {
             // Lancement de l'enregistrement
-
             imgAccount.setVisibility(View.GONE);
             btnRun.setImageResource(R.drawable.ic_pause);
             imgListRoute.setImageResource(R.drawable.vector);
@@ -457,6 +456,8 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             kilometersRun = 0;
             String strValue = String.format("%.2f", kilometersRun);
             kilometers.setText(strValue + " km");
+            Toasty.info(MapActivity.this,"L'enregistrement vient de démarrer",Toast.LENGTH_SHORT, true).show();
+
         }
     }
 

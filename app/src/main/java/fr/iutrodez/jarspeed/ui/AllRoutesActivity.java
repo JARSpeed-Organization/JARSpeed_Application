@@ -39,6 +39,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.Marker;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -175,6 +176,17 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         // Centrez la carte sur le premier point du parcours
         if (!geoPoints.isEmpty()) {
             mapController.setCenter(geoPoints.get(0));
+        }
+
+        for (Route.PointOfInterest poi : route.getPointsOfInterest()) {
+
+            Route.Coordinate coorPoi = poi.getCoordinates();
+            Marker marker = new Marker(miniMapView);
+            marker.setPosition(new GeoPoint(coorPoi.getLatitude(), coorPoi.getLongitude()));
+            marker.setTitle(poi.getName());
+
+            // Ajoutez le marqueur à la carte
+            miniMapView.getOverlays().add(marker);
         }
 
         miniMapView.invalidate(); // Rafraîchissez la carte pour afficher les modifications

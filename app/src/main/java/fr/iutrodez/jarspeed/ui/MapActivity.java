@@ -49,6 +49,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.GestureDetector;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -65,11 +66,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
-import fr.iutrodez.jarspeed.model.Coordinate;
-import fr.iutrodez.jarspeed.model.RouteDTO;
+import fr.iutrodez.jarspeed.model.route.CustomPoint;
+import fr.iutrodez.jarspeed.model.route.Route;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.network.RouteUtils;
-import fr.iutrodez.jarspeed.model.RouteDTO.PointOfInterest;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
 
 /**
@@ -142,7 +142,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     /**
      * The List point of interests.
      */
-    private List<PointOfInterest> listPointOfInterests;
+    private List<Route.PointOfInterest> listPointOfInterests;
     /**
      * The Datas block.
      */
@@ -399,9 +399,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 String titleOfThePointOfInterest = title.getText().toString();
                 double latitude = line.getPoints().get(line.getPoints().size() - 1).getLatitude();
                 double longitude = line.getPoints().get(line.getPoints().size() - 1).getLongitude();
-                Coordinate coor = new Coordinate(latitude, longitude);
-                PointOfInterest point = new PointOfInterest(titleOfThePointOfInterest, coor);
-                listPointOfInterests.add(point);
+                CustomPoint coor = new CustomPoint(longitude, latitude);
+                Route.PointOfInterest pointOfInterest = new Route.PointOfInterest(titleOfThePointOfInterest, coor);
+                listPointOfInterests.add(pointOfInterest);
                 Toasty.success(MapActivity.this, "Point d'intérêt créé.", Toast.LENGTH_SHORT, true).show();
                 dialog.dismiss();
                 params.alpha = 1.0f;
@@ -447,7 +447,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             elevationLoss = 0;
             setupLocation();
             line = new Polyline(); // Créez une nouvelle polyline
-            listPointOfInterests = new ArrayList<PointOfInterest>();
+            listPointOfInterests = new ArrayList<Route.PointOfInterest>();
             line.setPoints(geoPoints); // Ajoutez les points à la polyline
             mapView.getOverlays().add(line); // Ajoutez la polyline à la carte
             mapView.invalidate(); // Rafraîchissez la carte
@@ -493,18 +493,19 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             EditText title = dialogView.findViewById(R.id.editTextTitle);
             EditText description = dialogView.findViewById(R.id.editTextDescription);
             LocalDateTime endDate = LocalDateTime.now();
-            RouteDTO routeDTO =
-                    new RouteDTO(null,
+            Route route =
+                    new Route(null,
+                            null, // Initialized userId in API
                             startDate.toString(),
                             endDate.toString(),
-                            RouteUtils.pointsToCoordinates(line.getPoints()),
+                            RouteUtils.polylineToLineString(line),
                             listPointOfInterests,
                             RouteUtils.generateTitle(title.getText().toString(), endDate),
                             description.getText().toString(),
                             elevationGain,
                             elevationLoss);
 
-            ApiUtils.saveRoute(this, routeDTO, new Response.Listener<String>() {
+            ApiUtils.saveRoute(this, route, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     if (isStarted) {

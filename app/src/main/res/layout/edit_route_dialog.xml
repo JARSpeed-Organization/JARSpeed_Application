@@ -88,13 +88,30 @@
                     android:textSize="16dp"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Points d'intérêts"
                     android:layout_marginLeft="5dp"
-                    />
+                    android:text="Dénivelé positif" />
+
                 <TextView
-                    android:id="@+id/textViewPointsOfInterest"
+                    android:id="@+id/textViewElevationGain"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/edittext_background"
+                    android:padding="10dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="Dénivelé positif" />
+
+                <TextView
+                    android:id="@+id/textViewElevationLoss"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"

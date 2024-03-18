@@ -1,7 +1,6 @@
 package fr.iutrodez.jarspeed.network;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -18,8 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fr.iutrodez.jarspeed.model.RouteDTO;
 import fr.iutrodez.jarspeed.model.gender.Gender;
+import fr.iutrodez.jarspeed.model.route.Route;
 import fr.iutrodez.jarspeed.model.user.UserRegistrationRequest;
 import fr.iutrodez.jarspeed.model.user.UserUpdateRequest;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
@@ -89,7 +88,7 @@ public class ApiUtils {
         Volley.newRequestQueue(context).add(request);
     }
 
-    public static void saveRoute(Context context, RouteDTO pRoute, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+    public static void saveRoute(Context context, Route pRoute, Response.Listener<String> listener, Response.ErrorListener errorListener) {
 
         StringRequest request = new StringRequest(StringRequest.Method.POST, ApiConstants.ROUTE_BASE_URL, listener, errorListener) {
             @Override

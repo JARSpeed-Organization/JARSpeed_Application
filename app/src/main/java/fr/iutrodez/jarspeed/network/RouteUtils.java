@@ -1,22 +1,29 @@
 package fr.iutrodez.jarspeed.network;
 
+import com.mapbox.geojson.LineString;
+import com.mapbox.geojson.Point;
+
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.overlay.Polyline;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.iutrodez.jarspeed.model.Coordinate;
+import fr.iutrodez.jarspeed.model.route.CustomLineString;
+import fr.iutrodez.jarspeed.model.route.CustomPoint;
 
 public class RouteUtils {
 
-    public static List<Coordinate> pointsToCoordinates(List<GeoPoint> points) {
-        List<Coordinate> coordinates = new ArrayList<>();
-        for (GeoPoint point : points) {
-            coordinates.add(new Coordinate(point.getLatitude(), point.getLongitude()));
+    public static CustomLineString polylineToLineString(Polyline pPolyline) {
+        CustomLineString lineString = new CustomLineString();
+
+        for (GeoPoint geoPoint : pPolyline.getActualPoints()) {
+            lineString.add(geoPoint.getLongitude(), geoPoint.getLatitude());
         }
-        return coordinates;
+
+        return lineString;
     }
 
     public static String generateTitle(String pTitle, LocalDateTime pDate) {

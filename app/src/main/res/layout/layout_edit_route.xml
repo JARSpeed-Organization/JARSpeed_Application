@@ -14,19 +14,19 @@
             android:id="@+id/editTextTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Titre"/>
+            android:hint="@string/title"/>
         <EditText
             android:id="@+id/editTextDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Description"
+            android:hint="@string/description"
             android:inputType="textMultiLine"/>
 
         <!-- Affichage des dates de début et de fin -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Date de début"
+            android:text="@string/date_debut"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
         <TextView
             android:id="@+id/textViewStartDate"
@@ -35,7 +35,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Date de fin"
+            android:text="@string/date_fin"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
         <TextView
             android:id="@+id/textViewEndDate"
@@ -46,7 +46,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Points d'intérêt"
+            android:text="@string/poi"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
         <TextView
             android:id="@+id/textViewPointsOfInterest"
@@ -58,7 +58,7 @@
             android:id="@+id/buttonSave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enregistrer"
+            android:text="@string/enregistrer"
             android:layout_gravity="center"/>
 
     </LinearLayout>

@@ -3,6 +3,7 @@ package fr.iutrodez.jarspeed.ui;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -11,10 +12,12 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -239,7 +242,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      *
      * @return the location request
      */
-    private LocationRequest createLocationRequest() {
+    protected LocationRequest createLocationRequest() {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setInterval(10000); // Mise à jour de la position toutes les 10 secondes
         locationRequest.setFastestInterval(5000); // Mise à jour la plus rapide acceptée
@@ -297,32 +300,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         kilocal = findViewById(R.id.kcal);
         weight = "";
         longPressButton = findViewById(R.id.fabAdd);
-
-        longPressButton.setOnTouchListener(new View.OnTouchListener() {
-            private Handler handler = new Handler();
-            private Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    // Action à effectuer après l'appui prolongé de 3 secondes
-                    onRunButtonClick(longPressButton);
-                }
-            };
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        // Commence le timer lorsque l'utilisateur commence à appuyer
-                        handler.postDelayed(runnable, 2500);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        // Annule le timer si l'utilisateur relâche le bouton avant 3 secondes
-                        handler.removeCallbacks(runnable);
-                        return true;
-                }
-                return false;
-            }
-        });
+        longPress();
 
         // Gestion de la localisation
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -344,6 +322,39 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         };
         // Obtention du OnBackPressedDispatcher et ajout du callback
         getOnBackPressedDispatcher().addCallback(this, callback);
+    }
+
+
+    private void longPress() {
+        longPressButton.setOnTouchListener(new View.OnTouchListener() {
+            private Handler handler = new Handler();
+            private Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    // Action à effectuer après l'appui prolongé de 3 secondes
+                    if (!isLocationEnabled()) {
+                        promptEnableLocation();
+                    } else {
+                        onRunButtonClick(longPressButton);
+                    }
+                }
+            };
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Commence le timer lorsque l'utilisateur commence à appuyer
+                        handler.postDelayed(runnable, 2500);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        // Annule le timer si l'utilisateur relâche le bouton avant 3 secondes
+                        handler.removeCallbacks(runnable);
+                        return true;
+                }
+                return false;
+            }
+        });
     }
 
     /**
@@ -544,6 +555,48 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     }
 
     /**
+     * Is location enabled boolean.
+     *
+     * @return the boolean
+     */
+    private boolean isLocationEnabled() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+
+    private boolean isLocationDialogShowing = false;
+    private void promptEnableLocation() {
+        if (!isLocationDialogShowing) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Localisation désactivée");
+            builder.setMessage("Cette application nécessite l'accès à votre localisation. Veuillez activer la localisation.");
+            builder.setPositiveButton("Paramètres de localisation", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    isLocationDialogShowing = false;
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                }
+            });
+            builder.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    isLocationDialogShowing = false;
+                }
+            });
+            builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    isLocationDialogShowing = false;
+                }
+            });
+            builder.show();
+            isLocationDialogShowing = true;
+        }
+    }
+
+
+    /**
      * Sets location.
      */
     private void setupLocation() {
@@ -675,6 +728,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         runnable = new Runnable() {
             @Override
             public void run() {
+                if (!isLocationEnabled()) {
+                    promptEnableLocation();
+                }
                 timeSpendMillisecond += 1000;
 
                 int hour = (int) (timeSpendMillisecond / 3600000);
@@ -791,6 +847,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         super.onDestroy();
         // Assurez-vous de supprimer les callbacks du Handler lorsque l'activité est détruite
         handler.removeCallbacksAndMessages(null);
+        isStarted = false;
     }
 
     // TODO Arret recuperer position quand arret application

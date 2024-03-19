@@ -4,8 +4,8 @@
     <string name="name_hint">Nom</string>
     <string name="firstname_hint">Prénom</string>
     <string name="email_hint">E-mail</string>
-    <string name="password">Mot de passe</string>
-    <string name="password_hint">Nouveau mot de passe</string>
+    <string name="password_hint">Mot de passe</string>
+    <string name="new_password_hint">Nouveau mot de passe</string>
     <string name="password_confirmation_hint">Confirmer mot de passe</string>
     <string name="login">Se connecter</string>
     <string name="no_account">Pas de compte ?</string>
@@ -29,6 +29,11 @@
     <string name="ok">OK</string>
     <string name="cancel">Annuler</string>
     <string name="confirm">Confirmer</string>
+    <string name="debut">Début</string>
+    <string name="fin">Fin</string>
+    <string name="poi">Points d\'intérêts</string>
+    <string name="date_debut">Date de début</string>
+    <string name="date_fin">Date de fin</string>
 
     <!-- Strings for Profil Screen -->
     <string name="myProfil">Mon profil</string>

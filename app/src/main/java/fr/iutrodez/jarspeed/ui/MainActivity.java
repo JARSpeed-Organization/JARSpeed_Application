@@ -116,13 +116,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
                 try {
+                    Log.e("loginResponse", response);
                     JSONObject jsonResponse = new JSONObject(response);
                     String token = jsonResponse.getString("token");
-
-                    SharedPreferencesManager.saveAuthToken(MainActivity.this, token);
+                    String weight = jsonResponse.getString("weight");
+                    SharedPreferencesManager.saveAuthTokenAndWeight(MainActivity.this, token, weight);
 
                     goToMapActivity();
                 } catch (JSONException e) {
+                    Log.e("login", e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -131,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 setErrorFields();
                 Toasty.error(MainActivity.this, "Identifiants invalides.", Toast.LENGTH_SHORT, true).show();
-
+                Log.e("login", error.toString());
             }
         });
     }

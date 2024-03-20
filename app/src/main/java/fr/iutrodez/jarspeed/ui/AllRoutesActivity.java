@@ -219,9 +219,10 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         textViewEndDate.setText(route.getEndDate() != null ? LocalDateTime.parse(route.getEndDate()).format(formatter) : "Non spécifiée");
         textViewElevationGain.setText(route.getElevationGain() != null ? String.format ("%.2f", route.getElevationGain()) : "Non spécifiée");
         textViewElevationLoss.setText(route.getElevationLoss() != null ? String.format ("%.2f", route.getElevationLoss()) : "Non spécifiée");
-
+        Log.e("azer", route.getPointsOfInterest().toString());
         // Construction et affichage des points d'intérêt
         StringBuilder poiBuilder = new StringBuilder();
+        poiBuilder.append("\n");
         if (route.getPointsOfInterest() != null && !route.getPointsOfInterest().isEmpty()) {
             for (Route.PointOfInterest poi : route.getPointsOfInterest()) {
                 poiBuilder.append(poi.getName()).append("\n");
@@ -230,7 +231,7 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
             poiBuilder.append("Aucun");
         }
         // TODO Points of interest
-//        textViewPointsOfInterest.setText(poiBuilder.toString() != null ? poiBuilder.toString() : "Non spécifiée");
+        textViewPointsOfInterest.setText(poiBuilder.toString() != null ? poiBuilder.toString() : "Non spécifiée");
     }
 
     private void setupSaveButtonListener(AlertDialog dialog, View dialogView, Route route) {
@@ -245,60 +246,23 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         // Récupération des nouvelles valeurs
         String newTitle = ((EditText) dialog.findViewById(R.id.editTextTitle)).getText().toString().trim();
         String newDescription = ((EditText) dialog.findViewById(R.id.editTextDescription)).getText().toString().trim();
-
+        // Mise à jour des champs modifiables
+        route.setTitle(newTitle);
+        route.setDescription(newDescription);
         // Préparation de l'objet JSON pour la requête
-        JSONObject parameters = new JSONObject();
-        try {
-            parameters.put("id", route.getId());
-            parameters.put("title", newTitle);
-            parameters.put("description", newDescription);
-            parameters.put("endDate", route.getEndDate().toString());
-            parameters.put("startDate", route.getStartDate().toString());
-
-            // Ajout du chemin
-            JSONArray pathArray = new JSONArray();
-            for (List<Double> coord : route.getPath().getCoordinates()) {
-                JSONObject coordJSON = new JSONObject();
-                coordJSON.put("latitude", coord.get(0));
-                coordJSON.put("longitude", coord.get(1));
-                pathArray.put(coordJSON);
-            }
-            parameters.put("path", pathArray);
-
-            // Ajout des points d'intérêt
-            JSONArray poiArray = new JSONArray();
-            for (Route.PointOfInterest poi : route.getPointsOfInterest()) {
-                JSONObject poiJSON = new JSONObject();
-                poiJSON.put("name", poi.getName());
-                JSONObject coordJSON = new JSONObject();
-//                coordJSON.put("latitude", poi.getCoordinates().getLatitude());
-//                coordJSON.put("longitude", poi.getCoordinates().getLongitude());
-                poiJSON.put("coordinates", coordJSON);
-                poiArray.put(poiJSON);
-            }
-            parameters.put("pointsOfInterest", poiArray);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        String url = ApiConstants.ROUTE_BASE_URL + "/" + route.getId();
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, url, parameters, response -> {
-            loadAllRoutes();
-            Toasty.success(getApplicationContext(), "Votre parcours a été mis à jour avec succès", Toast.LENGTH_SHORT, true).show();
-            dialog.dismiss(); // Fermez directement le dialogue ici
-        }, error -> Toasty.error(getApplicationContext(), "Erreur de réseau: " + error.getMessage(), Toast.LENGTH_SHORT, true).show())
-
-        {
+        ApiUtils.updateRoute(this, route, new Response.Listener<String>() {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json");
-                return headers;
+            public void onResponse(String response) {
+                loadAllRoutes();
+                Toasty.success(getApplicationContext(), "Votre parcours a été mis à jour avec succès", Toast.LENGTH_SHORT, true).show();
+                dialog.dismiss(); // Fermez directement le dialogue ici
             }
-        };
-
-        Volley.newRequestQueue(this).add(jsonObjectRequest);
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toasty.error(getApplicationContext(), "Erreur de réseau: " + error.getMessage(), Toast.LENGTH_SHORT, true).show();
+            }
+        });
     }
 
     @Override

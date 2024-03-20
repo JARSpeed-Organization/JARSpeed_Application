@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -184,6 +186,8 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
             Marker marker = new Marker(miniMapView);
             marker.setPosition(new GeoPoint(coorPoi.getLatitude(), coorPoi.getLongitude()));
             marker.setTitle(poi.getName());
+            Drawable customIcon = ContextCompat.getDrawable(ctx, R.drawable.custom_marker);
+            marker.setIcon(customIcon);
 
             // Ajoutez le marqueur à la carte
             miniMapView.getOverlays().add(marker);

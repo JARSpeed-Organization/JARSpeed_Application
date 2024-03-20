@@ -58,8 +58,8 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
         Collections.sort(filteredRoutes, new Comparator<Route>() {
             @Override
             public int compare(Route route1, Route route2) {
-                LocalDateTime date1 = route1.getStartDate();
-                LocalDateTime date2 = route2.getStartDate();
+                LocalDateTime date1 = LocalDateTime.parse(route1.getStartDate());
+                LocalDateTime date2 = LocalDateTime.parse(route2.getStartDate());
                 return date1.compareTo(date2);
             }
         });
@@ -70,8 +70,8 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
         Collections.sort(filteredRoutes, new Comparator<Route>() {
             @Override
             public int compare(Route route1, Route route2) {
-                LocalDateTime date1 = route1.getStartDate();
-                LocalDateTime date2 = route2.getStartDate();
+                LocalDateTime date1 = LocalDateTime.parse(route1.getStartDate());
+                LocalDateTime date2 = LocalDateTime.parse(route2.getStartDate());
                 return date2.compareTo(date1);
             }
         });

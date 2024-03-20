@@ -31,6 +31,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.jarspeed.R;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,12 +62,12 @@ import java.util.Locale;
 import java.util.Map;
 
 import es.dmoral.toasty.Toasty;
+import fr.iutrodez.jarspeed.model.route.CustomPoint;
+import fr.iutrodez.jarspeed.model.route.Route;
 import fr.iutrodez.jarspeed.network.ApiConstants;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.RouteAdapter;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
-
-import fr.iutrodez.jarspeed.model.route.Route;
 
 public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter.OnItemClickListener {
 
@@ -148,7 +152,7 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
 
     private void setupMinimap(View dialogView, Route route) {
         // Assurez-vous que la route et son chemin ne sont pas nuls
-        if (route == null || route.getPath() == null || route.getPath().isEmpty()) {
+        if (route == null || route.getPath().getCoordinates() == null || route.getPath().getCoordinates().isEmpty()) {
             Log.d("setupMinimap", "Parcours ou liste des points est nulle ou vide.");
             return; // Sortez de la méthode si la route ou le chemin est nul ou vide
         }
@@ -168,8 +172,8 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         line.setWidth(2.0f);
 
         List<GeoPoint> geoPoints = new ArrayList<>();
-        for (Route.Coordinate coord : route.getPath()) {
-            geoPoints.add(new GeoPoint(coord.getLatitude(), coord.getLongitude()));
+        for (List<Double> coord : route.getPath().getCoordinates()) {
+            geoPoints.add(new GeoPoint(coord.get(1), coord.get(0)));
         }
 
         line.setPoints(geoPoints);
@@ -182,9 +186,9 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
 
         for (Route.PointOfInterest poi : route.getPointsOfInterest()) {
 
-            Route.Coordinate coorPoi = poi.getCoordinates();
+            CustomPoint coorPoi = poi.getCoordinates();
             Marker marker = new Marker(miniMapView);
-            marker.setPosition(new GeoPoint(coorPoi.getLatitude(), coorPoi.getLongitude()));
+            marker.setPosition(new GeoPoint(coorPoi.getCoordinates().get(1), coorPoi.getCoordinates().get(0)));
             marker.setTitle(poi.getName());
             Drawable customIcon = ContextCompat.getDrawable(ctx, R.drawable.custom_marker);
             marker.setIcon(customIcon);
@@ -203,17 +207,22 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         EditText editTextDescription = dialogView.findViewById(R.id.editTextDescription);
         TextView textViewStartDate = dialogView.findViewById(R.id.textViewStartDate);
         TextView textViewEndDate = dialogView.findViewById(R.id.textViewEndDate);
+        TextView textViewElevationGain = dialogView.findViewById(R.id.textViewElevationGain);
+        TextView textViewElevationLoss = dialogView.findViewById(R.id.textViewElevationLoss);
         TextView textViewPointsOfInterest = dialogView.findViewById(R.id.textViewPointsOfInterest);
 
         // Configuration initiale des champs
         editTextTitle.setText(route.getTitle() != null && !route.getTitle().isEmpty() ? route.getTitle() : "");
         editTextDescription.setText(route.getDescription() != null && !route.getDescription().isEmpty() ? route.getDescription() : "");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE dd MMMM yyyy à HH:mm", Locale.FRANCE);
-        textViewStartDate.setText(route.getStartDate() != null ? route.getStartDate().format(formatter) : "Non spécifiée");
-        textViewEndDate.setText(route.getEndDate() != null ? route.getEndDate().format(formatter) : "Non spécifiée");
-
+        textViewStartDate.setText(route.getStartDate() != null ? LocalDateTime.parse(route.getStartDate()).format(formatter) : "Non spécifiée");
+        textViewEndDate.setText(route.getEndDate() != null ? LocalDateTime.parse(route.getEndDate()).format(formatter) : "Non spécifiée");
+        textViewElevationGain.setText(route.getElevationGain() != null ? String.format ("%.2f", route.getElevationGain()) : "Non spécifiée");
+        textViewElevationLoss.setText(route.getElevationLoss() != null ? String.format ("%.2f", route.getElevationLoss()) : "Non spécifiée");
+        Log.e("azer", route.getPointsOfInterest().toString());
         // Construction et affichage des points d'intérêt
         StringBuilder poiBuilder = new StringBuilder();
+        poiBuilder.append("\n");
         if (route.getPointsOfInterest() != null && !route.getPointsOfInterest().isEmpty()) {
             for (Route.PointOfInterest poi : route.getPointsOfInterest()) {
                 poiBuilder.append(poi.getName()).append("\n");
@@ -221,7 +230,8 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         } else {
             poiBuilder.append("Aucun");
         }
-        textViewPointsOfInterest.setText(poiBuilder.toString());
+        // TODO Points of interest
+        textViewPointsOfInterest.setText(poiBuilder.toString() != null ? poiBuilder.toString() : "Non spécifiée");
     }
 
     private void setupSaveButtonListener(AlertDialog dialog, View dialogView, Route route) {
@@ -236,60 +246,23 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         // Récupération des nouvelles valeurs
         String newTitle = ((EditText) dialog.findViewById(R.id.editTextTitle)).getText().toString().trim();
         String newDescription = ((EditText) dialog.findViewById(R.id.editTextDescription)).getText().toString().trim();
-
+        // Mise à jour des champs modifiables
+        route.setTitle(newTitle);
+        route.setDescription(newDescription);
         // Préparation de l'objet JSON pour la requête
-        JSONObject parameters = new JSONObject();
-        try {
-            parameters.put("id", route.getId());
-            parameters.put("title", newTitle);
-            parameters.put("description", newDescription);
-            parameters.put("endDate", route.getEndDate().toString());
-            parameters.put("startDate", route.getStartDate().toString());
-
-            // Ajout du chemin
-            JSONArray pathArray = new JSONArray();
-            for (Route.Coordinate coord : route.getPath()) {
-                JSONObject coordJSON = new JSONObject();
-                coordJSON.put("latitude", coord.getLatitude());
-                coordJSON.put("longitude", coord.getLongitude());
-                pathArray.put(coordJSON);
-            }
-            parameters.put("path", pathArray);
-
-            // Ajout des points d'intérêt
-            JSONArray poiArray = new JSONArray();
-            for (Route.PointOfInterest poi : route.getPointsOfInterest()) {
-                JSONObject poiJSON = new JSONObject();
-                poiJSON.put("name", poi.getName());
-                JSONObject coordJSON = new JSONObject();
-                coordJSON.put("latitude", poi.getCoordinates().getLatitude());
-                coordJSON.put("longitude", poi.getCoordinates().getLongitude());
-                poiJSON.put("coordinates", coordJSON);
-                poiArray.put(poiJSON);
-            }
-            parameters.put("pointsOfInterest", poiArray);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        String url = ApiConstants.ROUTE_BASE_URL + "/" + route.getId();
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, url, parameters, response -> {
-            loadAllRoutes();
-            Toasty.success(getApplicationContext(), "Votre parcours a été mis à jour avec succès", Toast.LENGTH_SHORT, true).show();
-            dialog.dismiss(); // Fermez directement le dialogue ici
-        }, error -> Toasty.error(getApplicationContext(), "Erreur de réseau: " + error.getMessage(), Toast.LENGTH_SHORT, true).show())
-
-        {
+        ApiUtils.updateRoute(this, route, new Response.Listener<String>() {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json");
-                return headers;
+            public void onResponse(String response) {
+                loadAllRoutes();
+                Toasty.success(getApplicationContext(), "Votre parcours a été mis à jour avec succès", Toast.LENGTH_SHORT, true).show();
+                dialog.dismiss(); // Fermez directement le dialogue ici
             }
-        };
-
-        Volley.newRequestQueue(this).add(jsonObjectRequest);
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toasty.error(getApplicationContext(), "Erreur de réseau: " + error.getMessage(), Toast.LENGTH_SHORT, true).show();
+            }
+        });
     }
 
     @Override
@@ -320,76 +293,12 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
                     // Vider la liste existante pour éviter les doublons
                     routeList.clear();
 
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    objectMapper.registerModule(new JavaTimeModule());
                     // Boucle pour ajouter chaque parcours dans la liste
                     for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject routeObject = jsonArray.getJSONObject(i);
-
-                        Route route = new Route();
-
-                        // Supposons que votre objet Route a des setters pour chaque champ
-                        if(routeObject.has("id") && !routeObject.isNull("id")) {
-                            route.setId(routeObject.getString("id"));
-                        }
-                        if(routeObject.has("title") && !routeObject.isNull("title")) {
-                            route.setTitle(routeObject.getString("title"));
-                        }
-                        if(routeObject.has("description") && !routeObject.isNull("description")) {
-                            route.setDescription(routeObject.getString("description"));
-                        }
-                        if(routeObject.has("startDate") && !routeObject.isNull("startDate")) {
-                            try {
-                                String startDateStr = routeObject.getString("startDate");
-                                // Parsing de la chaîne de caractères en LocalDateTime
-                                LocalDateTime startDate = LocalDateTime.parse(startDateStr);
-                                route.setStartDate(startDate);
-                            } catch (DateTimeParseException e) {
-                                e.printStackTrace();
-                                // Gérer l'exception si la date n'est pas au format attendu
-                            }
-                        }
-                        if(routeObject.has("endDate") && !routeObject.isNull("endDate")) {
-                            try {
-                                String endDateStr = routeObject.getString("endDate");
-                                // Parsing de la chaîne de caractères en LocalDateTime
-
-                                LocalDateTime endDate = LocalDateTime.parse(endDateStr);
-                                route.setEndDate(endDate);
-                            } catch (DateTimeParseException e) {
-                                e.printStackTrace();
-                                // Gérer l'exception si la date n'est pas au format attendu
-                            }
-                        }
-                        // À l'intérieur de la boucle for, après avoir extrait les autres champs
-                        List<Route.Coordinate> path = new ArrayList<>();
-                        JSONArray pathArray = routeObject.optJSONArray("path");
-                        if (pathArray != null) {
-                            for (int j = 0; j < pathArray.length(); j++) {
-                                JSONObject pathObject = pathArray.getJSONObject(j);
-                                double latitude = pathObject.optDouble("latitude");
-                                double longitude = pathObject.optDouble("longitude");
-                                Route.Coordinate coordinate = new Route.Coordinate(latitude, longitude);
-                                path.add(coordinate);
-                            }
-                        }
-                        route.setPath(path); // Assurez-vous que votre classe Route a une méthode setPath(List<Coordinate> path)
-
-                        List<Route.PointOfInterest> pointsOfInterest = new ArrayList<>();
-                        JSONArray poiArray = routeObject.optJSONArray("pointsOfInterest");
-                        if (poiArray != null) {
-                            for (int k = 0; k < poiArray.length(); k++) {
-                                JSONObject poiObject = poiArray.getJSONObject(k);
-                                String name = poiObject.optString("name");
-                                JSONObject coordObject = poiObject.optJSONObject("coordinates");
-                                double latitude = coordObject.optDouble("latitude");
-                                double longitude = coordObject.optDouble("longitude");
-                                Route.Coordinate coordinate = new Route.Coordinate(latitude, longitude);
-                                Route.PointOfInterest poi = new Route.PointOfInterest(name, coordinate);
-                                pointsOfInterest.add(poi);
-                            }
-                        }
-                        route.setPointsOfInterest(pointsOfInterest); // Assurez-vous que votre classe Route a une méthode setPointsOfInterest(List<PointOfInterest> pointsOfInterest)
-
-
+                        Route route = objectMapper.readValue(jsonArray.getJSONObject(i).toString(), Route.class);
+                        Log.e("route", route.toString());
                         routeList.add(route);
                     }
 
@@ -398,6 +307,10 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
                     recyclerView.setAdapter(adapter);
                 } catch (JSONException e) {
                     Toasty.error(AllRoutesActivity.this, "Erreur lors du chargement des données", Toast.LENGTH_SHORT, true).show();
+                } catch (JsonMappingException pE) {
+                    throw new RuntimeException(pE);
+                } catch (JsonProcessingException pE) {
+                    throw new RuntimeException(pE);
                 }
             }
         }, new Response.ErrorListener() {
@@ -477,11 +390,5 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
      */
     public void onSortDescendingButtonClick(View view) {
         adapter.sortDescending();
-    }
-
-    @Override
-    public void onBackPressed() {
-        // Laissez vide pour ne rien faire sur le pression du bouton Retour
-        // Ou ajoutez votre propre logique ici
     }
 }

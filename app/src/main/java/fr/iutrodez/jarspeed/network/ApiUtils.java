@@ -1,7 +1,6 @@
 package fr.iutrodez.jarspeed.network;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -18,8 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fr.iutrodez.jarspeed.model.RouteDTO;
 import fr.iutrodez.jarspeed.model.gender.Gender;
+import fr.iutrodez.jarspeed.model.route.Route;
 import fr.iutrodez.jarspeed.model.user.UserRegistrationRequest;
 import fr.iutrodez.jarspeed.model.user.UserUpdateRequest;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
@@ -89,7 +88,31 @@ public class ApiUtils {
         Volley.newRequestQueue(context).add(request);
     }
 
-    public static void saveRoute(Context context, RouteDTO pRoute, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+    public static void updateRoute(Context context, Route pRoute, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+
+        StringRequest request = new StringRequest(StringRequest.Method.PUT, ApiConstants.ROUTE_BASE_URL, listener, errorListener) {
+            @Override
+            public byte[] getBody() {
+                return new Gson().toJson(pRoute).getBytes();
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                String token = SharedPreferencesManager.getAuthToken(context);
+                headers.put("Authorization", "Bearer " + token);
+                return headers;
+            }
+        };
+        Volley.newRequestQueue(context).add(request);
+    }
+
+    public static void saveRoute(Context context, Route pRoute, Response.Listener<String> listener, Response.ErrorListener errorListener) {
 
         StringRequest request = new StringRequest(StringRequest.Method.POST, ApiConstants.ROUTE_BASE_URL, listener, errorListener) {
             @Override
@@ -121,7 +144,6 @@ public class ApiUtils {
      * @param listener      the listener
      * @param errorListener the error listener
      */
-// Méthode pour mettre à jour un utilisateur
     public static void updateUser(Context context, UserUpdateRequest updateRequest, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = ApiConstants.UPDATE_USER_URL;
         StringRequest request = new StringRequest(StringRequest.Method.PUT, url, listener, errorListener) {

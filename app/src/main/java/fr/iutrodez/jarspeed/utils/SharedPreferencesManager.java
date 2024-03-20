@@ -18,22 +18,33 @@ public class SharedPreferencesManager {
      *
      * @param context the context
      * @param token   the token
+     * @param weight  the weight
      */
-    public static void saveAuthToken(Context context, String token) {
+    public static void saveAuthTokenAndWeight(Context context, String token, String weight) {
         SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
         prefs.edit().putString("token", token).apply();
+        prefs.edit().putString("weight", weight).apply();
     }
 
     /**
      * Gets auth token.
      *
-     * @param context the context
+     * @param pContext the context
      * @return the auth token
      */
-    public static String getAuthToken(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+    public static String getAuthToken(Context pContext) {
+        SharedPreferences prefs = pContext.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
         return prefs.getString("token", null);
     }
 
-    // ... autres méthodes pour gérer SharedPreferences
+    /**
+     * Gets weight.
+     *
+     * @param pContext the p context
+     * @return weight
+     */
+    public static double getWeight(Context pContext) {
+        SharedPreferences prefs = pContext.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+        return Double.parseDouble(prefs.getString("weight", null));
+    }
 }

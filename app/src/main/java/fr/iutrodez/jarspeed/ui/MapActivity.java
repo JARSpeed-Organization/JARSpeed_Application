@@ -68,11 +68,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
-import fr.iutrodez.jarspeed.model.Coordinate;
-import fr.iutrodez.jarspeed.model.RouteDTO;
+import fr.iutrodez.jarspeed.model.route.CustomPoint;
+import fr.iutrodez.jarspeed.model.route.Route;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.network.RouteUtils;
-import fr.iutrodez.jarspeed.model.RouteDTO.PointOfInterest;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
 
 /**
@@ -81,9 +80,17 @@ import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
 public class MapActivity extends AppCompatActivity implements SensorEventListener {
 
     /**
-     * The constant MY_USER_AGENT.
+     * The constant REQUEST_LOCATION_PERMISSION.
      */
-    private static final String MY_USER_AGENT = "USER_AGENT";
+    private static final int REQUEST_LOCATION_PERMISSION = 1;
+    /**
+     * The constant EARTH_RADIUS.
+     */
+    private static final double EARTH_RADIUS = 6371;
+    /**
+     * The Constante calcul kcal.
+     */
+    private final double CONSTANTE_CALCUL_KCAL = 1.036;
     /**
      * The Is ongoing.
      */
@@ -101,11 +108,6 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      */
     private Sensor compass;
     /**
-     * The constant REQUEST_LOCATION_PERMISSION.
-     */
-    private static final int REQUEST_LOCATION_PERMISSION = 1;
-
-    /**
      * The Map view.
      */
     private MapView mapView;
@@ -121,7 +123,6 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      * The Current location marker.
      */
     private Marker currentLocationMarker;
-
     /**
      * The Line.
      */
@@ -145,7 +146,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     /**
      * The List point of interests.
      */
-    private List<PointOfInterest> listPointOfInterests;
+    private List<Route.PointOfInterest> listPointOfInterests;
     /**
      * The Datas block.
      */
@@ -162,12 +163,10 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      * The Time spend millisecond.
      */
     private long timeSpendMillisecond;
-
     /**
      * The Timer in pause.
      */
     private boolean timerInPause;
-
     /**
      * The Runnable.
      */
@@ -176,62 +175,42 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
      * The Initialise time.
      */
     private final String INITIALISE_TIME = "00:00:00";
-
-    /**
-     * The constant EARTH_RADIUS.
-     */
-    private static final double EARTH_RADIUS = 6371;
-
     /**
      * The Kilometers run.
      */
     private double kilometersRun;
-
     /**
      * The Kilometers.
      */
     private TextView kilometers;
-
     /**
      * The Time for one kilometer.
      */
     private TextView timeForOneKilometer;
-
     /**
      * The Time in hour.
      */
     private double timeInHour;
-
-    /**
-     * The Constante calcul kcal.
-     */
-    private final double CONSTANTE_CALCUL_KCAL = 1.036;
-
     /**
      * The Kilocal.
      */
     private TextView kilocal;
-
     /**
      * The Weight.
      */
-    private String weight;
-
+    private double weight;
     /**
      * The Elevation gain.
      */
     private double elevationGain;
-
     /**
      * The Elevation loss.
      */
     private double elevationLoss;
-
     /**
      * The Last altitude.
      */
     private double lastAltitude;
-
     /**
      * The Long press button.
      */
@@ -298,7 +277,8 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         timeForOneKilometer = findViewById(R.id.time_km);
         timeInHour = 0;
         kilocal = findViewById(R.id.kcal);
-        weight = "";
+        weight = SharedPreferencesManager.getWeight(ctx);
+        Log.e("weight", weight + "");
         longPressButton = findViewById(R.id.fabAdd);
         longPress();
 
@@ -310,7 +290,6 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             setupLocation();
             startLocationUpdates();
         }
-        loadUserWeight();
 
         // Création d'un callback pour l'appui sur le bouton de retour
         // désactivation du bouton retour.
@@ -410,9 +389,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 String titleOfThePointOfInterest = title.getText().toString();
                 double latitude = line.getPoints().get(line.getPoints().size() - 1).getLatitude();
                 double longitude = line.getPoints().get(line.getPoints().size() - 1).getLongitude();
-                Coordinate coor = new Coordinate(latitude, longitude);
-                PointOfInterest point = new PointOfInterest(titleOfThePointOfInterest, coor);
-                listPointOfInterests.add(point);
+                CustomPoint coor = new CustomPoint(longitude, latitude);
+                Route.PointOfInterest pointOfInterest = new Route.PointOfInterest(titleOfThePointOfInterest, coor);
+                listPointOfInterests.add(pointOfInterest);
                 Toasty.success(MapActivity.this, "Point d'intérêt créé.", Toast.LENGTH_SHORT, true).show();
                 dialog.dismiss();
                 params.alpha = 1.0f;
@@ -458,7 +437,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             elevationLoss = 0;
             setupLocation();
             line = new Polyline(); // Créez une nouvelle polyline
-            listPointOfInterests = new ArrayList<PointOfInterest>();
+            listPointOfInterests = new ArrayList<Route.PointOfInterest>();
             line.setPoints(geoPoints); // Ajoutez les points à la polyline
             mapView.getOverlays().add(line); // Ajoutez la polyline à la carte
             mapView.invalidate(); // Rafraîchissez la carte
@@ -499,23 +478,24 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             getWindow().setAttributes(params);
         });
         buttonStopAndSave.setOnClickListener(v -> {
-
+            Log.e("points", listPointOfInterests.toString());
             // Get informations of route
             EditText title = dialogView.findViewById(R.id.editTextTitle);
             EditText description = dialogView.findViewById(R.id.editTextDescription);
             LocalDateTime endDate = LocalDateTime.now();
-            RouteDTO routeDTO =
-                    new RouteDTO(null,
+            Route route =
+                    new Route(null,
+                            null, // Initialized userId in API
                             startDate.toString(),
                             endDate.toString(),
-                            RouteUtils.pointsToCoordinates(line.getPoints()),
+                            RouteUtils.polylineToLineString(line),
                             listPointOfInterests,
                             RouteUtils.generateTitle(title.getText().toString(), endDate),
                             description.getText().toString(),
                             elevationGain,
                             elevationLoss);
 
-            ApiUtils.saveRoute(this, routeDTO, new Response.Listener<String>() {
+            ApiUtils.saveRoute(this, route, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     if (isStarted) {
@@ -536,7 +516,6 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Toasty.error(MapActivity.this, "Erreur : " + error + " " + error.getMessage(), Toast.LENGTH_SHORT, true).show();
-
                     // TODO Manage errors
                 }
             });
@@ -640,8 +619,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 strValue = String.format("%02d:%02d", minutes, secondes);
                 timeForOneKilometer.setText(strValue + " /km");
 
-                double userWeight = Double.parseDouble(weight);
-                double kcalBurn = userWeight * kilometersRun * CONSTANTE_CALCUL_KCAL;
+                double kcalBurn = weight * kilometersRun * CONSTANTE_CALCUL_KCAL;
                 strValue = String.format("%.2f", kcalBurn);
                 kilocal.setText(strValue + " Kcal");
 
@@ -669,38 +647,6 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         currentLocationMarker.setIcon(resizedIcon);
 
         mapView.invalidate(); // Rafraîchir la carte
-    }
-
-    /**
-     * Load user weight.
-     */
-    private void loadUserWeight() {
-        String token = SharedPreferencesManager.getAuthToken(this);
-        if (token == null || token.isEmpty()) {
-            Toasty.error(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT, true).show();
-            return;
-        }
-        ApiUtils.loadUserProfile(this, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject jsonResponse = new JSONObject(response);
-                    weight = jsonResponse.optString("weight");
-
-                } catch (JSONException e) {
-                    Log.e("LoadUserProfile", "Error parsing JSON", e);
-                    Toasty.error(MapActivity.this, "Erreur lors du parsing des données", Toast.LENGTH_SHORT, true).show();
-
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("LoadUserProfile", "Error loading weight: " + error.toString());
-                Toasty.error(MapActivity.this, "Erreur lors du chargement du poids", Toast.LENGTH_SHORT, true).show();
-
-            }
-        });
     }
 
     /**

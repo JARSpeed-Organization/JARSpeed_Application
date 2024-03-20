@@ -307,9 +307,13 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     private void longPress() {
         longPressButton.setOnTouchListener(new View.OnTouchListener() {
             private Handler handler = new Handler();
+            private boolean isPressedLongEnough = false;
+
             private Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
+                    // Marquez comme vrai puisque l'utilisateur a maintenu l'appui suffisamment longtemps
+                    isPressedLongEnough = true;
                     // Action à effectuer après l'appui prolongé de 3 secondes
                     if (!isLocationEnabled()) {
                         promptEnableLocation();
@@ -323,18 +327,25 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                        // Réinitialisez cette variable à chaque nouvel appui
+                        isPressedLongEnough = false;
                         // Commence le timer lorsque l'utilisateur commence à appuyer
-                        handler.postDelayed(runnable, 2500);
+                        handler.postDelayed(runnable, 3000); // Modifier ici si nécessaire
                         return true;
                     case MotionEvent.ACTION_UP:
                         // Annule le timer si l'utilisateur relâche le bouton avant 3 secondes
                         handler.removeCallbacks(runnable);
+                        if (!isPressedLongEnough) {
+                            // Affichez un toasty pour informer l'utilisateur
+                            Toasty.info(MapActivity.this, "Maintenez le bouton pressé pendant 3 secondes pour démarrer ou arrêter.", Toast.LENGTH_SHORT, true).show();
+                        }
                         return true;
                 }
                 return false;
             }
         });
     }
+
 
     /**
      * Start location updates.

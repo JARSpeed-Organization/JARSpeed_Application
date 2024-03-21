@@ -178,7 +178,7 @@ public class EditProfilActivity extends AppCompatActivity {
         });
         buttonConfirm.setOnClickListener(v -> {
             String oldPassword = PasswordEncryptor.encryptPassword(editTextOldPassword.getText().toString());
-            String newPassword = PasswordEncryptor.encryptPassword(editTextPassword.getText().toString());
+            String newPassword = editTextPassword.getText().toString();
             String confirmPassword = PasswordEncryptor.encryptPassword(editTextConfirmPassword.getText().toString());
 
             // vérifier que le champ "ancien mot de passe" est correctement saisi
@@ -193,6 +193,8 @@ public class EditProfilActivity extends AppCompatActivity {
                 editTextPassword.requestFocus();
                 return;
             }
+
+            newPassword = PasswordEncryptor.encryptPassword(editTextPassword.getText().toString());
 
             // Vérifier que les mots de passe correspondent
             if (!newPassword.equals(confirmPassword)) {

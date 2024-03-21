@@ -34,6 +34,7 @@ import es.dmoral.toasty.Toasty;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
 import fr.iutrodez.jarspeed.utils.ValidationUtils;
+import fr.iutrodez.jarspeed.utils.PasswordEncryptor;
 
 /**
  * The type Main activity.
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         EditText emailEditText = findViewById(R.id.email);
         EditText passwordEditText = findViewById(R.id.password);
         String email = emailEditText.getText().toString();
-        String password = passwordEditText.getText().toString();
+        String password = PasswordEncryptor.encryptPassword(passwordEditText.getText().toString());
 
         // Réinitialisez les bordures des champs à chaque tentative
         ValidationUtils.resetFieldBorders(this, emailEditText, passwordEditText);

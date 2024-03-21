@@ -40,6 +40,8 @@ import fr.iutrodez.jarspeed.model.user.UserUpdateRequest;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
 import fr.iutrodez.jarspeed.utils.ValidationUtils;
+import fr.iutrodez.jarspeed.utils.PasswordEncryptor;
+
 import com.android.volley.VolleyError;
 
 /**
@@ -138,6 +140,7 @@ public class EditProfilActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+
     /**
      * On change password click.
      *
@@ -174,9 +177,9 @@ public class EditProfilActivity extends AppCompatActivity {
             getWindow().setAttributes(params);
         });
         buttonConfirm.setOnClickListener(v -> {
-            String oldPassword = editTextOldPassword.getText().toString();
-            String newPassword = editTextPassword.getText().toString();
-            String confirmPassword = editTextConfirmPassword.getText().toString();
+            String oldPassword = PasswordEncryptor.encryptPassword(editTextOldPassword.getText().toString());
+            String newPassword = PasswordEncryptor.encryptPassword(editTextPassword.getText().toString());
+            String confirmPassword = PasswordEncryptor.encryptPassword(editTextConfirmPassword.getText().toString());
 
             // vérifier que le champ "ancien mot de passe" est correctement saisi
             if (!oldPassword.equals(oldPasswordBd)) {

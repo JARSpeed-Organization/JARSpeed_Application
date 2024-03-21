@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import es.dmoral.toasty.Toasty;
 import fr.iutrodez.jarspeed.model.user.UserRegistrationRequest;
 import fr.iutrodez.jarspeed.network.ApiUtils;
+import fr.iutrodez.jarspeed.utils.PasswordEncryptor;
 import fr.iutrodez.jarspeed.utils.ValidationUtils;
 
 /**
@@ -94,7 +95,7 @@ public class RegisterActivity extends AppCompatActivity {
             String name = nameEditText.getText().toString();
             String firstname = firstnameEditText.getText().toString();
             String email = emailEditText.getText().toString();
-            String password = passwordEditText.getText().toString();
+            String password = PasswordEncryptor.encryptPassword(passwordEditText.getText().toString());
 
             UserRegistrationRequest registrationRequest = new UserRegistrationRequest(name, firstname, email, password);
 

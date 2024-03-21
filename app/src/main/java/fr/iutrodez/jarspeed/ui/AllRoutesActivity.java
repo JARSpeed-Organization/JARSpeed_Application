@@ -42,6 +42,7 @@ import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
@@ -165,7 +166,7 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         miniMapView.setMultiTouchControls(true);
 
         IMapController mapController = miniMapView.getController();
-        mapController.setZoom(15.0);
+        mapController.setZoom(17.0);
 
         Polyline line = new Polyline();
         line.setColor(Color.RED);
@@ -209,7 +210,6 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         TextView textViewEndDate = dialogView.findViewById(R.id.textViewEndDate);
         TextView textViewElevationGain = dialogView.findViewById(R.id.textViewElevationGain);
         TextView textViewElevationLoss = dialogView.findViewById(R.id.textViewElevationLoss);
-        TextView textViewPointsOfInterest = dialogView.findViewById(R.id.textViewPointsOfInterest);
 
         // Configuration initiale des champs
         editTextTitle.setText(route.getTitle() != null && !route.getTitle().isEmpty() ? route.getTitle() : "");
@@ -217,22 +217,9 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE dd MMMM yyyy à HH:mm", Locale.FRANCE);
         textViewStartDate.setText(route.getStartDate() != null ? LocalDateTime.parse(route.getStartDate()).format(formatter) : "Non spécifiée");
         textViewEndDate.setText(route.getEndDate() != null ? LocalDateTime.parse(route.getEndDate()).format(formatter) : "Non spécifiée");
-        textViewElevationGain.setText(route.getElevationGain() != null ? String.format ("%.2f", route.getElevationGain()) : "Non spécifiée");
-        textViewElevationLoss.setText(route.getElevationLoss() != null ? String.format ("%.2f", route.getElevationLoss()) : "Non spécifiée");
-        Log.e("azer", route.getPointsOfInterest().toString());
-        // Construction et affichage des points d'intérêt
-        StringBuilder poiBuilder = new StringBuilder();
-        poiBuilder.append("\n");
-        if (route.getPointsOfInterest() != null && !route.getPointsOfInterest().isEmpty()) {
-            for (Route.PointOfInterest poi : route.getPointsOfInterest()) {
-                poiBuilder.append(poi.getName()).append("\n");
-            }
-        } else {
-            poiBuilder.append("Aucun");
-        }
-        // TODO Points of interest
-        textViewPointsOfInterest.setText(poiBuilder.toString() != null ? poiBuilder.toString() : "Non spécifiée");
-    }
+        textViewElevationGain.setText(route.getElevationGain() != null ? String.format ("%.2f", route.getElevationGain()) + " m" : "Non spécifiée");
+        textViewElevationLoss.setText(route.getElevationLoss() != null ? String.format ("%.2f", route.getElevationLoss()) + " m" : "Non spécifiée");
+       }
 
     private void setupSaveButtonListener(AlertDialog dialog, View dialogView, Route route) {
         Button buttonSave = dialogView.findViewById(R.id.buttonSave);

@@ -80,5 +80,7 @@
 
     <string name="confirm_logout">Êtes-vous sûr de vouloir vous déconnecter ?</string>
     <string name="confirm_delete_route">Êtes-vous sûr de vouloir supprimer ce parcours ?</string>
+    <string name="denivel_positif">Dénivelé positif</string>
+    <string name="denivel_negatif">Dénivelé négatif</string>
 
 </resources>

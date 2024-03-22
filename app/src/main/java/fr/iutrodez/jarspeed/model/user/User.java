@@ -25,9 +25,9 @@ public class User {
      */
     private String firstname;
     /**
-     * The Birthday.
+     * The Birthdate.
      */
-    private Date birthday;
+    private Date birthdate;
     /**
      * The Gender.
      */
@@ -35,39 +35,20 @@ public class User {
     /**
      * The Weight.
      */
-//private Gender gender;  // Vous pouvez définir une classe Gender séparée si nécessaire
     private Double weight;
     /**
      * The Password.
      */
     private String password; // Notez que stocker le mot de passe en clair n'est pas recommandé
+    /**
+     * The Token.
+     */
+    private String token;
 
     /**
      * Instantiates a new User.
      */
-// Constructeur vide pour initialiser un objet User sans paramètres
     public User() {
-    }
-
-    /**
-     * Instantiates a new User.
-     *
-     * @param lastname  the lastname
-     * @param firstname the firstname
-     * @param email     the email
-     * @param birthday  the birthday
-     * @param weight    the weight
-     * @param password  the password
-     */
-// Constructeur avec tous les paramètres
-    public User(String lastname, String firstname, String email, Date birthday/* , Gender gender*/, Double weight, String password) {
-        this.lastname = lastname;
-        this.firstname = firstname;
-        this.email = email;
-        this.birthday = birthday;
-        //this.gender = gender;
-        this.weight = weight;
-        this.password = password;
     }
 
     /**
@@ -75,7 +56,6 @@ public class User {
      *
      * @return the id
      */
-// Getters et setters pour chaque attribut
     public Integer getId() {
         return id;
     }
@@ -144,21 +124,21 @@ public class User {
     }
 
     /**
-     * Gets birthday.
+     * Gets birthdate.
      *
-     * @return the birthday
+     * @return the birthdate
      */
-    public Date getBirthday() {
-        return birthday;
+    public Date getBirthdate() {
+        return birthdate;
     }
 
     /**
-     * Sets birthday.
+     * Sets birthdate.
      *
-     * @param pBirthday the p birthday
+     * @param pBirthdate the p birthdate
      */
-    public void setBirthday(Date pBirthday) {
-        birthday = pBirthday;
+    public void setBirthdate(Date pBirthdate) {
+        birthdate = pBirthdate;
     }
 
     /**
@@ -215,4 +195,21 @@ public class User {
         this.password = password;
     }
 
+    /**
+     * Gets token.
+     *
+     * @return the token
+     */
+    public String getToken() {
+        return token;
+    }
+
+    /**
+     * Sets token.
+     *
+     * @param pToken the p token
+     */
+    public void setToken(String pToken) {
+        token = pToken;
+    }
 }

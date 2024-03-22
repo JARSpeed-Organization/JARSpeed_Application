@@ -47,6 +47,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.Marker;
+import org.w3c.dom.Text;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -70,10 +71,22 @@ import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.RouteAdapter;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
 
+/**
+ * The type All routes activity.
+ */
 public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter.OnItemClickListener {
 
+    /**
+     * The Recycler view.
+     */
     private RecyclerView recyclerView;
+    /**
+     * The Adapter.
+     */
     private RouteAdapter adapter;
+    /**
+     * The Route list.
+     */
     private List<Route> routeList;
 
     @Override
@@ -119,12 +132,20 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
+    /**
+     * Darken background.
+     */
     private void darkenBackground() {
         final WindowManager.LayoutParams params = getWindow().getAttributes();
         params.alpha = 0.2f;
         getWindow().setAttributes(params);
     }
 
+    /**
+     * Restore background on dismiss.
+     *
+     * @param dialog the dialog
+     */
     private void restoreBackgroundOnDismiss(AlertDialog dialog) {
         dialog.setOnDismissListener(d -> {
             final WindowManager.LayoutParams params = getWindow().getAttributes();
@@ -133,6 +154,12 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         });
     }
 
+    /**
+     * Create edit route dialog alert dialog.
+     *
+     * @param route the route
+     * @return the alert dialog
+     */
     private AlertDialog createEditRouteDialog(Route route) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.edit_route_dialog, null);
@@ -151,6 +178,12 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         return dialog;
     }
 
+    /**
+     * Sets minimap.
+     *
+     * @param dialogView the dialog view
+     * @param route      the route
+     */
     private void setupMinimap(View dialogView, Route route) {
         // Assurez-vous que la route et son chemin ne sont pas nuls
         if (route == null || route.getPath().getCoordinates() == null || route.getPath().getCoordinates().isEmpty()) {
@@ -202,6 +235,12 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
     }
 
 
+    /**
+     * Configure dialog fields.
+     *
+     * @param dialogView the dialog view
+     * @param route      the route
+     */
     private void configureDialogFields(View dialogView, Route route) {
         // Initialisation des composants du dialogue
         EditText editTextTitle = dialogView.findViewById(R.id.editTextTitle);
@@ -210,6 +249,9 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         TextView textViewEndDate = dialogView.findViewById(R.id.textViewEndDate);
         TextView textViewElevationGain = dialogView.findViewById(R.id.textViewElevationGain);
         TextView textViewElevationLoss = dialogView.findViewById(R.id.textViewElevationLoss);
+        TextView textViewDistance = dialogView.findViewById(R.id.textViewDistance);
+        TextView textViewTime = dialogView.findViewById(R.id.textViewTime);
+        TextView textViewSpeed = dialogView.findViewById(R.id.textViewSpeed);
 
         // Configuration initiale des champs
         editTextTitle.setText(route.getTitle() != null && !route.getTitle().isEmpty() ? route.getTitle() : "");
@@ -219,16 +261,40 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         textViewEndDate.setText(route.getEndDate() != null ? LocalDateTime.parse(route.getEndDate()).format(formatter) : "Non spécifiée");
         textViewElevationGain.setText(route.getElevationGain() != null ? String.format ("%.2f", route.getElevationGain()) + " m" : "Non spécifiée");
         textViewElevationLoss.setText(route.getElevationLoss() != null ? String.format ("%.2f", route.getElevationLoss()) + " m" : "Non spécifiée");
+        textViewDistance.setText(route.getDistance());
+        textViewTime.setText(route.getTime());
+        textViewSpeed.setText(route.getSpeed());
        }
 
+    /**
+     * Sets save button listener.
+     *
+     * @param dialog     the dialog
+     * @param dialogView the dialog view
+     * @param route      the route
+     */
     private void setupSaveButtonListener(AlertDialog dialog, View dialogView, Route route) {
         Button buttonSave = dialogView.findViewById(R.id.buttonSave);
         buttonSave.setOnClickListener(v -> updateRoute(dialog, route));
     }
+
+    /**
+     * Sets cancel button.
+     *
+     * @param dialogView the dialog view
+     * @param dialog     the dialog
+     */
     private void setupCancelButton(View dialogView, AlertDialog dialog) {
         Button buttonCancel = dialogView.findViewById(R.id.buttonCancelEditRoute);
         buttonCancel.setOnClickListener(v -> dialog.dismiss());
     }
+
+    /**
+     * Update route.
+     *
+     * @param dialog the dialog
+     * @param route  the route
+     */
     private void updateRoute(AlertDialog dialog, Route route) {
         // Récupération des nouvelles valeurs
         String newTitle = ((EditText) dialog.findViewById(R.id.editTextTitle)).getText().toString().trim();
@@ -263,6 +329,9 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
     }
 
 
+    /**
+     * Load all routes.
+     */
     private void loadAllRoutes() {
         String token = SharedPreferencesManager.getAuthToken(this);
         if (token == null || token.isEmpty()) {
@@ -356,6 +425,7 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
 
     /**
      * On home button click.
+     *
      * @param view the view
      */
     public void onHomeButtonClick(View view) {
@@ -365,6 +435,7 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
 
     /**
      * Sort ascending on start date for all routes.
+     *
      * @param view the view
      */
     public void onSortAscendingButtonClick(View view) {
@@ -373,6 +444,7 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
 
     /**
      * Sort descending on start date for all routes.
+     *
      * @param view the view
      */
     public void onSortDescendingButtonClick(View view) {

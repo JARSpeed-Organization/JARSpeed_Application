@@ -217,6 +217,11 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     private FloatingActionButton longPressButton;
 
     /**
+     * The Speed.
+     */
+    private String speed;
+
+    /**
      * Create location request location request.
      *
      * @return the location request
@@ -304,6 +309,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     }
 
 
+    /**
+     * Long press.
+     */
     private void longPress() {
         longPressButton.setOnTouchListener(new View.OnTouchListener() {
             private Handler handler = new Handler();
@@ -447,7 +455,8 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             elevationGain = 0;
             elevationLoss = 0;
             setupLocation();
-            line = new Polyline(); // Créez une nouvelle polyline
+            line = new Polyline();
+            line.setColor(Color.RED);
             listPointOfInterests = new ArrayList<Route.PointOfInterest>();
             line.setPoints(geoPoints); // Ajoutez les points à la polyline
             mapView.getOverlays().add(line); // Ajoutez la polyline à la carte
@@ -504,7 +513,10 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                             RouteUtils.generateTitle(title.getText().toString(), endDate),
                             description.getText().toString(),
                             elevationGain,
-                            elevationLoss);
+                            elevationLoss,
+                            timeForOneKilometer.getText().toString(),
+                            textViewTimer.getText().toString(),
+                            kilometers.getText().toString());
 
             ApiUtils.saveRoute(this, route, new Response.Listener<String>() {
                 @Override
@@ -554,7 +566,14 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
+    /**
+     * The Is location dialog showing.
+     */
     private boolean isLocationDialogShowing = false;
+
+    /**
+     * Prompt enable location.
+     */
     private void promptEnableLocation() {
         if (!isLocationDialogShowing) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -628,7 +647,10 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 int minutes = (int) forOneKmInMin;
                 int secondes = (int) ((forOneKmInMin - minutes) * 60);
                 strValue = String.format("%02d:%02d", minutes, secondes);
+                speed = strValue + "/km";
                 timeForOneKilometer.setText(strValue + " /km");
+
+
 
                 double kcalBurn = weight * kilometersRun * CONSTANTE_CALCUL_KCAL;
                 strValue = String.format("%.2f", kcalBurn);

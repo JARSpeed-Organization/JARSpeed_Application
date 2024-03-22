@@ -19,18 +19,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Response;
 import com.example.jarspeed.R;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.gson.Gson;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import es.dmoral.toasty.Toasty;
@@ -41,8 +39,6 @@ import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
 import fr.iutrodez.jarspeed.utils.ValidationUtils;
 import fr.iutrodez.jarspeed.utils.PasswordEncryptor;
-
-import com.android.volley.VolleyError;
 
 /**
  * The type Edit profil activity.
@@ -59,7 +55,6 @@ public class EditProfilActivity extends AppCompatActivity {
     private Spinner spinnerGender;
     private User user;
 
-    private String oldPasswordBd;
     /**
      * On create.
      *
@@ -75,59 +70,15 @@ public class EditProfilActivity extends AppCompatActivity {
         editTextLastName = findViewById(R.id.nameItem);
         editTextEmail = findViewById(R.id.emailItem);
 
-        loadUserProfile();
-
+        user = SharedPreferencesManager.getAuthUserData(this);
+        setFields();
     }
 
-    private void loadUserProfile() {
-        String token = SharedPreferencesManager.getAuthToken(this);
-        if (token == null || token.isEmpty()) {
-            Toast.makeText(this, "Vous n'êtes pas connecté.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        ApiUtils.loadUserProfile(this, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject jsonResponse = new JSONObject(response);
-                    user = new User();
-                    user.setFirstname(jsonResponse.optString("firstname"));
-                    user.setLastname(jsonResponse.optString("lastname"));
-                    user.setEmail(jsonResponse.optString("email"));
-                    oldPasswordBd = jsonResponse.optString("password");
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    try {
-                        user.setBirthday(dateFormat.parse(jsonResponse.optString("birthdate")));
-                    } catch (ParseException pE) {
-                        user.setBirthday(new Date());
-                    }
-                    user.setWeight(jsonResponse.optDouble("weight"));
-                    JSONObject genderJSON = jsonResponse.optJSONObject("gender");
-                    Gender gender = new Gender();
-                    gender.setId(genderJSON.optInt("id"));
-                    gender.setLabel(genderJSON.optString("label"));
-                    user.setGender(gender);
-
-                    // Mise à jour de l'interface utilisateur avec les données reçues
-                    editTextFirstName.setText(user.getFirstname());
-                    editTextLastName.setText(user.getLastname());
-                    editTextEmail.setText(user.getEmail());
-                } catch (JSONException e) {
-                    Log.e("LoadUserProfile", "Error parsing JSON", e);
-                    Toast.makeText(EditProfilActivity.this, "Erreur lors du parsing des données", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("LoadUserProfile", "Error loading profile: " + error.toString());
-                Toast.makeText(EditProfilActivity.this, "Erreur lors du chargement du profil", Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void setFields() {
+        editTextFirstName.setText(user.getFirstname());
+        editTextLastName.setText(user.getLastname());
+        editTextEmail.setText(user.getEmail());
     }
-
-
 
     /**
      * Return to profil page.
@@ -140,15 +91,12 @@ public class EditProfilActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
     /**
      * On change password click.
      *
      * @param view the view
      */
     public void onChangePasswordClick(View view) {
-        loadUserProfile(); // pour récupérer le mot de passe si il a déjà été changé
-
         // Assombrir l'arrière-plan
         final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
         final Drawable originalBackground = rootView.getBackground();
@@ -182,7 +130,7 @@ public class EditProfilActivity extends AppCompatActivity {
             String confirmPassword = PasswordEncryptor.encryptPassword(editTextConfirmPassword.getText().toString());
 
             // vérifier que le champ "ancien mot de passe" est correctement saisi
-            if (!oldPassword.equals(oldPasswordBd)) {
+            if (!oldPassword.equals(user.getPassword())) {
                 Toasty.error(this, "L'ancien mot de passe saisi est incorrect", Toast.LENGTH_LONG, true).show();
                 editTextPassword.requestFocus();
                 return;
@@ -204,7 +152,7 @@ public class EditProfilActivity extends AppCompatActivity {
             }
 
             // Vérifier que l'ancien mot de passe est différent du nouveau
-            if (oldPasswordBd.equals(newPassword)) {
+            if (user.getPassword().equals(newPassword)) {
                 Toasty.error(this, "Le nouveau mot de passe doit être différent de l'ancien.", Toast.LENGTH_LONG, true).show();
                 editTextPassword.requestFocus();
                 return;
@@ -347,7 +295,8 @@ public class EditProfilActivity extends AppCompatActivity {
 
         final Calendar calendar = Calendar.getInstance();
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        textViewBirthdate.setText(dateFormat.format(user.getBirthday()));
+        Log.e("birthdate", user.getBirthdate().toString());
+        textViewBirthdate.setText(dateFormat.format(user.getBirthdate()));
         textViewBirthdate.setOnClickListener(v -> {
             DatePickerDialog datePickerDialog = new DatePickerDialog(EditProfilActivity.this, (view1, year, monthOfYear, dayOfMonth) -> {
                 calendar.set(Calendar.YEAR, year);
@@ -438,7 +387,7 @@ public class EditProfilActivity extends AppCompatActivity {
             user.setWeight(weight);
             user.setGender(selectedGender);
             try {
-                user.setBirthday(dateFormat.parse(birthdate));
+                user.setBirthdate(dateFormat.parse(birthdate));
             } catch (ParseException pE) {
                 Log.e("Save", "Load new information");
             }
@@ -456,6 +405,15 @@ public class EditProfilActivity extends AppCompatActivity {
      */
     private void sendUpdateRequest(UserUpdateRequest updateRequest) {
         ApiUtils.updateUser(this, updateRequest, response -> {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.registerModule(new JavaTimeModule());
+                User userUpdated = objectMapper.readValue(response, User.class);
+                SharedPreferencesManager.saveAuthUserData(this, userUpdated);
+                user = userUpdated;
+            } catch (JsonProcessingException pE) {
+                throw new RuntimeException(pE);
+            }
             Toasty.success(EditProfilActivity.this, "Mise à jour réussie", Toast.LENGTH_SHORT, true).show();
         }, error -> {
             Toasty.error(EditProfilActivity.this, "Erreur lors de la mise à jour", Toast.LENGTH_SHORT, true).show();

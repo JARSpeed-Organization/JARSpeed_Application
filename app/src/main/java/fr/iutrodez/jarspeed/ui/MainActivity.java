@@ -23,6 +23,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.jarspeed.R;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +35,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import es.dmoral.toasty.Toasty;
+import fr.iutrodez.jarspeed.model.route.Route;
+import fr.iutrodez.jarspeed.model.user.Login;
 import fr.iutrodez.jarspeed.network.ApiUtils;
 import fr.iutrodez.jarspeed.utils.SharedPreferencesManager;
 import fr.iutrodez.jarspeed.utils.ValidationUtils;
@@ -117,16 +123,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
                 try {
-                    Log.e("loginResponse", response);
-                    JSONObject jsonResponse = new JSONObject(response);
-                    String token = jsonResponse.getString("token");
-                    String weight = jsonResponse.getString("weight");
-                    SharedPreferencesManager.saveAuthTokenAndWeight(MainActivity.this, token, weight);
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    objectMapper.registerModule(new JavaTimeModule());
+                    Login userConnection = objectMapper.readValue(response, Login.class);
+                    SharedPreferencesManager.saveAuthUserData(MainActivity.this, userConnection);
 
                     goToMapActivity();
-                } catch (JSONException e) {
-                    Log.e("login", e.getMessage());
-                    e.printStackTrace();
+                } catch (JsonMappingException pE) {
+                    throw new RuntimeException(pE);
+                } catch (JsonProcessingException pE) {
+                    throw new RuntimeException(pE);
                 }
             }
         }, new Response.ErrorListener() {

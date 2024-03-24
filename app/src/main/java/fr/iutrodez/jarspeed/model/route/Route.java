@@ -52,6 +52,21 @@ public class Route {
     public Double elevationLoss;
 
     /**
+     * The Time.
+     */
+    public String time;
+
+    /**
+     * The Speed.
+     */
+    public String speed;
+
+    /**
+     * The Distance.
+     */
+    public String distance;
+
+    /**
      * Instantiates a new Route.
      */
     public Route() {
@@ -70,8 +85,11 @@ public class Route {
      * @param pDescription      the p description
      * @param pElevationGain    the p elevation gain
      * @param pElevationLoss    the p elevation loss
+     * @param pSpeed            the p speed
+     * @param pTime             the p time
+     * @param pDistance         the p distance
      */
-    public Route(String pId, String pUserId, String pStartDate, String pEndDate, CustomLineString pPath, List<PointOfInterest> pPointsOfInterest, String pTitle, String pDescription, Double pElevationGain, Double pElevationLoss) {
+    public Route(String pId, String pUserId, String pStartDate, String pEndDate, CustomLineString pPath, List<PointOfInterest> pPointsOfInterest, String pTitle, String pDescription, Double pElevationGain, Double pElevationLoss, String pSpeed, String pTime, String pDistance) {
         id = pId;
         userId = pUserId;
         startDate = pStartDate;
@@ -82,9 +100,33 @@ public class Route {
         description = pDescription;
         elevationGain = pElevationGain;
         elevationLoss = pElevationLoss;
+        time = pTime;
+        speed = pSpeed;
+        distance = pDistance;
     }
 
     // Getters and Setters
+
+    /**
+     * Gets speed.
+     *
+     * @return the speed
+     */
+    public String getSpeed() {return speed;}
+
+    /**
+     * Gets time.
+     *
+     * @return the time
+     */
+    public String getTime() {return time;}
+
+    /**
+     * Gets distance.
+     *
+     * @return the distance
+     */
+    public String getDistance() {return distance;}
 
     /**
      * Gets id.

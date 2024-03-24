@@ -192,10 +192,12 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
 
 
     /**
-     * Sets minimap.
+     * Sets up a miniature map (minimap) in the edit route dialog to display the route's path and points of interest.
+     * This method is responsible for configuring the map view within the dialog, including setting the zoom level,
+     * adding polyline to represent the route path, and markers for each point of interest.
      *
-     * @param dialogView the dialog view
-     * @param route      the route
+     * @param dialogView The view of the dialog where the minimap is to be set up.
+     * @param route The route object whose details are to be displayed on the minimap.
      */
     private void setupMinimap(View dialogView, Route route) {
         // Assurez-vous que la route et son chemin ne sont pas nuls
@@ -249,17 +251,17 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
 
 
     /**
-     * Configure dialog fields.
+     * Configures the fields of the edit route dialog with the current data of the route.
+     * This includes setting the title, description, start and end dates, and elevation gain and loss.
      *
-     * @param dialogView the dialog view
-     * @param route      the route
+     * @param dialogView The view of the dialog containing the fields to be configured.
+     * @param route The route object whose data is to fill in the dialog fields.
      */
     private void configureDialogFields(View dialogView, Route route) {
         // Initialisation des composants du dialogue
         EditText editTextTitle = dialogView.findViewById(R.id.editTextTitle);
         EditText editTextDescription = dialogView.findViewById(R.id.editTextDescription);
         TextView textViewStartDate = dialogView.findViewById(R.id.textViewStartDate);
-        TextView textViewEndDate = dialogView.findViewById(R.id.textViewEndDate);
         TextView textViewElevationGain = dialogView.findViewById(R.id.textViewElevationGain);
         TextView textViewElevationLoss = dialogView.findViewById(R.id.textViewElevationLoss);
         TextView textViewDistance = dialogView.findViewById(R.id.textViewDistance);
@@ -279,11 +281,12 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
        }
 
     /**
-     * Sets save button listener.
+     * Sets a click listener for the save button in the edit route dialog.
+     * This listener triggers the update of the route's details with the new values entered by the user.
      *
-     * @param dialog     the dialog
-     * @param dialogView the dialog view
-     * @param route      the route
+     * @param dialog The dialog containing the save button.
+     * @param dialogView The view of the dialog containing the fields to extract the updated route details from.
+     * @param route The route object to be updated.
      */
     private void setupSaveButtonListener(AlertDialog dialog, View dialogView, Route route) {
         Button buttonSave = dialogView.findViewById(R.id.buttonSave);
@@ -291,10 +294,11 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
     }
 
     /**
-     * Sets cancel button.
+     * Sets a click listener for the cancel button in the edit route dialog.
+     * This listener simply dismisses the dialog without making any changes to the route's details.
      *
-     * @param dialogView the dialog view
-     * @param dialog     the dialog
+     * @param dialogView The view of the dialog containing the cancel button.
+     * @param dialog The dialog to be dismissed upon clicking the cancel button.
      */
     private void setupCancelButton(View dialogView, AlertDialog dialog) {
         Button buttonCancel = dialogView.findViewById(R.id.buttonCancelEditRoute);
@@ -302,10 +306,11 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
     }
 
     /**
-     * Update route.
+     * Updates the route details based on the user's input and sends the update to the server.
+     * Upon successful update, it reloads the list of routes to reflect the changes and notifies the user of the success.
      *
-     * @param dialog the dialog
-     * @param route  the route
+     * @param dialog The dialog containing the editable fields for the route details.
+     * @param route The route object to be updated.
      */
     private void updateRoute(AlertDialog dialog, Route route) {
         // Récupération des nouvelles valeurs
@@ -331,9 +336,11 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
     }
 
     /**
-     * Show edit route popup.
+     * Displays the edit route dialog for a given route.
+     * This method is responsible for both darkening the background to focus on the dialog
+     * and for creating and displaying the dialog itself using {@link #createEditRouteDialog(Route)}.
      *
-     * @param route the route
+     * @param route The route object to be edited.
      */
     @Override
     public void showEditRoutePopup(Route route) {
@@ -347,7 +354,11 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
 
 
     /**
-     * Load all routes.
+     * Loads all available routes from the server and updates the UI accordingly.
+     * This method sends a network request to fetch all routes. On successful response,
+     * it updates the `routeList` and notifies the adapter to refresh the display. It handles
+     * any errors or issues with connectivity by displaying an appropriate message to the user.
+     * Authentication token is required to access the routes, and the user is notified if not logged in.
      */
     private void loadAllRoutes() {
         String token = SharedPreferencesManager.getAuthToken(this);
@@ -397,9 +408,12 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
 
 
     /**
-     * On delete route clicked.
+     * Presents a confirmation dialog to delete a specific route.
+     * This method creates and displays a dialog asking the user to confirm the deletion of a route.
+     * On confirmation, it sends a request to the server to delete the route and refreshes the list of routes.
+     * It handles user cancellation by simply dismissing the dialog without any further action.
      *
-     * @param route the route
+     * @param route The route to be deleted.
      */
     public void onDeleteRouteClicked(Route route) {
         View dialogView = getLayoutInflater().inflate(R.layout.confirmation_popup, null);
@@ -446,9 +460,11 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
     }
 
     /**
-     * On home button click.
+     * Navigates the user back to the home screen (map view).
+     * This method is called when the home button is clicked. It creates an intent to start
+     * the `MapActivity` and navigates the user to the home screen of the application.
      *
-     * @param view the view
+     * @param view The view that was clicked to trigger this method.
      */
     public void onHomeButtonClick(View view) {
         Intent intent = new Intent(this, MapActivity.class);
@@ -456,18 +472,22 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
     }
 
     /**
-     * Sort ascending on start date for all routes.
+     * Initiates sorting of the displayed routes in ascending order based on their start date.
+     * This method is called when the sort ascending button is clicked. It triggers the adapter
+     * to sort the current list of routes in ascending order by their start date.
      *
-     * @param view the view
+     * @param view The view that was clicked to trigger this method.
      */
     public void onSortAscendingButtonClick(View view) {
         adapter.sortAscending();
     }
 
     /**
-     * Sort descending on start date for all routes.
+     * Initiates sorting of the displayed routes in descending order based on their start date.
+     * This method is called when the sort descending button is clicked. It triggers the adapter
+     * to sort the current list of routes in descending order by their start date.
      *
-     * @param view the view
+     * @param view The view that was clicked to trigger this method.
      */
     public void onSortDescendingButtonClick(View view) {
         adapter.sortDescending();

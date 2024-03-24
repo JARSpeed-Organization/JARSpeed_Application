@@ -61,15 +61,15 @@ public class RegisterActivity extends AppCompatActivity {
         passwordConfirmationEditText = findViewById(R.id.password_confirmation);
 
         setHintColors(nameEditText, firstnameEditText, emailEditText, passwordEditText, passwordConfirmationEditText);
-        // Création d'un callback pour l'appui sur le bouton de retour
-        // désactivation du bouton retour.
+        // Creation of a callback for pressing the back button.
+        // disable back button.
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
 
             }
         };
-        // Obtention du OnBackPressedDispatcher et ajout du callback
+        // Get the OnBackPressedDispatcher and add the callback
         getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
@@ -79,7 +79,7 @@ public class RegisterActivity extends AppCompatActivity {
      * @param view the view
      */
     public void onLoginClick(View view) {
-        // Démarrez login page ici
+        // Start login screen
         Intent loginIntent = new Intent(this, MainActivity.class);
         startActivity(loginIntent);
     }
@@ -89,7 +89,6 @@ public class RegisterActivity extends AppCompatActivity {
      *
      * @param view the view
      */
-// This method is called when the register button is clicked
     public void onRegisterClick(View view) {
         if (validateFields()) {
             String name = nameEditText.getText().toString();

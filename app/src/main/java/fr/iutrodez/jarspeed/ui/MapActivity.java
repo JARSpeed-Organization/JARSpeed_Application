@@ -222,20 +222,19 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     private String speed;
 
     /**
-     * Create location request location request.
-     *
-     * @return the location request
+     * Configures and returns a LocationRequest with high accuracy and suitable intervals.
+     * @return Configured LocationRequest object.
      */
     protected LocationRequest createLocationRequest() {
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000); // Mise à jour de la position toutes les 10 secondes
-        locationRequest.setFastestInterval(5000); // Mise à jour la plus rapide acceptée
+        locationRequest.setInterval(10000); // update location all 10 sec
+        locationRequest.setFastestInterval(5000); // Fastest update accepted
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         return locationRequest;
     }
 
     /**
-     * The Location callback.
+     * Handles location updates, updating the marker to reflect the user's current location.
      */
     private LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -254,7 +253,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        // Initialisation de la configuration d'OSMdroid
+        // Initialize OSMdroid configuration
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -287,7 +286,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         longPressButton = findViewById(R.id.fabAdd);
         longPress();
 
-        // Gestion de la localisation
+        // Location management
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
@@ -296,21 +295,21 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             startLocationUpdates();
         }
 
-        // Création d'un callback pour l'appui sur le bouton de retour
-        // désactivation du bouton retour.
+        // Creation of a callback for pressing the back button.
+        // disable back button.
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
 
             }
         };
-        // Obtention du OnBackPressedDispatcher et ajout du callback
+        // Get the OnBackPressedDispatcher and add the callback
         getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
 
     /**
-     * Long press.
+     * Configures long press functionality on the main button to start or stop tracking.
      */
     private void longPress() {
         longPressButton.setOnTouchListener(new View.OnTouchListener() {
@@ -320,9 +319,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             private Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-                    // Marquez comme vrai puisque l'utilisateur a maintenu l'appui suffisamment longtemps
+                    // Mark as true if the user has held down the button long enough
                     isPressedLongEnough = true;
-                    // Action à effectuer après l'appui prolongé de 3 secondes
+                    // Action to be taken after pressing and holding for 3 seconds
                     if (!isLocationEnabled()) {
                         promptEnableLocation();
                     } else {
@@ -335,16 +334,16 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        // Réinitialisez cette variable à chaque nouvel appui
+                        // Reset this variable with each new press
                         isPressedLongEnough = false;
-                        // Commence le timer lorsque l'utilisateur commence à appuyer
+                        // Starts timer when user starts pressing
                         handler.postDelayed(runnable, 3000); // Modifier ici si nécessaire
                         return true;
                     case MotionEvent.ACTION_UP:
-                        // Annule le timer si l'utilisateur relâche le bouton avant 3 secondes
+                        // Cancels timer if user releases button within 3 seconds
                         handler.removeCallbacks(runnable);
                         if (!isPressedLongEnough) {
-                            // Affichez un toasty pour informer l'utilisateur
+                            // Display a toasty to inform the user
                             Toasty.info(MapActivity.this, "Maintenez le bouton pressé pendant 3 secondes pour démarrer ou arrêter.", Toast.LENGTH_SHORT, true).show();
                         }
                         return true;
@@ -356,20 +355,19 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
 
 
     /**
-     * Start location updates.
+     * Starts location updates, requesting updates from the fusedLocationClient.
      */
     private void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Vérifiez si l'autorisation a été accordée
+            // Check if authorization has been granted
             return;
         }
         fusedLocationClient.requestLocationUpdates(createLocationRequest(), locationCallback, Looper.getMainLooper());
     }
 
     /**
-     * On profile button click.
-     *
-     * @param view the view
+     * Navigates to the profile activity when the profile button is clicked.
+     * @param view The clicked view.
      */
     public void onProfileButtonClick(View view) {
         Intent intent = new Intent(this, ProfilActivity.class);
@@ -377,13 +375,12 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     }
 
     /**
-     * On list route on clicked.
-     *
-     * @param view the view
+     * Manages clicks on the route list button, presenting different options based on the current tracking state.
+     * @param view The clicked view.
      */
     public void onListRouteOnClicked(View view) {
         if (isStarted) {
-            //durant une course lancé (point of interest)
+            //during a race launched (point of interest)
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             View dialogView = getLayoutInflater().inflate(R.layout.point_of_interest_dialog, null);
             builder.setView(dialogView);
@@ -427,24 +424,23 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialog.show();
         } else {
-            //course pas lancé (burger Menu pour liste de route)
-            /* Lancer l'activité pour voir tout les parcours */
+            //course not launched (burger Menu for route list)
+            /* Launch activity to see all routes */
             Intent intent = new Intent(MapActivity.this, AllRoutesActivity.class);
             startActivity(intent);
         }
     }
 
     /**
-     * Start recording.
-     *
-     * @param view View
+     * Handles the start and stop of route recording.
+     * @param view The view that was clicked.
      */
     @SuppressLint("ResourceType")
     public void onRunButtonClick(View view) {
         if (isOngoing) {
             openPopupPause();
         } else {
-            // Lancement de l'enregistrement
+            // Start recording
             imgAccount.setVisibility(View.GONE);
             btnRun.setImageResource(R.drawable.ic_pause);
             imgListRoute.setImageResource(R.drawable.vector);
@@ -455,13 +451,13 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             elevationGain = 0;
             elevationLoss = 0;
             setupLocation();
-            line = new Polyline(); // Créez une nouvelle polyline
+            line = new Polyline(); // Create a new polyline
             line.setColor(Color.RED);
 
             listPointOfInterests = new ArrayList<Route.PointOfInterest>();
-            line.setPoints(geoPoints); // Ajoutez les points à la polyline
-            mapView.getOverlays().add(line); // Ajoutez la polyline à la carte
-            mapView.invalidate(); // Rafraîchissez la carte
+            line.setPoints(geoPoints);
+            mapView.getOverlays().add(line);
+            mapView.invalidate(); // Refresh map
             Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_to_bot);
             datasBlock.setVisibility(View.VISIBLE);
             datasBlock.startAnimation(animation);
@@ -475,7 +471,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     }
 
     /**
-     * Open popup pause.
+     * Opens a pause dialog that allows the user to stop and save the current route.
      */
     private void openPopupPause() {
         pauseTimer();
@@ -541,7 +537,6 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Toasty.error(MapActivity.this, "Erreur : " + error + " " + error.getMessage(), Toast.LENGTH_SHORT, true).show();
-                    // TODO Manage errors
                 }
             });
             dialog.dismiss();
@@ -559,9 +554,8 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     }
 
     /**
-     * Is location enabled boolean.
-     *
-     * @return the boolean
+     * Checks if location services are enabled.
+     * @return true if location services are enabled, false otherwise.
      */
     private boolean isLocationEnabled() {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -574,7 +568,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     private boolean isLocationDialogShowing = false;
 
     /**
-     * Prompt enable location.
+     * Prompts the user to enable location services if they are disabled.
      */
     private void promptEnableLocation() {
         if (!isLocationDialogShowing) {
@@ -608,7 +602,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
 
 
     /**
-     * Sets location.
+     * Requests the current location and updates the UI accordingly.
      */
     private void setupLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -626,9 +620,8 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     }
 
     /**
-     * Update marker.
-     *
-     * @param location the location
+     * Updates the location marker on the map based on the provided location.
+     * @param location The new location.
      */
     private void updateMarker(Location location) {
         GeoPoint newLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
@@ -636,7 +629,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         // Manamgment line overlay
         if (line != null && isStarted) {
             line.addPoint(newLocation);
-            mapView.invalidate(); // Rafraîchissez la carte
+            mapView.invalidate(); // Refresh map
             if (line.getPoints().size() > 1) {
                 GeoPoint beforeLast = line.getPoints().get(line.getPoints().size()-2);
                 GeoPoint last = line.getPoints().get(line.getPoints().size()-1);
@@ -675,17 +668,17 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         currentLocationMarker.setPosition(newLocation);
         mapController.animateTo(newLocation);
 
-        // Configuration de l'icône du marqueur
+        // Configuration marker icon
         Drawable icon = getResources().getDrawable(R.drawable.ic_direct_location, getApplicationContext().getTheme());
         Bitmap bitmap = ((BitmapDrawable) icon).getBitmap();
         Drawable resizedIcon = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 50, 50, true)); // Redimensionner à 50x50 pixels
         currentLocationMarker.setIcon(resizedIcon);
 
-        mapView.invalidate(); // Rafraîchir la carte
+        mapView.invalidate(); // Refresh map
     }
 
     /**
-     * Animation end for block data.
+     * Animates the data block to disappear after tracking stops.
      */
     private void animationEndForBlockData() {
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_to_top);
@@ -703,7 +696,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     }
 
     /**
-     * Start timer.
+     * Starts the timer for tracking duration.
      */
     private void startTimer() {
         runnable = new Runnable() {
@@ -730,7 +723,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
 
 
     /**
-     * Pause timer.
+     * Pauses the timer.
      */
     private void pauseTimer() {
         if (!timerInPause) {
@@ -740,7 +733,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     }
 
     /**
-     * Restart timer.
+     * Restart the timer.
      */
     private void restartTimer() {
         if (timerInPause) {
@@ -750,7 +743,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     }
 
     /**
-     * Reinitialiser timer.
+     * Reinitialiser the timer.
      */
     private void reinitialiserTimer() {
         timeSpendMillisecond = -1;
@@ -759,11 +752,11 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     }
 
     /**
-     * Calculate distance between two points double.
+     * Calculates the distance between two points.
      *
-     * @param coord1 the coord 1
-     * @param coord2 the coord 2
-     * @return the double
+     * @param coord1 First GeoPoint.
+     * @param coord2 Second GeoPoint.
+     * @return The distance in kilometers.
      */
     public static double calculateDistanceBetweenTwoPoints(GeoPoint coord1, GeoPoint coord2) {
         double lat1 = Math.toRadians(coord1.getLatitude());
@@ -796,17 +789,16 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
-            // Obtenez l'angle de la boussole
+            // Get the compass angle
             float azimuth = event.values[0];
 
-            // Faites pivoter la carte en fonction de l'angle de la boussole
+            // Rotate the map according to the compass angle
             mapView.setMapOrientation(-azimuth);
         }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Vous pouvez implémenter la gestion des changements de précision ici
     }
 
     @Override
@@ -826,10 +818,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Assurez-vous de supprimer les callbacks du Handler lorsque l'activité est détruite
         handler.removeCallbacksAndMessages(null);
         isStarted = false;
     }
-
-    // TODO Arret recuperer position quand arret application
 }

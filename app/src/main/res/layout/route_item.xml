@@ -44,9 +44,5 @@
                 android:src="@drawable/ic_delete_account" />
 
         </LinearLayout>
-
-        <!-- Ajoutez d'autres TextViews ou éléments ici pour afficher plus d'informations -->
-
     </LinearLayout>
-
 </androidx.cardview.widget.CardView>

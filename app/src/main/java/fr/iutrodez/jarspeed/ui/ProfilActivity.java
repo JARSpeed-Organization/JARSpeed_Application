@@ -67,10 +67,10 @@ public class ProfilActivity extends AppCompatActivity {
         builder.setView(dialogView);
         final AlertDialog dialog = builder.create();
 
-        // Gère le clic sur le bouton Annuler
+        // Handles clicks on the Cancel button
         dialogView.findViewById(R.id.buttonCancelGeneric).setOnClickListener(v -> dialog.dismiss());
 
-        // Gère le clic sur le bouton Confirmer pour la déconnexion
+        // Manages the click on the Confirm button to disconnect
         dialogView.findViewById(R.id.buttonConfirmGeneric).setOnClickListener(v -> {
             clearUserSession();
             redirectToLoginScreen();
@@ -88,7 +88,7 @@ public class ProfilActivity extends AppCompatActivity {
      * @param view the view
      */
     public void onRoutesClick(View view) {
-        /* Lancer l'activité pour voir tout les parcours */
+        /* Launch activity to see all routes */
         Intent intent = new Intent(ProfilActivity.this, AllRoutesActivity.class);
         startActivity(intent);
     }
@@ -98,22 +98,18 @@ public class ProfilActivity extends AppCompatActivity {
      *
      * @param view the view
      */
-// Ajoutez cette méthode pour être appelée lorsque l'utilisateur souhaite supprimer son compte
     public void onDeleteAccountClick(View view) {
-        // Inflate le layout de la popup de confirmation
+        // Inflate confirmation popup layout
         View dialogView = getLayoutInflater().inflate(R.layout.confirmation_popup, null);
 
-        // Construit la boîte de dialogue
+        // Builds the dialog box
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
-
-        // Crée et affiche la boîte de dialogue
         final AlertDialog dialog = builder.create();
-
-        // Gère le clic sur le bouton Annuler
+        // Handles clicks on the Cancel button
         dialogView.findViewById(R.id.buttonCancelGeneric).setOnClickListener(v -> dialog.dismiss());
 
-        // Gère le clic sur le bouton Confirmer
+        // Manages the click on the Confirm button
         dialogView.findViewById(R.id.buttonConfirmGeneric).setOnClickListener(v -> {
             ApiUtils.deleteAccount(this, response -> {
                 Toasty.success(ProfilActivity.this, "Compte supprimé avec succès.", Toast.LENGTH_SHORT, true).show();

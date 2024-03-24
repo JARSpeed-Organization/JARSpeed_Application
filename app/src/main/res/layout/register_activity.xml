@@ -69,7 +69,9 @@
                 android:background="@drawable/edittext_background"
                 android:paddingLeft="14dp"
                 android:layout_marginBottom="16dp"
-                android:fontFamily="@font/righteous" />
+                android:fontFamily="@font/righteous"
+                android:maxLength="30"
+                />
 
             <EditText
                 android:id="@+id/firstname"
@@ -83,7 +85,9 @@
                 android:background="@drawable/edittext_background"
                 android:paddingLeft="14dp"
                 android:layout_marginBottom="16dp"
-                android:fontFamily="@font/righteous" />
+                android:fontFamily="@font/righteous"
+                android:maxLength="30"
+                />
             <!-- Email EditText -->
             <EditText
                 android:id="@+id/email"
@@ -97,7 +101,9 @@
                 android:background="@drawable/edittext_background"
                 android:paddingLeft="14dp"
                 android:layout_marginBottom="16dp"
-                android:fontFamily="@font/righteous" />
+                android:fontFamily="@font/righteous"
+                android:maxLength="45"
+                />
 
             <!-- Password EditText -->
             <EditText

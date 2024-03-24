@@ -74,6 +74,9 @@ public class EditProfilActivity extends AppCompatActivity {
         setFields();
     }
 
+    /**
+     * Sets the input fields with the current user's information.
+     */
     private void setFields() {
         editTextFirstName.setText(user.getFirstname());
         editTextLastName.setText(user.getLastname());
@@ -81,9 +84,9 @@ public class EditProfilActivity extends AppCompatActivity {
     }
 
     /**
-     * Return to profil page.
+     * Navigates back to the profile page when the back button is pressed.
      *
-     * @param view the view
+     * @param view The view that triggers this action.
      */
     public void returnToProfilPage(View view) {
         // Intent pour ouvrir la vue profil
@@ -92,9 +95,9 @@ public class EditProfilActivity extends AppCompatActivity {
     }
 
     /**
-     * On change password click.
+     * Displays a dialog for the user to change their password.
      *
-     * @param view the view
+     * @param view The view that triggers this action.
      */
     public void onChangePasswordClick(View view) {
         // Assombrir l'arrière-plan
@@ -184,9 +187,9 @@ public class EditProfilActivity extends AppCompatActivity {
     }
 
     /**
-     * On generic edit click.
+     * Displays a dialog for editing generic user information based on the view that was clicked.
      *
-     * @param view the view
+     * @param view The view that triggers this action.
      */
     public void onGenericEditClick(View view) {
         // Assombrir l'arrière-plan
@@ -256,9 +259,9 @@ public class EditProfilActivity extends AppCompatActivity {
 
 
     /**
-     * On change health data.
+     * Displays a dialog for the user to edit their health-related data.
      *
-     * @param view the view
+     * @param view The view that triggers this action.
      */
     public void onChangeHealthData(View view) {
         final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
@@ -316,14 +319,14 @@ public class EditProfilActivity extends AppCompatActivity {
     }
 
     /**
-     * Sets dialog buttons.
+     * Sets up the dialog buttons and their actions.
      *
-     * @param dialog            the dialog
-     * @param buttonCancel      the button cancel
-     * @param buttonConfirm     the button confirm
-     * @param textViewBirthdate the text view birthdate
-     * @param editTextWeight    the edit text weight
-     * @param spinnerGender     the spinner gender
+     * @param dialog The dialog where the buttons are located.
+     * @param buttonCancel The cancel button.
+     * @param buttonConfirm The confirm button.
+     * @param textViewBirthdate The TextView where the user's birthdate is displayed.
+     * @param editTextWeight The EditText for the user's weight.
+     * @param spinnerGender The Spinner for the user's gender.
      */
     private void setupDialogButtons(AlertDialog dialog, Button buttonCancel, Button buttonConfirm, TextView textViewBirthdate, EditText editTextWeight, Spinner spinnerGender) {
         dialog.setOnDismissListener(d -> {
@@ -345,8 +348,9 @@ public class EditProfilActivity extends AppCompatActivity {
         params.alpha = 0.2f;
         getWindow().setAttributes(params);
     }
+
     /**
-     * Reset dialog background.
+     * Resets the background of the dialog to its original state.
      */
     private void resetDialogBackground() {
         final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
@@ -357,12 +361,12 @@ public class EditProfilActivity extends AppCompatActivity {
     }
 
     /**
-     * Perform health data update.
+     * Performs validation and sends a request to update the user's health data.
      *
-     * @param textViewBirthdate the text view birthdate
-     * @param editTextWeight    the edit text weight
-     * @param spinnerGender     the spinner gender
-     * @param dialog            the dialog
+     * @param textViewBirthdate The TextView containing the user's birthdate.
+     * @param editTextWeight The EditText containing the user's weight.
+     * @param spinnerGender The Spinner containing the user's gender.
+     * @param dialog The dialog that contains these views.
      */
     private void performHealthDataUpdate(TextView textViewBirthdate, EditText editTextWeight, Spinner spinnerGender, AlertDialog dialog) {
         try {
@@ -399,9 +403,9 @@ public class EditProfilActivity extends AppCompatActivity {
 
 
     /**
-     * Send update request.
+     * Sends a request to update the user's profile data based on the specified update request.
      *
-     * @param updateRequest the update request
+     * @param updateRequest The request containing the updated user data.
      */
     private void sendUpdateRequest(UserUpdateRequest updateRequest) {
         ApiUtils.updateUser(this, updateRequest, response -> {
@@ -421,10 +425,10 @@ public class EditProfilActivity extends AppCompatActivity {
     }
 
     /**
-     * Send update request based on field.
+     * Sends a request to update a specific field of the user's profile.
      *
-     * @param fieldId  the field id
-     * @param newValue the new value
+     * @param fieldId The ID of the field to be updated.
+     * @param newValue The new value for the specified field.
      */
     private void sendUpdateRequestBasedOnField(int fieldId, String newValue) {
         UserUpdateRequest updateRequest = new UserUpdateRequest();
@@ -439,6 +443,12 @@ public class EditProfilActivity extends AppCompatActivity {
         sendUpdateRequest(updateRequest);
     }
 
+    /**
+     * Returns the index of the user's gender in the spinner.
+     *
+     * @param userGender The gender of the user.
+     * @return The index of the user's gender in the spinner.
+     */
     private int getGenderIndex(Gender userGender) {
         // Parcourir la liste des genres pour trouver l'index du genre de l'utilisateur
         for (int i = 0; i < spinnerGender.getCount(); i++) {

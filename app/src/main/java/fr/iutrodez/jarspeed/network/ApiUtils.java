@@ -88,6 +88,14 @@ public class ApiUtils {
         Volley.newRequestQueue(context).add(request);
     }
 
+    /**
+     * Update route.
+     *
+     * @param context       the context
+     * @param pRoute        the p route
+     * @param listener      the listener
+     * @param errorListener the error listener
+     */
     public static void updateRoute(Context context, Route pRoute, Response.Listener<String> listener, Response.ErrorListener errorListener) {
 
         StringRequest request = new StringRequest(StringRequest.Method.PUT, ApiConstants.ROUTE_BASE_URL, listener, errorListener) {
@@ -112,6 +120,14 @@ public class ApiUtils {
         Volley.newRequestQueue(context).add(request);
     }
 
+    /**
+     * Save route.
+     *
+     * @param context       the context
+     * @param pRoute        the p route
+     * @param listener      the listener
+     * @param errorListener the error listener
+     */
     public static void saveRoute(Context context, Route pRoute, Response.Listener<String> listener, Response.ErrorListener errorListener) {
 
         StringRequest request = new StringRequest(StringRequest.Method.POST, ApiConstants.ROUTE_BASE_URL, listener, errorListener) {
@@ -204,6 +220,13 @@ public class ApiUtils {
         Volley.newRequestQueue(context).add(request);
     }
 
+    /**
+     * Load user profile.
+     *
+     * @param context       the context
+     * @param listener      the listener
+     * @param errorListener the error listener
+     */
     public static void loadUserProfile(Context context, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = ApiConstants.USER_INFO_URL; // Assurez-vous que cela pointe vers votre endpoint /profile
         StringRequest request = new StringRequest(Request.Method.GET, url, listener, errorListener) {
@@ -215,6 +238,13 @@ public class ApiUtils {
         Volley.newRequestQueue(context).add(request);
     }
 
+    /**
+     * Load all routes.
+     *
+     * @param context       the context
+     * @param listener      the listener
+     * @param errorListener the error listener
+     */
     public static void loadAllRoutes(Context context, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         String url = ApiConstants.ALL_ROUTES_URL;
         StringRequest request = new StringRequest(Request.Method.GET, url, listener, errorListener) {
@@ -226,6 +256,14 @@ public class ApiUtils {
         Volley.newRequestQueue(context).add(request);
     }
 
+    /**
+     * Delete route.
+     *
+     * @param context       the context
+     * @param url           the url
+     * @param listener      the listener
+     * @param errorListener the error listener
+     */
     public static void deleteRoute(Context context, String url, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         StringRequest request = new StringRequest(Request.Method.DELETE, url, listener, errorListener) {
             @Override

@@ -3,18 +3,26 @@ package fr.iutrodez.jarspeed.utils;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Utility class for encrypting passwords.
+ */
 public class PasswordEncryptor {
 
-    // Méthode pour crypter un mot de passe avec SHA-256
+    /**
+     * Encrypts a password using the SHA-256 hashing algorithm.
+     *
+     * @param password The password to encrypt.
+     * @return The encrypted password in hexadecimal format, or null if an error occurs.
+     */
     public static String encryptPassword(String password) {
         try {
-            // Création d'un objet MessageDigest avec l'algorithme SHA-256
+            // Create a MessageDigest instance for SHA-256
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
-            // Appliquer le hachage au mot de passe
+            // Apply SHA-256 hashing to the password
             byte[] hash = digest.digest(password.getBytes());
 
-            // Convertir le tableau de bytes en format hexadécimal
+            // Convert the byte array into a hexadecimal format
             StringBuilder hexString = new StringBuilder();
             for (byte b : hash) {
                 String hex = Integer.toHexString(0xff & b);
@@ -26,7 +34,7 @@ public class PasswordEncryptor {
             return hexString.toString();
 
         } catch (NoSuchAlgorithmException e) {
-            // Gérer l'exception NoSuchAlgorithmException
+            // Handle the NoSuchAlgorithmException
             e.printStackTrace();
             return null;
         }

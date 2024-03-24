@@ -37,8 +37,11 @@
                     android:background="@drawable/edittext_background"
                     android:hint="@string/title"
                     android:inputType="text"
-                    android:padding="14dp" />
+                    android:padding="14dp"
+                    android:maxLength="40"
+                    />
 
+                <!-- Boutons Stop and save et Cancel -->
                 <EditText
                     android:id="@+id/editTextDescription"
                     android:layout_width="match_parent"
@@ -49,7 +52,6 @@
                     android:inputType="text"
                     android:padding="14dp" />
 
-                <!-- Boutons Stop and save et Cancel -->
                 <Button
                     android:id="@+id/buttonStopAndSave"
                     android:layout_width="wrap_content"

@@ -60,49 +60,48 @@ public class MainActivity extends AppCompatActivity {
         emailEditText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));
         passwordEditText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));
 
-        // Application de l'animation au logo
+        // Applying animation to the logo
         ImageView logoImageView = findViewById(R.id.logo);
         Animation logoAnimation = AnimationUtils.loadAnimation(this, R.anim.logo_animation);
         logoImageView.startAnimation(logoAnimation);
 
-        // Création d'un callback pour l'appui sur le bouton de retour
+        // Creation of a callback for pressing the back button
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
 
             }
         };
-        // Obtention du OnBackPressedDispatcher et ajout du callback
+        // Get the OnBackPressedDispatcher and add the callback
         getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     /**
-     * On register click.
+     * Handles the user's click on the register button, navigating to the RegisterActivity.
      *
-     * @param view the view
+     * @param view The view that was clicked.
      */
-// Méthode pour la gestion du clic sur le bouton d'inscription
     public void onRegisterClick(View view) {
         Intent registerIntent = new Intent(this, RegisterActivity.class);
         startActivity(registerIntent);
     }
 
     /**
-     * On login click.
+     * Handles the user's click on the login button, performing field validation and attempting
+     * to login the user with the provided credentials.
      *
-     * @param view the view
+     * @param view The view that was clicked.
      */
-// Méthode pour la gestion du clic sur le bouton de connexion
     public void onLoginClick(View view) {
         EditText emailEditText = findViewById(R.id.email);
         EditText passwordEditText = findViewById(R.id.password);
         String email = emailEditText.getText().toString();
         String password = PasswordEncryptor.encryptPassword(passwordEditText.getText().toString());
 
-        // Réinitialisez les bordures des champs à chaque tentative
+        // Reset field borders on each attempt
         ValidationUtils.resetFieldBorders(this, emailEditText, passwordEditText);
 
-        // Vérifiez si les champs sont vides
+        // Check for empty fields
         if (email.trim().isEmpty() || password.trim().isEmpty()) {
             ValidationUtils.setErrorBorder(this, emailEditText);
             ValidationUtils.setErrorBorder(this, passwordEditText);
@@ -113,10 +112,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Méthode pour envoyer une requête de connexion à l'API.
+     * Attempts to login the user with the given credentials by sending a request to the API.
      *
-     * @param email    L'email de l'utilisateur.
-     * @param password Le mot de passe de l'utilisateur.
+     * @param email    The user's email.
+     * @param password The user's password.
      */
     private void loginUser(String email, String password) {
         ApiUtils.loginUser(this, email, password, new Response.Listener<String>() {
@@ -145,6 +144,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Sets error borders on email and password fields to indicate an issue with the login attempt.
+     */
     private void setErrorFields() {
         EditText emailEditText = findViewById(R.id.email);
         EditText passwordEditText = findViewById(R.id.password);
@@ -153,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Navigue vers l'activité MapActivity.
+     * Navigates to the MapActivity screen.
      */
     private void goToMapActivity() {
         Intent mapIntent = new Intent(this, MapActivity.class);

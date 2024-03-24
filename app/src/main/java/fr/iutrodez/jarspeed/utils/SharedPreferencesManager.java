@@ -23,6 +23,9 @@ public class SharedPreferencesManager {
      */
     private static final String SHARED_PREFS_NAME = "api_shared_prefs";
 
+    /**
+     * The constant dateFormat.
+     */
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss 'GMT'Z yyyy");
 
     /**
@@ -45,6 +48,12 @@ public class SharedPreferencesManager {
         prefs.edit().putString("password", pLogin.getUser().getPassword()).apply();
     }
 
+    /**
+     * Save auth user data.
+     *
+     * @param context the context
+     * @param pUser   the p user
+     */
     public static void saveAuthUserData(Context context, User pUser) {
         SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
         prefs.edit().putString("token", pUser.getToken()).apply();

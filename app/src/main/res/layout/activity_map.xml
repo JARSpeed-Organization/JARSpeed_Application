@@ -117,19 +117,7 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
-    <!-- Container pour les parcours -->
-    <LinearLayout
-        android:id="@+id/parcoursContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:layout_centerInParent="true"
-        android:elevation="4dp">
 
-        <!-- Ajoutez ici vos éléments pour les 5 derniers parcours, par exemple des CardViews ou des custom layouts -->
-
-    </LinearLayout>
 
     <!-- Bottom Navigation View -->
     <LinearLayout

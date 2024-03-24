@@ -76,7 +76,9 @@
                         android:padding="10dp"
                         android:gravity="center_vertical"
                         android:textColor="@color/black"
-                        android:textSize="16dp"/>
+                        android:textSize="16dp"
+                        android:drawableEnd="@drawable/ic_distance_synthese" />
+
 
 
                     <TextView
@@ -94,27 +96,31 @@
                         android:padding="10dp"
                         android:gravity="center_vertical"
                         android:textColor="@color/black"
-                        android:textSize="16dp"/>
+                        android:textSize="16dp"
+                        android:drawableEnd="@drawable/ic_speed_average" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+
+                    <!-- Date de début -->
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/duree"
-                        android:layout_marginLeft="5dp"
-                        />
-                    <TextView
-                        android:id="@+id/textViewTime"
+                        android:layout_weight="0.60"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:layout_marginRight="5dp">
+
+
+                <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:background="@drawable/edittext_background"
-                        android:padding="10dp"
-                        android:gravity="center_vertical"
-                        android:textColor="@color/black"
-                        android:textSize="16dp"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/debut"
                         android:layout_marginLeft="5dp"
@@ -128,17 +134,28 @@
                         android:padding="10dp"
                         android:gravity="center_vertical"
                         android:textColor="@color/black"
-                        android:textSize="16dp"/>
+                        android:textSize="16dp"
+                        android:drawableEnd="@drawable/ic_calendar_synthese" />
 
+
+                </LinearLayout>
+
+                    <!-- Date de fin -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.40"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/fin"
+                        android:text="@string/duree"
                         android:layout_marginLeft="5dp"
                         />
                     <TextView
-                        android:id="@+id/textViewEndDate"
+                        android:id="@+id/textViewTime"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="10dp"
@@ -146,9 +163,26 @@
                         android:padding="10dp"
                         android:gravity="center_vertical"
                         android:textColor="@color/black"
-                        android:textSize="16dp"/>
+                        android:textSize="16dp"
+                        android:drawableEnd="@drawable/ic_timer" />
+                </LinearLayout>
+                </LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
 
+                <!-- Date de début -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:layout_marginRight="5dp">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -164,8 +198,16 @@
                         android:padding="10dp"
                         android:gravity="center_vertical"
                         android:textColor="@color/black"
-                        android:textSize="16dp"/>
+                        android:textSize="16dp"
+                        android:drawableEnd="@drawable/ic_deniv_pos" />
+                </LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -181,8 +223,10 @@
                         android:padding="10dp"
                         android:gravity="center_vertical"
                         android:textColor="@color/black"
-                        android:textSize="16dp"/>
-
+                        android:textSize="16dp"
+                        android:drawableEnd="@drawable/ic_deniv_neg" />
+                </LinearLayout>
+                </LinearLayout>
                     <org.osmdroid.views.MapView
                         android:id="@+id/mapViewMini"
                         android:layout_width="match_parent"

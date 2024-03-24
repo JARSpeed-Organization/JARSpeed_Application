@@ -29,11 +29,11 @@
     <string name="ok">OK</string>
     <string name="cancel">Annuler</string>
     <string name="confirm">Confirmer</string>
-    <string name="debut">Début</string>
+    <string name="debut">Date de Début</string>
     <string name="distance">Distance</string>
     <string name="allure">Vitesse moyenne</string>
     <string name="duree">Duree</string>
-    <string name="fin">Fin</string>
+    <string name="fin">Date de Fin</string>
     <string name="poi">Points d\'intérêts</string>
     <string name="date_debut">Date de début</string>
     <string name="date_fin">Date de fin</string>

@@ -269,9 +269,8 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         // Configuration initiale des champs
         editTextTitle.setText(route.getTitle() != null && !route.getTitle().isEmpty() ? route.getTitle() : "");
         editTextDescription.setText(route.getDescription() != null && !route.getDescription().isEmpty() ? route.getDescription() : "");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE dd MMMM yyyy à HH:mm", Locale.FRANCE);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy à HH:mm", Locale.FRANCE);
         textViewStartDate.setText(route.getStartDate() != null ? LocalDateTime.parse(route.getStartDate()).format(formatter) : "Non spécifiée");
-        textViewEndDate.setText(route.getEndDate() != null ? LocalDateTime.parse(route.getEndDate()).format(formatter) : "Non spécifiée");
         textViewElevationGain.setText(route.getElevationGain() != null ? String.format ("%.2f", route.getElevationGain()) + " m" : "Non spécifiée");
         textViewElevationLoss.setText(route.getElevationLoss() != null ? String.format ("%.2f", route.getElevationLoss()) + " m" : "Non spécifiée");
         textViewDistance.setText(route.getDistance());

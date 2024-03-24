@@ -14,8 +14,17 @@ import java.util.List;
 import fr.iutrodez.jarspeed.model.route.CustomLineString;
 import fr.iutrodez.jarspeed.model.route.CustomPoint;
 
+/**
+ * The type Route utils.
+ */
 public class RouteUtils {
 
+    /**
+     * Polyline to line string custom line string.
+     *
+     * @param pPolyline the p polyline
+     * @return the custom line string
+     */
     public static CustomLineString polylineToLineString(Polyline pPolyline) {
         CustomLineString lineString = new CustomLineString();
 
@@ -26,6 +35,13 @@ public class RouteUtils {
         return lineString;
     }
 
+    /**
+     * Generate title string.
+     *
+     * @param pTitle the p title
+     * @param pDate  the p date
+     * @return the string
+     */
     public static String generateTitle(String pTitle, LocalDateTime pDate) {
         if (pTitle != null && !pTitle.trim().equals("")) {
             return pTitle;

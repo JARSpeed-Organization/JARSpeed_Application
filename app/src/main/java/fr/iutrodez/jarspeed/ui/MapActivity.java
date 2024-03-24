@@ -455,8 +455,9 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             elevationGain = 0;
             elevationLoss = 0;
             setupLocation();
-            line = new Polyline();
+            line = new Polyline(); // Créez une nouvelle polyline
             line.setColor(Color.RED);
+
             listPointOfInterests = new ArrayList<Route.PointOfInterest>();
             line.setPoints(geoPoints); // Ajoutez les points à la polyline
             mapView.getOverlays().add(line); // Ajoutez la polyline à la carte
@@ -517,6 +518,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                             timeForOneKilometer.getText().toString(),
                             textViewTimer.getText().toString(),
                             kilometers.getText().toString());
+
 
             ApiUtils.saveRoute(this, route, new Response.Listener<String>() {
                 @Override

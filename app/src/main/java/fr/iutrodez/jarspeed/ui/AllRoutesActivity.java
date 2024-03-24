@@ -89,6 +89,11 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
      */
     private List<Route> routeList;
 
+    /**
+     * On create.
+     *
+     * @param savedInstanceState the saved instance state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,7 +108,7 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         loadAllRoutes();
 
         // Ecouteur de texte modifié à l'EditText pour déclencher le filtrage
-        EditText filterTitle = findViewById(R.id.filterTitle); // Ajoutez cette ligne pour récupérer l'EditText de filtrage
+        EditText filterTitle = findViewById(R.id.filterTitle); // Pour récupérer l'EditText de filtrage
         filterTitle.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -132,8 +137,10 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
+
     /**
-     * Darken background.
+     * Darkens the background of the activity. This is typically used to visually emphasize a dialog or a popup
+     * by reducing the brightness of the rest of the UI.
      */
     private void darkenBackground() {
         final WindowManager.LayoutParams params = getWindow().getAttributes();
@@ -141,10 +148,12 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         getWindow().setAttributes(params);
     }
 
+
     /**
-     * Restore background on dismiss.
+     * Restores the background brightness when a dialog is dismissed. It is typically used in conjunction with
+     * {@link #darkenBackground()} to reset the UI appearance after a dialog is closed.
      *
-     * @param dialog the dialog
+     * @param dialog The dialog whose dismissal will trigger the restoration of the background brightness.
      */
     private void restoreBackgroundOnDismiss(AlertDialog dialog) {
         dialog.setOnDismissListener(d -> {
@@ -154,11 +163,14 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         });
     }
 
+
     /**
-     * Create edit route dialog alert dialog.
+     * Creates and configures an AlertDialog for editing a route's details. This dialog includes functionality
+     * to edit the route's title, description, and other properties, with changes being savable.
+     * Additionally, this method configures the dialog to darken the background and to restore it upon dismissal.
      *
-     * @param route the route
-     * @return the alert dialog
+     * @param route The route object to be edited.
+     * @return An AlertDialog instance ready to be shown.
      */
     private AlertDialog createEditRouteDialog(Route route) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -177,6 +189,7 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         setupMinimap(dialogView, route); // Configurez la minimap ici
         return dialog;
     }
+
 
     /**
      * Sets minimap.
@@ -318,6 +331,11 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
         });
     }
 
+    /**
+     * Show edit route popup.
+     *
+     * @param route the route
+     */
     @Override
     public void showEditRoutePopup(Route route) {
         // Assombrir l'arrière-plan
@@ -379,6 +397,11 @@ public class AllRoutesActivity extends AppCompatActivity implements RouteAdapter
     }
 
 
+    /**
+     * On delete route clicked.
+     *
+     * @param route the route
+     */
     public void onDeleteRouteClicked(Route route) {
         View dialogView = getLayoutInflater().inflate(R.layout.confirmation_popup, null);
 

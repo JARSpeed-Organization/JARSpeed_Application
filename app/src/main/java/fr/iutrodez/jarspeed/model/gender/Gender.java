@@ -30,12 +30,12 @@ public class Gender {
         this.label = label;
     }
 
+    // Getters et setters
     /**
      * Gets id.
      *
      * @return the id
      */
-// Getters et setters
     public Integer getId() {
         return id;
     }

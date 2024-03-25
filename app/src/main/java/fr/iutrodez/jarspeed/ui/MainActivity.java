@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -93,6 +95,12 @@ public class MainActivity extends AppCompatActivity {
      * @param view The view that was clicked.
      */
     public void onLoginClick(View view) {
+
+        if (!isNetworkConnected()) {
+            // Afficher un message d'erreur si pas de connexion internet
+            Toasty.error(this, "Aucune connexion Internet. Veuillez vous connecter et réessayer.", Toast.LENGTH_LONG, true).show();
+            return; // Arrête l'exécution de la méthode ici
+        }
         EditText emailEditText = findViewById(R.id.email);
         EditText passwordEditText = findViewById(R.id.password);
         String email = emailEditText.getText().toString();
@@ -160,5 +168,11 @@ public class MainActivity extends AppCompatActivity {
     private void goToMapActivity() {
         Intent mapIntent = new Intent(this, MapActivity.class);
         startActivity(mapIntent);
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 }

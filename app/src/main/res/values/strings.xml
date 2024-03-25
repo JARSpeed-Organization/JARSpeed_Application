@@ -74,7 +74,7 @@
 
     <string name="hintTitre">Titre du parcours</string>
     <string name="hintDescription">Description du parcours</string>
-    <string name="enregistrer">Enregister</string>
+    <string name="enregistrer">Enregistrer</string>
 
     <string name="timer_default">00 : 00 : 00</string>
     <string name="kilometers_distance">0,0 km</string>

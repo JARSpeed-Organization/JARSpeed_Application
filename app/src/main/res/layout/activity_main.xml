@@ -57,6 +57,13 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- TextInputLayout pour l'Email -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/emailInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:hintTextColor="@color/gray" >
+
             <!-- Email EditText -->
             <EditText
                 android:id="@+id/email"
@@ -71,11 +78,15 @@
                 android:inputType="textEmailAddress"
                 android:minHeight="48dp"
                 android:paddingLeft="14dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:passwordToggleEnabled="true">
+                app:passwordToggleEnabled="true"
+                app:hintTextColor="@color/gray" >
+
             <!-- Password EditText -->
             <EditText
                 android:id="@+id/password"

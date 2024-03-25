@@ -56,11 +56,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-        EditText emailEditText = findViewById(R.id.email);
-        EditText passwordEditText = findViewById(R.id.password);
-
-        emailEditText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));
-        passwordEditText.setHintTextColor(ContextCompat.getColor(this, R.color.gray));
 
         // Applying animation to the logo
         ImageView logoImageView = findViewById(R.id.logo);
@@ -168,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
     private void goToMapActivity() {
         Intent mapIntent = new Intent(this, MapActivity.class);
         startActivity(mapIntent);
+        Toasty.success(MainActivity.this, "Connexion réussie", Toast.LENGTH_SHORT, true).show();
     }
 
     private boolean isNetworkConnected() {

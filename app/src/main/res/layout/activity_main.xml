@@ -72,6 +72,10 @@
                 android:minHeight="48dp"
                 android:paddingLeft="14dp" />
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:passwordToggleEnabled="true">
             <!-- Password EditText -->
             <EditText
                 android:id="@+id/password"
@@ -86,6 +90,8 @@
                 android:inputType="textPassword"
                 android:minHeight="48dp"
                 android:paddingLeft="14dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
         </LinearLayout>
 
         <!-- RelativeLayout for Button and TextView -->
